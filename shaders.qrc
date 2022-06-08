@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>shader/onecolor.fsh</file>
+        <file>shader/onecolor.vsh</file>
+        <file>shader/select.fsh</file>
+        <file>shader/select.vsh</file>
+        <file>shader/traj.vsh</file>
+        <file>shader/traj.fsh</file>
+    </qresource>
+</RCC>
