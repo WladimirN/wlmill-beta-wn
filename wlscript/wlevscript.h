@@ -122,20 +122,21 @@ Q_INVOKABLE bool runScript(QString _script,bool _detectError=true);
     bool isEnable() {return m_enable;}
     bool isReady() {return ready;}
 
+ QString getBeforeInitScript() {return m_beforeInitScript;}
+    void addBeforeInitScript(QString script) {m_beforeInitScript+=script;}
     void setBeforeInitScript(QString script) {m_beforeInitScript=script;}
     void setAfterInitScript(QString script)  {m_afterInitScript=script;}
+
 private:
     QList <WLObjectScript> m_objList;
     QList <WLValueScript>  m_valList;
 
 public slots:
-
     void reset();
     void includeFile(QString nameFile);
     void setEnable(bool enable=true);
 
 public:
-
 Q_INVOKABLE int setTimeout(QString func,long ms);
 Q_INVOKABLE int setInterval(QString func,long ms);
 

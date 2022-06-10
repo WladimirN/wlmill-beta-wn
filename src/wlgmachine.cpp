@@ -584,9 +584,6 @@ void WLGMachine::initMScript()
 {
 qDebug()<<"WLGMachine::initMScript()";
 
-m_MScript->setBeforeInitScript("TOOLBAR1.removeButtons();\
-                                TOOLBAR2.removeButtons()");
-
 m_MScript->addObject(this,"MACHINE");
 m_MScript->addObject(getGCode(),"GCODE");
 
