@@ -2570,6 +2570,8 @@ if(isEnable())
 if(MillTraj.isEmpty())
    {
    m_GCode.data()->lastGPoint=getCurrentPositionActivSC();
+   m_GCode.data()->lastGPoint.z-=m_HeightMap.getValue(m_GCode.data()->lastGPoint.x
+                                                     ,m_GCode.data()->lastGPoint.y);
    lastMillGPoint=getAxisPosition();
 
    qDebug()<<"WLGMachine::runGProgram updateLastGPoint"<<m_GCode.data()->lastGPoint.toString(0);
@@ -2778,6 +2780,8 @@ if(MillTraj.isEmpty()
 &&!ModulePlanner->isMoving())
     {    
     m_GCode.data()->lastGPoint=m_GCode.getPointActivSC(getCurrentPosition(),true);
+    m_GCode.data()->lastGPoint.z-=m_HeightMap.getValue(m_GCode.data()->lastGPoint.x
+                                                      ,m_GCode.data()->lastGPoint.y);
     lastMillGPoint=getAxisPosition();
 
     qDebug()<<"WLGMachine::runGCode updateLastGPoint"<<m_GCode.data()->lastGPoint.toString(0);
@@ -2974,194 +2978,6 @@ for(int i=0;i<Traj.size();i++)
 return true;
 }
 
-void WLGMachine::addHeightMap(QList<WLElementTraj> &Traj)
-{
-QList<WLElementTraj> newTraj;
-
-if(!m_HeightMap.isValid()
- ||!m_HeightMap.isEnable()) return;
-
-while(!Traj.isEmpty())
-{
-WLElementTraj ET=Traj.takeFirst();
-
-if(ET.updateHMap){
-
-ET.updateHMap=false;
-
-switch(ET.type)
-{
-case WLElementTraj::line: {
-                          double interpolationStepX = m_HeightMap.getInterpStepX();
-                          double interpolationStepY = m_HeightMap.getInterpStepY();
-
-                          QVector3D stXY(ET.data.line.startPoint.x
-                                        ,ET.data.line.startPoint.y
-                                        ,ET.data.line.startPoint.z);
-
-                          QVector3D enXY(ET.data.line.endPoint.x
-                                        ,ET.data.line.endPoint.y
-                                        ,ET.data.line.endPoint.z);
-
-                          QVector3D vec=enXY-stXY;
-                          double length;
-
-                          if(qIsNaN(vec.length()))
-                             {
-                             ET.data.line.startPoint.z+=m_HeightMap.getValue(ET.data.line.startPoint.x
-                                                                            ,ET.data.line.startPoint.y);
-
-                             ET.data.line.endPoint.z+=m_HeightMap.getValue(ET.data.line.endPoint.x
-                                                                           ,ET.data.line.endPoint.y);
-                             newTraj+=ET;
-                             break;
-                             }
-                             else {
-                             if (fabs(vec.x()) / fabs(vec.y()) < interpolationStepX / interpolationStepY)
-                                 length = interpolationStepY / (vec.y() / vec.length());
-                             else
-                                 length = interpolationStepX / (vec.x() / vec.length());
-
-                             length = fabs(length);
-
-                             QVector3D seg = vec.normalized() * length;
-                             int count = trunc(vec.length() / length);
-                             seg = vec / count;
-
-                             if (count == 0)
-                                {
-                                ET.data.line.startPoint.z+=m_HeightMap.getValue(ET.data.line.startPoint.x
-                                                                               ,ET.data.line.startPoint.y);
-
-                                ET.data.line.endPoint.z+=m_HeightMap.getValue(ET.data.line.endPoint.x
-                                                                              ,ET.data.line.endPoint.y);
-                                newTraj+=ET;
-                                break;
-                                }
-
-                             for (int i = 0; i < count; i++) {
-
-                                 WLElementTraj segLine=ET;
-
-                                 segLine.data.line.startPoint.x+=seg.x()*i;
-                                 segLine.data.line.startPoint.y+=seg.y()*i;
-                                 segLine.data.line.startPoint.z+=seg.z()*i;
-
-                                 segLine.data.line.endPoint=segLine.data.line.startPoint;
-
-                                 segLine.data.line.startPoint.z+=m_HeightMap.getValue(segLine.data.line.startPoint.x
-                                                                                     ,segLine.data.line.startPoint.y);
-
-                                 if(i==count-1)
-                                 {
-                                 segLine.data.line.endPoint.x=ET.data.line.endPoint.x;
-                                 segLine.data.line.endPoint.y=ET.data.line.endPoint.y;
-                                 segLine.data.line.endPoint.z=ET.data.line.endPoint.z;
-                                 }
-                                 else{
-                                 segLine.data.line.endPoint.x+=seg.x();
-                                 segLine.data.line.endPoint.y+=seg.y();
-                                 segLine.data.line.endPoint.z+=seg.z();
-                                 }
-
-                                 segLine.data.line.endPoint.z+=m_HeightMap.getValue(segLine.data.line.endPoint.x
-                                                                                   ,segLine.data.line.endPoint.y);
-
-
-                                 newTraj+=segLine;
-                                 }
-                             }
-
-                          }
-                          break;
-
-
-case WLElementTraj::arc:{
-                        double interpolationStep = qMin(m_HeightMap.getInterpStepX(),m_HeightMap.getInterpStepY());
-
-                        if(ET.data.arc.R/2.0<interpolationStep
-                         ||ET.data.arc.plane!=17)
-                          {
-                          ET.data.arc.startPoint.z+=m_HeightMap.getValue(ET.data.arc.startPoint.x
-                                                                        ,ET.data.arc.startPoint.y);
-
-                          ET.data.arc.endPoint.z+=m_HeightMap.getValue(ET.data.arc.endPoint.x
-                                                                      ,ET.data.arc.endPoint.y);
-                          newTraj+=ET;
-                          }
-                          else {
-                           WLElementTraj segArc=ET;
-
-                           double A_st=ET.data.arc.startPoint.to3D().getAxy(ET.data.arc.centerPoint.to3D());
-                           double A_en=ET.data.arc.endPoint.to3D().getAxy(ET.data.arc.centerPoint.to3D());
-
-                           if((ET.data.arc.CCW)&&(A_en<=A_st))  A_en+=2.0*M_PI;
-                           if((!ET.data.arc.CCW)&&(A_en>=A_st)) A_en-=2.0*M_PI;
-
-                           double lenght=qAbs((A_en-A_st)*ET.data.arc.R);
-
-                           int count=trunc(lenght/interpolationStep)+1;
-
-                           double dA=(A_en-A_st)/count;
-                           double A=A_st;
-
-                           for (int i = 0;i<count; i++) {
-
-                               if(i!=0){
-                               segArc.data.arc.startPoint.x=segArc.data.arc.endPoint.x;
-                               segArc.data.arc.startPoint.y=segArc.data.arc.endPoint.y;
-                               segArc.data.arc.startPoint.z=segArc.data.arc.endPoint.z;
-                               }
-                               else{
-                               segArc.data.arc.startPoint.z+=m_HeightMap.getValue(segArc.data.arc.startPoint.x
-                                                                                 ,segArc.data.arc.startPoint.y);
-                               }
-
-                               A+=dA;
-
-                               if(i==count-1)
-                                {
-                                A=A_en;
-
-                                segArc.data.arc.endPoint.x=ET.data.arc.endPoint.x;
-                                segArc.data.arc.endPoint.y=ET.data.arc.endPoint.y;
-                                }
-                                else{
-                                segArc.data.arc.endPoint.x=segArc.data.arc.centerPoint.x;
-                                segArc.data.arc.endPoint.y=segArc.data.arc.centerPoint.y;
-
-                                segArc.data.arc.endPoint.x+=segArc.data.arc.R*cos(A);
-                                segArc.data.arc.endPoint.y+=segArc.data.arc.R*sin(A);
-                                }
-
-                               segArc.data.arc.endPoint.z=ET.data.arc.endPoint.z;
-                               segArc.data.arc.endPoint.z+=m_HeightMap.getValue(segArc.data.arc.endPoint.x
-                                                                               ,segArc.data.arc.endPoint.y);
-
-                               newTraj+=segArc;
-
-                               if((ET.data.arc.CCW&&A>=A_en)
-                               ||(!ET.data.arc.CCW&&A<=A_en)) break;
-                               }
-
-                          }
-                         }
-                        break;
-case WLElementTraj::delay:
-                            ET.data.delay.point.z+=m_HeightMap.getValue(ET.data.delay.point.x
-                                                                       ,ET.data.delay.point.y);
-                            newTraj+=ET;
-                            break;
-
-default: newTraj+=ET;
-}
-}
-
-}
-
-
-Traj=newTraj;
-}
 
 #define useULine
 void WLGMachine::addSmooth(QList<WLElementTraj> &addTraj)
@@ -3734,7 +3550,7 @@ QList<WLElementTraj>  addModelTraj;
 if(!ListTraj.isEmpty())
 {
 #ifdef DEF_HMAP
-   addHeightMap(ListTraj);
+   getHeightMap()->addHeighMapPoints(ListTraj);
 #endif
 
 while(!ListTraj.isEmpty()){

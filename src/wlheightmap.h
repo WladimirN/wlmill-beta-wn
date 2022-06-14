@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QVector>
 #include <QVector2D>
+#include "wlelementtraj.h"
 #include "math.h"
 
 class Interpolation
@@ -66,6 +67,8 @@ class WLHeightMap : public QObject
 {
 Q_OBJECT
 
+    Q_PROPERTY(bool enable READ isEnable WRITE setEnable NOTIFY changedEnable)
+
 public:
   enum  typeInterpoliation {bicubic,bileniar};
 
@@ -118,7 +121,7 @@ Q_INVOKABLE void   setZShow(double Z0) {data.Zshow=Z0;m_updateShow=true;}
 Q_INVOKABLE double getZOffset()  {return data.Zoffset;}
 Q_INVOKABLE void   setZOffset(double Z) {data.Zoffset=Z;m_updateShow=true;}
 
-Q_INVOKABLE void setEnable(bool _enable) {m_enable=_enable; m_updateShow=true;}
+Q_INVOKABLE void setEnable(bool _enable) {if(m_enable!=_enable) {m_enable=_enable; m_updateShow=true; emit changedEnable(m_enable);}}
 Q_INVOKABLE bool isEnable()              {return m_enable;}
 
 Q_INVOKABLE void setP0(double _X0,double _Y0){data.X0=_X0; data.Y0=_Y0;  m_updateShow=true;}
@@ -130,138 +133,22 @@ QVector2D getP1(){return QVector2D(data.X1,data.Y1);}
 Q_INVOKABLE  int countX() {return data.map.size();}
 Q_INVOKABLE  int countY() {return data.map.isEmpty() ? 0 : data.map.first().size();}
 
-Q_INVOKABLE void create(int x,int y)
-{
-clear();
+Q_INVOKABLE void create(int x,int y);
 
-for(int i=0;i<x;i++)
-   {
-   data.map+=QVector<double>();
-   for(int j=0;j<y;j++)
-     data.map[i]+=qQNaN();
-   }
+Q_INVOKABLE bool isValid();
 
-emit changed();
-}
+Q_INVOKABLE void setValue(int ix,int iy,double value);
 
-Q_INVOKABLE bool isValid()
-{
-if(data.map.isEmpty())
-    return false;
+Q_INVOKABLE double getValueGrid(int i,int j);
 
-
-for(int i=0;i<countX();i++)
-      {
-      for(int j=0;j<countY();j++)
-         if(qIsNaN(data.map[i][j])) return false;
-      }
-
-return true;
-}
-
-Q_INVOKABLE void setValue(int ix,int iy,double value)
-{
-if(!data.map.isEmpty()
-  &&ix<countX()
-  &&iy<countY()){
- data.map[ix][iy]=value;
-
- m_updateShow=true;
-
- emit changedElement(ix,iy);
- }
-}
-
-Q_INVOKABLE double getValueGrid(int i,int j)
-{
-if(i<countX()
- &&j<countY())
-   return data.map[i][j];
-
-return 0;
-}
-
-Q_INVOKABLE double getValue(double x,double y)
-{
-if(!isValid()
- ||!isEnable())   return 0.0;
-// Setup grid
-int gridPointsX = countX();
-int gridPointsY = countY();
-
-double gridStepX = gridPointsX > 1 ? (data.X1-data.X0) / (gridPointsX - 1) : 0;
-double gridStepY = gridPointsY > 1 ? (data.Y1-data.Y0) / (gridPointsY - 1) : 0;
-
-// Get 16 points
-x -= data.X0;
-y -= data.Y0;
-
-int ix[4];
-int iy[4];
-
-ix[1] = floor(x / gridStepX);
-ix[2] =  ceil(x / gridStepX);
-
-ix[0] = ix[1]-1;
-ix[3] = ix[2]+1;
-
-iy[1] = floor(y / gridStepY);
-iy[2] =  ceil(y / gridStepY);
-
-iy[0] = iy[1]-1;
-iy[3] = iy[2]+1;
-
-for(int i=0;i<4;i++)
-    ix[i]=qBound(0,ix[i],countX()-1);
-for(int i=0;i<4;i++)
-    iy[i]=qBound(0,iy[i],countY()-1);
-
-// Interpolate
-switch(m_typeInterpoliation)
-{
-case WLHeightMap::bicubic:{
-                           double p[4][4];
-
-                           p[0][0] = data.map[ix[0]][iy[0]];
-                           p[0][1] = data.map[ix[1]][iy[0]];
-                           p[0][2] = data.map[ix[2]][iy[0]];
-                           p[0][3] = data.map[ix[3]][iy[0]];
-
-                           p[1][0] = data.map[ix[0]][iy[1]];
-                           p[1][1] = data.map[ix[1]][iy[1]];
-                           p[1][2] = data.map[ix[2]][iy[1]];
-                           p[1][3] = data.map[ix[3]][iy[1]];
-
-                           p[2][0] = data.map[ix[0]][iy[2]];
-                           p[2][1] = data.map[ix[1]][iy[2]];
-                           p[2][2] = data.map[ix[2]][iy[2]];
-                           p[2][3] = data.map[ix[3]][iy[2]];
-
-                           p[3][0] = data.map[ix[0]][iy[3]];
-                           p[3][1] = data.map[ix[1]][iy[3]];
-                           p[3][2] = data.map[ix[2]][iy[3]];
-                           p[3][3] = data.map[ix[3]][iy[3]];
-
-                           return Interpolation::bicubicInterpolate(p, x/gridStepX-ix[1], y/gridStepY-iy[1])-getZOffset();
-                          }
-
-case WLHeightMap::bileniar:
-                          {
-                          double p[2][2];
-
-                          p[0][0] = data.map[ix[1]][iy[1]];
-                          p[0][1] = data.map[ix[2]][iy[1]];
-
-                          p[1][0] = data.map[ix[1]][iy[2]];
-                          p[1][1] = data.map[ix[2]][iy[2]];
-
-                          return Interpolation::bileniarInterpolate(p, x/gridStepX-ix[1], y/gridStepY-iy[1])-getZOffset();
-                          }
-default: return 0.0;
-}
-}
+Q_INVOKABLE double getValue(double x,double y);
 
 void setTypeInterpoliation(const WLHeightMap::typeInterpoliation &typeInterpoliation);
 WLHeightMap::typeInterpoliation getTypeInterpoliation() const;
+
+void addHeighMapPoints(QList<WLElementTraj> &Traj);
+
+signals:
+  void changedEnable(bool);
 };
 #endif // WLHEIGHTMAP_H

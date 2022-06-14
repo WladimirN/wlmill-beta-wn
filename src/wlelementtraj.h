@@ -155,7 +155,7 @@ quint32  index=0;
 double F=0;
 double S=0;
 
-bool updateHMap =false;
+bool G53 =false;
 
 public:
 

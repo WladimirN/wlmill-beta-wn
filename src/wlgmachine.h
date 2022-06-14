@@ -203,7 +203,6 @@ WLGModel *getGModel() {return &m_GModel;}
     void updateGModel();
 private:
 
-void addHeightMap(QList<WLElementTraj> &Traj);
 void addBacklash(QList<WLElementTraj> &Traj);
 void addCalcGModel(QList<WLElementTraj> &addTraj);
 void addRotaryPosition(WLGPoint startPoint,QList<WLElementTraj> &addTraj);
