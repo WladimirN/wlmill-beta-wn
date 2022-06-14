@@ -2985,6 +2985,10 @@ while(!Traj.isEmpty())
 {
 WLElementTraj ET=Traj.takeFirst();
 
+if(ET.updateHMap){
+
+ET.updateHMap=false;
+
 switch(ET.type)
 {
 case WLElementTraj::line: {
@@ -3072,9 +3076,8 @@ case WLElementTraj::line: {
                           break;
 
 
-case WLElementTraj::arc:
-                        {
-                        double interpolationStep = 5;//qMin(m_HeightMap.getInterpStepX(),m_HeightMap.getInterpStepY());
+case WLElementTraj::arc:{
+                        double interpolationStep = qMin(m_HeightMap.getInterpStepX(),m_HeightMap.getInterpStepY());
 
                         if(ET.data.arc.R/2.0<interpolationStep
                          ||ET.data.arc.plane!=17)
@@ -3151,6 +3154,7 @@ case WLElementTraj::delay:
                             break;
 
 default: newTraj+=ET;
+}
 }
 
 }
