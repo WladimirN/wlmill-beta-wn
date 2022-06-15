@@ -77,11 +77,10 @@ struct WLElementDelay empty;
 struct WLElementTraj 
 {
 private:
-    bool stopMode=false;
+    bool stopMode   =false;
 
     double m_P = 0.0;
     double m_Q = 0.0;
-
 public:
     enum TypeElement {empty,line,arc,uline,delay,mcode};
 
@@ -112,7 +111,7 @@ bool isFast() {return F==-1.0;}
 void setStopMode(bool enable) {stopMode=enable;}
 
 bool isStopMode(){return stopMode;}
-bool isSmooth(){return !isStopMode();}
+bool isSmooth() {return !isStopMode();}
 
 void setSmooth(double P,double Q) {if(P>=0&&Q>=0) {m_P=P; m_Q=Q; stopMode=false;}}
 
@@ -155,6 +154,8 @@ quint32  index=0;
 
 double F=0;
 double S=0;
+
+bool G53 =false;
 
 public:
 

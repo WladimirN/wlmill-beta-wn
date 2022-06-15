@@ -376,11 +376,15 @@ GCode->verifyG43();
 
 if(GCode->isGCode(53))
 {
+ElementTraj.G53=true;
+
 GCode->resetGCode(53);
 GCode->data()->curGPoint=GCode->getPointG53(GCode->data()->lastGPoint);
 }
 else
  {
+ ElementTraj.G53=false;
+
  GCode->movPointToActivSC(iLastSC,GCode->data()->lastGPoint);
  GCode->data()->curGPoint=GCode->getPointGCode(GCode->data()->lastGPoint);
  }
@@ -736,6 +740,7 @@ loadFile(clearFile.fileName(),true);
 template<class T>
 T SQ(T a) { return a*a; }
 
+
 bool WLGProgram::convertLine(WLElementTraj ElementTraj,QList <WLElementTraj> &curListTraj,WLGCode *GCode)
 {
 bool ok;
@@ -1061,12 +1066,8 @@ if ((py == opy) && (px == opx)) {     /* no XY motion */
                           GCode->getPointActivSC(endGPoint));
 
             curListTraj+=ETraj;
-
-            //GCode->data()->endPoint.y=mid_y;//update last point
-            //GCode->data()->endPoint.x=mid_x;
-            //CHP(move_endpoint_and_flush(settings, mid_x, mid_y));
-
-        } else {
+            }
+            else {
             // arc->line
             // beware: the arc we saved is the compensated one.
             WLElementCirc prev = curListTraj.back().data.arc;
@@ -1150,12 +1151,6 @@ if ((py == opy) && (px == opx)) {     /* no XY motion */
         GCode->data()->endPoint.y=cx;
         GCode->data()->endPoint.x=cy;
     }
-//    (move == G_0? enqueue_STRAIGHT_TRAVERSE : enqueue_STRAIGHT_FEED)
-//        (settings, block->line_number,
-//         px - opx, py - opy, pz - opz,
-//         end_x, end_y, pz,
-//         AA_end, BB_end, CC_end,
-//         u_end, v_end, w_end);
 
     WLGPoint startGPoint;
     startGPoint  =GCode->data()->lastGPoint;
@@ -1177,15 +1172,6 @@ GCode->data()->curPoint.x=end_x;
 GCode->data()->curPoint.y=end_y;
 GCode->data()->curPoint.z=pz;
 
-//comp_set_current(settings, end_x, end_y, pz);
-//settings->AA_current = AA_end;
-//settings->BB_current = BB_end;
-//settings->CC_current = CC_end;
-//settings->u_current = u_end;
-//settings->v_current = v_end;
-//settings->w_current = w_end;
-//comp_set_programmed(settings, px, py, pz);
-//return INTERP_OK;
 return true;
 }
 

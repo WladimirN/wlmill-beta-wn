@@ -24,7 +24,7 @@ ques.setFont(font);
 
 ques.show();
 
-if(ques.exec())
+if(ques.exec()==QMessageBox::Yes)
     retOk=1;
 else
     retOk=0;

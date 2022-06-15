@@ -22,6 +22,7 @@ WLHeightMapWidget::WLHeightMapWidget(WLHeightMap *_heightMap,QWidget *parent) :
     connect(ui->cbType,QOverload<int>::of(&QComboBox::currentIndexChanged),this,[=](int index){m_heightMap->setTypeInterpoliation(static_cast<WLHeightMap::typeInterpoliation>(index));});
 
     connect(m_heightMap,&WLHeightMap::changed,[=](){ui->cbEnable->setEnabled(m_heightMap->isValid());});
+    connect(m_heightMap,&WLHeightMap::changedEnable,ui->cbEnable,&QCheckBox::setChecked);
 
     connect(m_heightMap,&WLHeightMap::changedElement,[=](int x,int y)
        {
