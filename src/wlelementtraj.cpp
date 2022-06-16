@@ -767,7 +767,7 @@ if(indexs.size()>=2)
 }
 else
  {
-  endspack:
+ endspack:
   //qDebug()<<"endspack:";
 
   if(!indexs.isEmpty()) //если 2 и больше
