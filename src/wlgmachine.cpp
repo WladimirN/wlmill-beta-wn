@@ -2835,7 +2835,6 @@ WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 float simpliD=(float)m_mainDim*(1<<xPD);
 
 int isimpli;
-bool detectM=false;;
 bool txtProgram=true;
 
 qDebug()<<"WLGMachine::updateMovProgram() m_iProgram"<<m_iProgram
@@ -2847,14 +2846,14 @@ if(isRunGProgram()
  {
  while(MillTraj.size()<100
      &&(!baseTraj.isEmpty()||m_iProgram<m_Program->getElementCount())
-     &&(MillTraj.isEmpty()||(!MillTraj.last().isMCode()))
-     &&!detectM)
+     &&(MillTraj.isEmpty()||(!MillTraj.last().isMCode())))
    {
 
    if(!baseTraj.isEmpty()
      &&baseTraj.first().isMCode()) //если первый элемент M то отправляем его на исполнение
      {
      addElementTraj(QList<WLElementTraj>()<<baseTraj.takeFirst());
+     continue;
      }
 
 
@@ -2889,26 +2888,20 @@ if(isRunGProgram()
     baseTraj+=curTraj;
     }  
 
-    detectM=WLElementTraj::detectMCode(baseTraj);
-
     isimpli=WLElementTraj::simpliTrajectory(simpliTraj
                                            ,baseTraj
-                                           ,simpliD
-                                           ,(m_iProgram!=(m_Program->getElementCount()))
-                                            &&!detectM);
+                                           ,simpliD);
 
    if((isimpli+1)<baseTraj.size()) //если сгладили и дошли до точки, но не до конца
     {
     addElementTraj(simpliTraj);
     baseTraj=baseTraj.mid(isimpli+1); //оставляем один элемент на будущее, может и М
     }
-    else if(m_iProgram==(m_Program->getElementCount()) //до конца
-          ||(detectM))                                 //или это был М код
+    else if(m_iProgram==(m_Program->getElementCount())) //до конца
           {
           while(!baseTraj.isEmpty())  //перемещаем всё + одна M
            {
            addElementTraj(QList<WLElementTraj>()<<baseTraj.first());
-
            if(baseTraj.takeFirst().isMCode())
                break;
            }
@@ -3449,76 +3442,79 @@ case WLElementTraj::uline:   {
                            break;
 
 case WLElementTraj::arc: {
-                          if(!getDrive("X")||!getDrive("Y"))
+                           QVector <quint8>  indexs;
+                           QVector <qint32>  ePos;
+                           QVector <qint32>  cPos;
+
+                           quint8 Ib=255;
+                           quint8 Jb=255;
+                           quint8 Kb=255;
+
+                           quint8 i=0;
+
+                           foreach(WLGDrive *mD,getGDrives()){
+                            if(!mD->getAxis()) continue;
+                            ePos+=ME.data.arc.endPoint.get(mD->getName())/mD->dimension();
+                            cPos+=ME.data.arc.centerPoint.get(mD->getName())/mD->dimension();
+                            indexs+=i;
+
+                            if(mD->getName()=="X") Ib=i;
+                            else if(mD->getName()=="Y") Jb=i;
+                            else if(mD->getName()=="Z") Kb=i;
+
+                            i++;
+                            }
+
+                           qint32 ePosIJK[3];
+                           qint32 cPosIJ[2];
+
+                           quint8 I,J,K;
+
+                           switch(ME.data.arc.plane)
+                           {
+                           case 18: I=Kb;J=Ib;K=Jb; break;
+                           case 19: I=Jb;J=Kb;K=Ib; break;
+                           default: I=Ib;J=Jb;K=Kb; break;
+                           }
+
+                           if(I==255||J==255)
                              {
-                             setMessage("Machine",tr("error set circle"),-1);
-                             break;
+                             sendMessage("WLGMachine",QString("error set arcmotion iI=%1 iJ%2").arg(I).arg(J),-1);
+                             return 0;
                              }
 
-                          QVector <quint8> indexs;
-                          QVector <qint32> ePos;
-                          QVector <qint32> cPos;
 
-                          quint8 i=0;
+                           cPosIJ[0]=cPos[I];
+                           cPosIJ[1]=cPos[J];
 
-                          foreach(WLGDrive *mD,getGDrives()){
-                           if(!mD->getAxis()) continue;
-                           ePos+=ME.data.arc.endPoint.get(mD->getName())/mD->dimension();
-                           cPos+=ME.data.arc.centerPoint.get(mD->getName())/mD->dimension();
-                           indexs+=i;
-                           i++;
-                           }
+                           ePosIJK[0]=ePos[I];
+                           ePosIJK[1]=ePos[J];
 
-                          qint32 ePosIJK[3];
-                          qint32 cPosIJ[2];
-                          
-                          quint8 Ib=0;
-                          quint8 Jb=1;
-                          quint8 Kb= getDrive("Z") ? 2 :0;
+                           ePos[0]=ePosIJK[0];
+                           ePos[1]=ePosIJK[1];
 
-                          quint8 I,J,K;
-
-                          switch(ME.data.arc.plane)
-                          {                           
-                          case 18: I=Kb;J=Ib;K=Jb; break;
-                          case 19: I=Jb;J=Kb;K=Ib; break;
-                          default: I=Ib;J=Jb;K=Kb; break;
-                          }                          
-                          
-
-                          cPosIJ[0]=cPos[I];
-                          cPosIJ[1]=cPos[J];
-
-                          ePosIJK[0]=ePos[I];
-                          ePosIJK[1]=ePos[J];
-                          ePosIJK[2]=ePos[K];
-
-                          ePos[0]=ePosIJK[0];
-                          ePos[1]=ePosIJK[1];
+                           indexs[0]=I;
+                           indexs[1]=J;
 
 
-                          indexs[0]=I;
-                          indexs[1]=J;
+                           if(K!=255){
+                            ePosIJK[2]=ePos[K];
+                            ePos[2]=ePosIJK[2];
+                            indexs[2]=K;
+                            }
 
-
-                          if(getDrive("Z"))
-                           {
-                           ePos[2]=ePosIJK[2];
-                           indexs[2]=K;
-                           }
-
-                         ok=ModulePlanner->addCirc(MASK_abs
-                                                 |(ME.data.arc.CCW  ? MASK_ccw:0)
-                                                 |(ME.isFast()      ? MASK_fline:0)
-                                                 |(getDrive("Z")    ? MASK_circxyz:0)
-                                                 |(ME.isSmooth()    ? MASK_ensmooth:0)
-                                                 ,indexs.size()
-                                                 ,indexs.data()
-                                                 ,ePos.data()
-                                                 ,cPosIJ
-                                                 ,ME.S
-                                                 ,ME.isFast() ? -1 : (ME.F/60)/m_mainDim
-                                                 ,ME.index);
+                          ok=ModulePlanner->addCirc(MASK_abs
+                                                  |(ME.data.arc.CCW  ? MASK_ccw:0)
+                                                  |(ME.isFast()      ? MASK_fline:0)
+                                                  |(K!=255           ? MASK_circxyz:0)
+                                                  |(ME.isSmooth()    ? MASK_ensmooth:0)
+                                                  ,indexs.size()
+                                                  ,indexs.data()
+                                                  ,ePos.data()
+                                                  ,cPosIJ
+                                                  ,ME.S
+                                                  ,ME.isFast() ? -1 : (ME.F/60)/m_mainDim
+                                                  ,ME.index);
                           }
 						  break;
 }
