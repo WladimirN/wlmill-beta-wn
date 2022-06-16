@@ -2838,7 +2838,6 @@ WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 float simpliD=(float)m_mainDim*(1<<xPD);
 
 int isimpli;
-bool detectM=false;;
 bool txtProgram=true;
 
 qDebug()<<"WLGMachine::updateMovProgram() m_iProgram"<<m_iProgram
@@ -2850,14 +2849,14 @@ if(isRunGProgram()
  {
  while(MillTraj.size()<100
      &&(!baseTraj.isEmpty()||m_iProgram<m_Program->getElementCount())
-     &&(MillTraj.isEmpty()||(!MillTraj.last().isMCode()))
-     &&!detectM)
+     &&(MillTraj.isEmpty()||(!MillTraj.last().isMCode())))
    {
 
    if(!baseTraj.isEmpty()
      &&baseTraj.first().isMCode()) //если первый элемент M то отправляем его на исполнение
      {
      addElementTraj(QList<WLElementTraj>()<<baseTraj.takeFirst());
+     continue;
      }
 
 
@@ -2892,26 +2891,20 @@ if(isRunGProgram()
     baseTraj+=curTraj;
     }  
 
-    detectM=WLElementTraj::detectMCode(baseTraj);
-
     isimpli=WLElementTraj::simpliTrajectory(simpliTraj
                                            ,baseTraj
-                                           ,simpliD
-                                           ,(m_iProgram!=(m_Program->getElementCount()))
-                                            &&!detectM);
+                                           ,simpliD);
 
    if((isimpli+1)<baseTraj.size()) //если сгладили и дошли до точки, но не до конца
     {
     addElementTraj(simpliTraj);
     baseTraj=baseTraj.mid(isimpli+1); //оставляем один элемент на будущее, может и М
     }
-    else if(m_iProgram==(m_Program->getElementCount()) //до конца
-          ||(detectM))                                 //или это был М код
+    else if(m_iProgram==(m_Program->getElementCount())) //до конца
           {
           while(!baseTraj.isEmpty())  //перемещаем всё + одна M
            {
            addElementTraj(QList<WLElementTraj>()<<baseTraj.first());
-
            if(baseTraj.takeFirst().isMCode())
                break;
            }
