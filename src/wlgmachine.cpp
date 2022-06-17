@@ -2828,7 +2828,6 @@ QString txt;
 QList<WLElementTraj> simpliTraj;
 QList<WLElementTraj> curTraj;
 WLElementTraj lastEG4142;
-
 WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 //WLElementTraj ETraj;
 
@@ -2848,7 +2847,6 @@ if(isRunGProgram()
      &&(!baseTraj.isEmpty()||m_iProgram<m_Program->getElementCount())
      &&(MillTraj.isEmpty()||(!MillTraj.last().isMCode())))
    {
-
    if(!baseTraj.isEmpty()
      &&baseTraj.first().isMCode()) //если первый элемент M то отправляем его на исполнение
      {
@@ -2897,7 +2895,8 @@ if(isRunGProgram()
     addElementTraj(simpliTraj);
     baseTraj=baseTraj.mid(isimpli+1); //оставляем один элемент на будущее, может и М
     }
-    else if(m_iProgram==(m_Program->getElementCount())) //до конца
+    else if(m_iProgram==(m_Program->getElementCount())
+          ||WLElementTraj::detectMCode(baseTraj)) //до конца
           {
           while(!baseTraj.isEmpty())  //перемещаем всё + одна M
            {
