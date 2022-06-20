@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include "wlmilldrive.h"
-#include "ui_wlmilldrivewidget.h"
+#include "ui_wlgdrivewidget.h"
 
 namespace Ui {
 class WLMillDriveWidget;

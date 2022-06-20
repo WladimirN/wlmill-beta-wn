@@ -1,5 +1,5 @@
 #include "wlgdrivewidget.h"
-#include "ui_wlmilldrivewidget.h"
+#include "ui_wlgdrivewidget.h"
 
 WLGDriveWidget::WLGDriveWidget(WLGDrive *_drive,QWidget *parent) :
     QDialog(parent),

@@ -75,6 +75,7 @@ HEADERS += \
     widget/wltoolswidget.h \
     widget/wlgaxislabel.h \
     widget/wleditpoint.h \
+    widget/wlgdrivewidget.h \
     src/wl3dpoint.h \
     src/wlcalc.h \
     src/wldrive.h \
@@ -102,8 +103,8 @@ HEADERS += \
     model/wlgtoolstablemodel.h \
     wlmill.h \
     wlmilldrive.h \
-    wlmillmachine.h \
-    widget/wlgdrivewidget.h
+    wlmillmachine.h
+
 
 SOURCES += \
     widget/wldevicewidget.cpp \
@@ -131,6 +132,7 @@ SOURCES += \
     widget/wleditmillwidget.cpp \
     widget/wleditpoint.cpp \
     widget/wlpositionwidget.cpp \
+    widget/wlgdrivewidget.cpp \
     src/wl3dpoint.cpp \
     src/wlcalc.cpp \
     src/wldrive.cpp \
@@ -158,8 +160,8 @@ SOURCES += \
     main.cpp \    
     wlmill.cpp \
     wlmillmachine.cpp \
-    wlgdrive.cpp \
-    widget/wlgdrivewidget.cpp
+    wlgdrive.cpp
+
 
 FORMS += \
     widget/wldevicewidget.ui \
