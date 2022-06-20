@@ -2576,8 +2576,12 @@ if(MillTraj.isEmpty())
    getGCode()->loadStr(getGCode()->getStrRunProgram());
    }
 
-bool   firstZ=false;
 double planeZ=getGCode()->getCurPoint().z;
+
+WLGPoint curGPoint=getGCode()->getPointActivSC(getGCode()->getCurPoint(),true);
+
+if(getGCode()->isGCode(90))
+    curGPoint.z-=getGCode()->getHToolOfst();
 
 if(istart>0)
  { 
@@ -2591,17 +2595,12 @@ if(istart>0)
        return 0;
        }
 
-   if(!firstZ&&getGCode()->isValidValue('Z'))
+   if(getGCode()->isValidValue('Z'))
      {
-     firstZ=true;
-     planeZ=getGCode()->getCurPoint().z;
-     }
+     curGPoint=getGCode()->getPointActivSC(getGCode()->getCurPoint(),true);
 
-   if(!curTraj.isEmpty())
-     {
-     WLElementTraj lastElement = curTraj.last();
-     curTraj.clear();
-     curTraj+=lastElement;
+     if(getGCode()->isGCode(90))
+         curGPoint.z-=getGCode()->getHToolOfst();
      }
 
    foreach(WLElementTraj et,curTraj){
@@ -2649,6 +2648,13 @@ if(istart>0)
 
        }
      }
+
+   if(!curTraj.isEmpty())  //оставляем один элемент для последующего
+     {
+     WLElementTraj lastElement = curTraj.last();
+     curTraj.clear();
+     curTraj+=lastElement;
+     }
    }
  }
 else
@@ -2694,17 +2700,16 @@ if(getCurrentPosition().z<getGCode()->getG28Position().z)
 preRunProgramList+=QString("G53 G0 X%1 Y%2").arg(endPoint.x).arg(endPoint.y);
 preRunProgramList+=QString("G53 G0 A%1 B%2 C%3").arg(endPoint.a).arg(endPoint.b).arg(endPoint.c);
 
+
 if(getGCode()->isGCode(0)||getDistG1StartAt()==0.0){
-   preRunProgramList+=QString("G53 G0 Z%1").arg(endPoint.z);
+   preRunProgramList+=QString("G0 Z%1").arg(curGPoint.z);
    }
    else{    
-   if((endPoint.z+getDistG1StartAt())<getCurrentPosition().z){
-    preRunProgramList+=QString("G53 G0 Z%1 ").arg(endPoint.z+getDistG1StartAt());
-    }
+   preRunProgramList+=QString("G0 Z%1").arg(curGPoint.z+getDistG1StartAt());
 
    double F = getFeedG1StartAt() > 0 ? getFeedG1StartAt() : getGCode()->getValue('F');
 
-   preRunProgramList+=QString("G53 G1 Z%1 F%2").arg(endPoint.z).arg(F);
+   preRunProgramList+=QString("G1 Z%1 F%2").arg(curGPoint.z).arg(F);
    }
 
 preRunProgramList+=getGCode()->getContextGCodeList();
@@ -2843,7 +2848,7 @@ qDebug()<<"WLGMachine::updateMovProgram() m_iProgram"<<m_iProgram
 if(isRunGProgram()
 &&!isRunMScript())
  {
- while(MillTraj.size()<100
+ while(MillTraj.size()<50
      &&(!baseTraj.isEmpty()||m_iProgram<m_Program->getElementCount())
      &&(MillTraj.isEmpty()||(!MillTraj.last().isMCode())))
    {
@@ -2888,7 +2893,8 @@ if(isRunGProgram()
 
     isimpli=WLElementTraj::simpliTrajectory(simpliTraj
                                            ,baseTraj
-                                           ,simpliD);
+                                           ,simpliD
+                                           ,true);
 
    if((isimpli+1)<baseTraj.size()) //если сгладили и дошли до точки, но не до конца
     {

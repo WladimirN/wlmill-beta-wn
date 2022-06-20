@@ -12,7 +12,6 @@ setGCode(98);
 setGCode(90);
 setGCode(80);
 setGCode(17);
-setGCode(02);
 setGCode(01);
 setGCode(54);
 setGCode(61);
@@ -489,20 +488,28 @@ switch(code)
    ///**01
    case 0: m_data.GCode[0]=1; //"Position Fast";
            m_data.GCode[1]=0;
-		   return setGCode(80);
-           break;
-   case 1: m_data.GCode[1]=1;//"Line Interpol";
-           m_data.GCode[0]=0;
-		   return setGCode(80);
-           break;
-   case 2: m_data.GCode[2]=1;//"CW";
-           m_data.GCode[3]=0;
-           m_data.GCode[0]=0;
-		   break;
-   case 3: m_data.GCode[3]=1;//"CCW";
            m_data.GCode[2]=0;
-           m_data.GCode[0]=0;
+           m_data.GCode[3]=0;
+           return setGCode(80);
+
+   case 1: m_data.GCode[0]=0;//"Line Interpol";
+           m_data.GCode[1]=1;
+           m_data.GCode[2]=0;
+           m_data.GCode[3]=0;
+		   return setGCode(80);           
+
+   case 2: m_data.GCode[0]=0;//"CW";
+           m_data.GCode[1]=0;
+           m_data.GCode[2]=1;
+           m_data.GCode[3]=0;
 		   break;
+
+   case 3: m_data.GCode[0]=0;//"CCW";
+           m_data.GCode[1]=0;
+           m_data.GCode[2]=0;
+           m_data.GCode[3]=1;
+		   break;
+
   case 102:
   case 103:m_data.GCode[2]=0;
            m_data.GCode[3]=0;
@@ -756,7 +763,7 @@ return true;
 
 bool WLGCode::isValidGCode(QString Gx)
 {
-    return GValidList.contains(Gx);
+return GValidList.contains(Gx);
 }
 
 WLGPoint WLGCode::getCurPoint()

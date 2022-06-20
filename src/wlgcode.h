@@ -572,7 +572,8 @@ public:
     Q_INVOKABLE void setHTool(int i,float h);
     Q_INVOKABLE void setDTool(int i,float d);
 
-    Q_INVOKABLE  int getT() {return getValue('T');}
+    Q_INVOKABLE   int getT() {return getValue('T');}
+    Q_INVOKABLE  bool setT(int T) {return setValue('T',T);}
     Q_INVOKABLE double getValue(QString name);
 
     Q_INVOKABLE double getGSC(){return m_data.iSC+53;}
