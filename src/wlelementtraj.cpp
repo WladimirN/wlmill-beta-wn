@@ -767,7 +767,9 @@ if(indexs.size()>=2)
 }
 else
  {
-  endspack:
+ oneSimpli=true;// no line
+
+ endspack:
   //qDebug()<<"endspack:";
 
   if(!indexs.isEmpty()) //если 2 и больше
