@@ -37,6 +37,7 @@ if(_startPoint!=_midPoint
  &&_endPoint!=_midPoint
  &&(qAbs(qAbs((_startPoint.to3D()-_midPoint.to3D()).r())
         -qAbs((_endPoint.to3D()  -_midPoint.to3D()).r()))<=ULINE_MAXERRORPOINTR)){
+ //qDebug()<<"WLElementTraj::setULine"<<str;
  type=uline;
  data.uline.startPoint=_startPoint;
  data.uline.midPoint=_midPoint;
@@ -55,6 +56,7 @@ if(_startPoint!=_midPoint
 bool WLElementTraj::setDelay(WLGPoint _Point,quint32 ms)
 {
 if(ms!=0){
+    qDebug()<<"WLElementTraj::setDelay"<<str;
     type=WLElementTraj::delay;
     data.delay.time=ms;
     data.delay.point=_Point;
@@ -68,14 +70,15 @@ if(ms!=0){
 return false;
 }
 
-bool WLElementTraj::setMCode(WLGPoint _Point, int _MCode)
+bool WLElementTraj::setScript(WLGPoint _Point, QString txt,bool singleRun)
 {
-qDebug()<<"WLElementTraj::setMCode"<<_MCode;
+qDebug()<<"WLElementTraj::setScript"<<txt;
 
-if(_MCode>0){  
- type=WLElementTraj::mcode;
- data.mcode.MCode=_MCode;
- data.mcode.point=_Point;
+if(!txt.isEmpty()){
+ type=WLElementTraj::script;
+ escript.script=txt;
+ escript.point=_Point;
+ escript.singleRun=singleRun;
  return true;
  }
  else {
@@ -91,7 +94,7 @@ QList <WL6DPoint> WLElementTraj::calcMCodePoints(bool *ok,WLGModel *GModel)
 {
 QList <WL6DPoint> Points;
 
-Points+=GModel->getFrame(data.mcode.point).to6D();
+Points+=GModel->getFrame(escript.point).to6D();
 
 if(ok)
     *ok=true;
@@ -109,7 +112,7 @@ QList<WL6DPoint> List;
     case line:  List=calcLinePoints(ok,GModel,delta);  break;
     case arc:   List=calcArcPoints(ok,GModel,delta);break;
     case uline: List=calcULinePoints(ok,GModel,delta); break;
-    case mcode: List=calcMCodePoints(ok,GModel);  break;
+    case script: List=calcMCodePoints(ok,GModel);  break;
     default: break;
     }
 
@@ -123,9 +126,10 @@ WLGPoint WLElementTraj::getStartPoint()
  case line:  return data.line.startPoint;
  case arc:   return data.arc.startPoint;
  case uline: return data.uline.startPoint;
- case mcode: return data.mcode.point;
  case delay: return data.delay.point;
  case empty: return data.empty.point;
+
+ case script:return escript.point;
  }
 }
 
@@ -136,9 +140,10 @@ WLGPoint WLElementTraj::getEndPoint()
  case line:  return data.line.endPoint;
  case arc:   return data.arc.endPoint;
  case uline: return data.uline.endPoint;
- case mcode: return data.mcode.point;
  case delay: return data.delay.point;
  case empty: return data.empty.point;
+
+ case script: return escript.point;
  }
 }
 
@@ -149,9 +154,10 @@ void WLElementTraj::setStartPoint(WLGPoint point)
  case line:   data.line.startPoint=point; break;
  case arc:     data.arc.startPoint=point; break;
  case uline: data.uline.startPoint=point; break;
- case mcode:      data.mcode.point=point; break;
  case delay:      data.delay.point=point; break;
  case empty:      data.empty.point=point; break;
+
+ case script:        escript.point=point; break;
  }
 }
 
@@ -162,9 +168,10 @@ void WLElementTraj::setEndPoint(WLGPoint point)
  case line:   data.line.endPoint=point; break;
  case arc:     data.arc.endPoint=point; break;
  case uline: data.uline.endPoint=point; break;
- case mcode:    data.mcode.point=point; break;
  case delay:    data.delay.point=point; break;
  case empty:    data.empty.point=point; break;
+
+ case script:      escript.point=point; break;
  }
 }
 
@@ -175,6 +182,7 @@ data.line.startPoint=_startPoint;
 data.line.endPoint  =_endPoint;
 
 if(_startPoint!=_endPoint){
+   //qDebug()<<"WLElementTraj::setLine"<<str<<index;
     type=WLElementTraj::line;
     }
     else{
@@ -459,6 +467,7 @@ if(R1>(R2*1.02)||R1<(R2*0.92))
       return false;
       }
       else {
+      //qDebug()<<"WLElementTraj::setArc"<<str;
       type=arc;
       data.arc.R=(R1+R2)/2.0;
       data.arc.startPoint=_startPoint;
@@ -677,10 +686,10 @@ for(int i=0;i<Traj.size();i++)
     if(Traj[i].isEmpty()) Traj.removeAt(i--);
 }
 
-bool WLElementTraj::detectMCode(QList<WLElementTraj> &Traj)
+bool WLElementTraj::detectScript(QList<WLElementTraj> &Traj)
 {
 for(int i=0;i<Traj.size();i++)
-    if(Traj[i].isMCode()){
+    if(Traj[i].isScript()){
      return true;
      }
 
@@ -717,7 +726,7 @@ indexs+=i;
 
 //qDebug()<<"baseTraj[i].getG64Q()="<<baseTraj[i].getG64Q();
 
-if(baseTraj[i].isLine()) //если нет M комманд
+if(baseTraj[i].isLine()) //если линия
 {
 if(indexs.size()==1)
   {
@@ -767,7 +776,7 @@ if(indexs.size()>=2)
 }
 else
  {
- endspack:
+  endspack:
   //qDebug()<<"endspack:";
 
   if(!indexs.isEmpty()) //если 2 и больше

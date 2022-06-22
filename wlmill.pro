@@ -102,8 +102,8 @@ HEADERS += \
     model/wlheightmaptablemodel.h \
     model/wlgtoolstablemodel.h \
     wlmill.h \
-    wlmilldrive.h \
-    wlmillmachine.h
+    wlgdrive.h \
+    wlmillmachine.h \
 
 
 SOURCES += \

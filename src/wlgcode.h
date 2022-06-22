@@ -344,9 +344,10 @@ struct WLGCodeData
  WL3DPoint curPoint;//G41/42
  WL3DPoint endPoint;//G41/42
 
- int iCurTool=0;
-
+ int iToolOfst=0;
  int iSC=0;
+
+ bool Xdiam=false;//turnmode
 
   double drillPlane=0;
  quint32 drillPms=0;
@@ -469,6 +470,7 @@ public:
    WLGPoint getPointActivSC(WLGPoint GPoint,bool back=false);
 
    WLGPoint movPointToActivSC(int iLastSC,WLGPoint &lastGPoint);
+   WLGPoint movPointToActivToolOfst(int iLastTOfst,WLGPoint &lastGPoint);
 
    static WLGPoint convertPlane(WLGPoint Point,int plane,bool front);
 
@@ -525,6 +527,9 @@ public:
     double getDToolOfst();
     double getCompToolRadius() {return qAbs(getDToolOfst()/2.0);}
 
+    int getToolOfst() {return data()->iToolOfst;}
+    WLGPoint getGToolOfst(int ikey=-1);
+
     void verifyG51();
     void verifyG43();
 
@@ -545,13 +550,15 @@ public:
 
     int getCompSide();
 
-    void setTool(int ikey,WLGTool Tool) {m_data.Tools.setTool(ikey,Tool); emit changedTool(ikey);}
+    void setTool(int ikey,WLGTool Tool);
 
     WLGTool const getTool(int ikey);
 
     QVariant getDataTool(int ikey,QString key,QVariant defvalue);
 
-    WLGTools *getTools() {return &m_data.Tools;}
+    WLGTools *getTools() {return &m_data.Tools;}    
+
+
 private:
     void resetValid();
 
@@ -562,18 +569,25 @@ public:
     static bool detectMCode(QString gstr);
 public:
 
-    Q_INVOKABLE    void removeTool(int ikey);
-    Q_INVOKABLE    void setDataTool(int ikey,QString key,QVariant value,bool send=true);
+    Q_INVOKABLE void setXDiam(bool en=true) {data()->Xdiam=en;}
+    Q_INVOKABLE bool isXDiam() {return data()->Xdiam;}
+
+    Q_INVOKABLE void removeTool(int ikey);
+    Q_INVOKABLE void setDataTool(int ikey,QString key,QVariant value,bool send=true);
+    Q_INVOKABLE void setDataCurTool(QString key,QVariant value,bool send=true){setDataTool(getT(),key,value,send);}
+
     Q_INVOKABLE double  getDataToolNum(int ikey,QString key,double  defvalue) {return getDataTool(ikey,key,defvalue).toDouble();}
     Q_INVOKABLE QString getDataToolStr(int ikey,QString key,QString defvalue) {return getDataTool(ikey,key,defvalue).toString();}
+
+    Q_INVOKABLE double  getDataCurToolNum(QString key,double  defvalue) {return getDataTool(getT(),key,defvalue).toDouble();}
+    Q_INVOKABLE QString getDataCurToolStr(QString key,QString defvalue) {return getDataTool(getT(),key,defvalue).toString();}
 
     Q_INVOKABLE  int setMCode(int);
 
     Q_INVOKABLE void setHTool(int i,float h);
     Q_INVOKABLE void setDTool(int i,float d);
 
-    Q_INVOKABLE   int getT() {return getValue('T');}
-    Q_INVOKABLE  bool setT(int T) {return setValue('T',T);}
+    Q_INVOKABLE  int getT() {return getValue('T');}
     Q_INVOKABLE double getValue(QString name);
 
     Q_INVOKABLE double getGSC(){return m_data.iSC+53;}
