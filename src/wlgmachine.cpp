@@ -2579,7 +2579,8 @@ if(MillTraj.isEmpty())
    getGCode()->loadStr(getGCode()->getStrRunProgram());
    }
 
-double planeZ=getGCode()->getCurPoint().z;
+double firstPlaneZ=getGCode()->getCurPoint().z;
+bool   detFirstPlane=true;
 
 WLGPoint curGPoint=getGCode()->getPointActivSC(getGCode()->getCurPoint(),true);
 
@@ -2604,6 +2605,11 @@ if(istart>0)
 
      if(getGCode()->isGCode(90))
          curGPoint.z-=getGCode()->getHToolOfst();
+
+     if(detFirstPlane){
+       detFirstPlane=false;
+       firstPlaneZ=getGCode()->getCurPoint().z;
+       }
      }
 
    foreach(WLElementTraj et,curTraj){
