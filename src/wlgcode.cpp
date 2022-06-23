@@ -17,7 +17,6 @@ setGCode(54);
 setGCode(61);
 
 setMCode(5);
-//setMCode(9);
 
 push();
 }
@@ -117,11 +116,31 @@ switch(a)
  case 'D':
 
  case 'F':
- case 'S':
- case 'T': str>>d1;
-           setValue(a,d1);
-           break;
+ case 'S':str>>d1;
+          setValue(a,d1);
+          break;
 
+#ifdef GCODE_TURN
+case 'T': str>>buf;
+          if(buf.length()<=2) {
+          setValue(a,buf.toInt());
+          }
+          else if(buf.length()==3){
+          setValue(a,buf.mid(0,1).toInt());
+          data()->iToolOfst=buf.mid(1).toInt();
+          }
+          else if(buf.length()==4){
+          setValue(a,buf.mid(0,2).toInt());
+          data()->iToolOfst=buf.mid(2).toInt();
+          }
+          break;
+#endif
+
+#ifdef GCODE_MILL
+case 'T': str>>buf;
+          setValue(a,buf.toInt());
+          break;
+#endif
  //case 'N':  str>>kadr; //qDebug()<<"N="<<kadr<<a<<f1;
 //	        break;
  case 'M': str>>(i1);
@@ -247,22 +266,23 @@ return retList;
 
 void WLGCode::setDataTool(int ikey,QString key,QVariant value,bool send)
 {
-WLGTool Tool=getTool(ikey);
+if(ikey>0) {
+   WLGTool Tool=getTool(ikey);
 
-bool add=Tool.isEmpty();
+  bool add=Tool.isEmpty();
 
-Tool.insert(key,value);
+  Tool.insert(key,value);
 
-setTool(ikey,Tool);
+  setTool(ikey,Tool);
 
-if(send) {
-  emit changedTool(ikey);
-  }
+  if(send) {
+    emit changedTool(ikey);
+    }
 
-if(add) {
-  emit changedTools();
-  }
-
+  if(add) {
+    emit changedTools();
+    }
+}
 }
 
 QVariant WLGCode::getDataTool(int ikey, QString key,QVariant defvalue)
@@ -293,6 +313,28 @@ quint16 D=(quint16)getValue('D');
 
 if(D!=0){
  ret=getDataTool(D,"D",0).toDouble();
+ }
+
+return ret;
+}
+
+WLGPoint WLGCode::getGToolOfst(int ikey)
+{
+WLGPoint ret;
+
+if(ikey==-1)
+    ikey=data()->iToolOfst;
+
+if(data()->iToolOfst!=0)
+ {
+ ret.x=getDataToolNum(ikey,"Xg",0)
+      +getDataToolNum(ikey,"Xw",0);
+
+ ret.y=getDataToolNum(ikey,"Yg",0)
+      +getDataToolNum(ikey,"Yw",0);
+
+ ret.z=getDataToolNum(ikey,"Zg",0)
+      +getDataToolNum(ikey,"Zw",0);
  }
 
 return ret;
@@ -338,6 +380,14 @@ if(getDToolOfst()<0){
  }
 
 return side;
+}
+
+void WLGCode::setTool(int ikey, WLGTool Tool)
+{
+if(ikey>0){
+m_data.Tools.setTool(ikey,Tool);
+emit changedTool(ikey);
+}
 }
 
 WLGTool const WLGCode::getTool(int ikey)
@@ -496,19 +546,19 @@ switch(code)
            m_data.GCode[1]=1;
            m_data.GCode[2]=0;
            m_data.GCode[3]=0;
-		   return setGCode(80);           
+           return setGCode(80);
 
    case 2: m_data.GCode[0]=0;//"CW";
            m_data.GCode[1]=0;
            m_data.GCode[2]=1;
            m_data.GCode[3]=0;
-		   break;
+           break;
 
    case 3: m_data.GCode[0]=0;//"CCW";
            m_data.GCode[1]=0;
            m_data.GCode[2]=0;
            m_data.GCode[3]=1;
-		   break;
+           break;
 
   case 102:
   case 103:m_data.GCode[2]=0;
@@ -763,7 +813,7 @@ return true;
 
 bool WLGCode::isValidGCode(QString Gx)
 {
-return GValidList.contains(Gx);
+    return GValidList.contains(Gx);
 }
 
 WLGPoint WLGCode::getCurPoint()
@@ -884,7 +934,8 @@ WLGPoint newPoint=lastPoint;
 
 if(isGCode(91))
 	{
-    if(isValidValue('X')) newPoint.x+=getValue('X')*(scale ? m_data.G51Scale.x:1.0);
+    if(isValidValue('X')) newPoint.x+=getValue('X')*(scale ? m_data.G51Scale.x:1.0) / (isXDiam() ? 2.0: 1);
+
     if(isValidValue('Y')) newPoint.y+=getValue('Y')*(scale ? m_data.G51Scale.y:1.0);
     if(isValidValue('Z')) newPoint.z+=getValue('Z')*(scale ? m_data.G51Scale.z:1.0);
 
@@ -894,7 +945,7 @@ if(isGCode(91))
     }
 else
     {
-    if(isValidValue('X')) newPoint.x=getValue('X')*(scale ? m_data.G51Scale.x:1.0);
+    if(isValidValue('X')) newPoint.x=getValue('X')*(scale ? m_data.G51Scale.x:1.0) / (isXDiam() ? 2.0: 1);;
     if(isValidValue('Y')) newPoint.y=getValue('Y')*(scale ? m_data.G51Scale.y:1.0);
 
     if(isValidValue('Z'))
@@ -921,7 +972,7 @@ if(getRefPoint0SC(iSC).a!=0)
 WLFrame Fr;
 WLFrame frP0(getRefPoint0SC(iSC).to3D());
 
-if(back) GPoint=GPoint-SC;
+if(back) GPoint=GPoint-SC-getGToolOfst();
 
 Fr.x=GPoint.x;
 Fr.y=GPoint.y;
@@ -938,12 +989,14 @@ GPoint.x=Fr.x;
 GPoint.y=Fr.y;
 GPoint.z=Fr.z;
 
-if(!back) GPoint=GPoint+SC;
+if(!back) GPoint=GPoint+SC+getGToolOfst();
 
 return GPoint;
 }
 else
- return back? GPoint-SC:GPoint+SC;
+ return back
+       ?GPoint-SC-getGToolOfst()
+       :GPoint+SC+getGToolOfst();
 
 }
 
@@ -959,10 +1012,23 @@ if(iLastSC!=m_data.iSC)
  {
  lastGPoint=getPointSC(iLastSC,lastGPoint);
  lastGPoint=getPointActivSC(lastGPoint,true);
+
+ if(isXDiam())
+     lastGPoint.x/=2.0;
  }
 
 return lastGPoint;
 }
+
+WLGPoint WLGCode::movPointToActivToolOfst(int iLastTOfst, WLGPoint &lastGPoint)
+{
+if(iLastTOfst!=m_data.iToolOfst){
+ lastGPoint=lastGPoint+getGToolOfst(iLastTOfst)-getGToolOfst();
+ }
+
+return lastGPoint;
+}
+
 
 
 WLGPoint WLGCode::getPointIJK(WLGPoint lastGPoint)
@@ -1195,7 +1261,7 @@ G51Scale.z=1;
 
 absIJK=false;
 
-iCurTool=1;
+iToolOfst=1;
 
 gF.value=200;
 gS.value=0;

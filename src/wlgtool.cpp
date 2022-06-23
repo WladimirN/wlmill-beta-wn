@@ -5,10 +5,10 @@ WLGTools::WLGTools()
 m_keyList=QString("N,H,D,Diam").split(",");
 }
 
-bool WLGTools::setTool(int index, QMap<QString, QVariant> data)
+bool WLGTools::setTool(int index, WLGTool tool)
 {
-  data.insert("index",index);
-m_tools.insert(index,data);
+tool.insert("index",index);
+m_tools.insert(index,tool);
 return true;
 }
 

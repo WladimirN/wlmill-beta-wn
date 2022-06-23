@@ -50,10 +50,11 @@ quint32   time;
 WLGPoint point;
 };
 
-struct WLElementMCode
+struct WLElementScript
 {
-int MCode=0;
-WLGPoint point;
+QString      script;
+WLGPoint      point;
+bool singleRun=true;
 };
 
 struct WLElementEmpty
@@ -66,7 +67,6 @@ union WLElementData{
 struct WLElementCirc  arc;
 struct WLElementLine  line;
 struct WLElementULine uline;
-struct WLElementMCode mcode;
 struct WLElementDelay delay;
 struct WLElementDelay empty;
 
@@ -77,14 +77,16 @@ struct WLElementDelay empty;
 struct WLElementTraj 
 {
 private:
-    bool stopMode   =false;
+    bool stopMode=false;
 
     double m_P = 0.0;
     double m_Q = 0.0;
-public:
-    enum TypeElement {empty,line,arc,uline,delay,mcode};
 
-    union WLElementData data;
+public:
+    enum TypeElement {empty,line,arc,uline,delay,script};
+
+     union WLElementData   data;
+    struct WLElementScript escript;
 
 public:    
 
@@ -100,7 +102,7 @@ bool setLine(WLGPoint _startPoint,WLGPoint _endPoint);
 bool setArc(WLGPoint _startPoint,WLGPoint _centerPoint,WLGPoint endPoint,bool ccw,int plane);
 bool setULine(WLGPoint _startPoint,WLGPoint _midPoint,WLGPoint _endPoint);
 bool setDelay(WLGPoint _Point,quint32 ms);
-bool setMCode(WLGPoint _Point,int _MCode);
+bool setScript(WLGPoint _Point,QString txt,bool singleRun=false);
 
 void setS(double _S) {S=_S;}
 void setF(double _F) {F=_F;}
@@ -111,7 +113,7 @@ bool isFast() {return F==-1.0;}
 void setStopMode(bool enable) {stopMode=enable;}
 
 bool isStopMode(){return stopMode;}
-bool isSmooth() {return !isStopMode();}
+bool isSmooth(){return !isStopMode();}
 
 void setSmooth(double P,double Q) {if(P>=0&&Q>=0) {m_P=P; m_Q=Q; stopMode=false;}}
 
@@ -135,7 +137,7 @@ void reset(bool all=true);
 inline bool isCirc()  {return type==arc;}
 inline bool isLine()  {return type==line;}
 inline bool isULine() {return type==uline;}
-inline bool isMCode() {return type==mcode;}
+inline bool isScript(){return type==script;}
 inline bool isEmpty() {return type==empty;}
 
 float movDistance;
@@ -161,8 +163,8 @@ public:
 
 static void addBacklah(QList<WLElementTraj> &Traj,WL3DPoint lastBL,bool nextMov);
 static void removeEmpty(QList<WLElementTraj> &Traj);
-static bool detectMCode(QList<WLElementTraj> &Traj);
-static  int simpliTrajectory(QList<WLElementTraj> &simpliTraj,QList<WLElementTraj> baseTraj,float simpliDist ,bool oneSimpli=false,float simpliAngle=0,int Ar=0,int Br=0,int Cr=0);
+static bool detectScript(QList<WLElementTraj> &Traj);
+static  int simpliTrajectory(QList<WLElementTraj> &simpliTraj,QList<WLElementTraj> baseTraj,float simpliDist,bool oneSimpli=false,float simpliAngle=0,int Ar=0,int Br=0,int Cr=0);
 static void updateFS(QList<WLElementTraj> &Traj);
 
 bool calcVector(WL3DPoint &startV,WL3DPoint &endV);

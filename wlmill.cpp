@@ -46,9 +46,9 @@ WLMill::WLMill(QWidget *parent)
 
     QDir dir;
 
-    dir.mkdir(_iconsMMPath);
+    dir.mkdir(_iconsGMPath);
 
-    WLTButtonScript::setIconPath(_iconsMMPath);
+    WLTButtonScript::setIconPath(_iconsGMPath);
 
     QTimer::singleShot(3000,splash,SLOT(close()));
 
@@ -461,7 +461,7 @@ QMenu *MHelp= new QMenu(tr("Help"));
 MHelp->addAction("WLMill.pdf",this,[=](){QDesktopServices::openUrl(QUrl("http://wldev.ru/data/doc/WLMill.pdf"));});
 MHelp->addAction("WLMill-Script.pdf",this,[=](){QDesktopServices::openUrl(QUrl("http://wldev.ru/data/doc/WLMill-Script.pdf"));});
 MHelp->addAction(tr("Device"),this,[=](){QDesktopServices::openUrl(QUrl("http://wldev.ru/data/doc/"+MillMachine->getMotionDevice()->getNameDevice()+".pdf"));});
-MHelp->addAction(tr("Dir"),this,[=](){QDesktopServices::openUrl(configMMPath);});
+MHelp->addAction(tr("Dir"),this,[=](){QDesktopServices::openUrl(configGMPath);});
 MHelp->addSeparator();
 
 MHelp->addAction(tr("save debug file"),this,SLOT(onSaveDebugFile()));///??
@@ -1216,7 +1216,7 @@ if(Dialog.exec()) {
 
 void WLMill::loadDataState()
 {
-QSettings settings(configMMPath+"state",QSettings::IniFormat);
+QSettings settings(configGMPath+"state",QSettings::IniFormat);
 settings.setIniCodec("UTF-8");
 restoreGeometry(settings.value("geometry").toByteArray());
 restoreState(settings.value("windowState").toByteArray());
@@ -1265,7 +1265,7 @@ void WLMill::saveDataState()
 {
 if(!MillMachine->isReady()) return;
 
-QSettings settings(configMMPath+"state",QSettings::IniFormat);
+QSettings settings(configGMPath+"state",QSettings::IniFormat);
 settings.setIniCodec("UTF-8");
 settings.setValue("geometry", saveGeometry());
 settings.setValue("windowState", saveState());

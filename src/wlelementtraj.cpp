@@ -15,7 +15,7 @@ WLElementTraj::~WLElementTraj()
 }
 
 void WLElementTraj::reset(bool all)
-{ 
+{
 index=0;
 
 movDistanceIJ=movDistanceK=movDistance=0;
@@ -37,6 +37,7 @@ if(_startPoint!=_midPoint
  &&_endPoint!=_midPoint
  &&(qAbs(qAbs((_startPoint.to3D()-_midPoint.to3D()).r())
         -qAbs((_endPoint.to3D()  -_midPoint.to3D()).r()))<=ULINE_MAXERRORPOINTR)){
+ //qDebug()<<"WLElementTraj::setULine"<<str;
  type=uline;
  data.uline.startPoint=_startPoint;
  data.uline.midPoint=_midPoint;
@@ -55,6 +56,7 @@ if(_startPoint!=_midPoint
 bool WLElementTraj::setDelay(WLGPoint _Point,quint32 ms)
 {
 if(ms!=0){
+    qDebug()<<"WLElementTraj::setDelay"<<str;
     type=WLElementTraj::delay;
     data.delay.time=ms;
     data.delay.point=_Point;
@@ -68,14 +70,15 @@ if(ms!=0){
 return false;
 }
 
-bool WLElementTraj::setMCode(WLGPoint _Point, int _MCode)
+bool WLElementTraj::setScript(WLGPoint _Point, QString txt,bool singleRun)
 {
-qDebug()<<"WLElementTraj::setMCode"<<_MCode;
+qDebug()<<"WLElementTraj::setScript"<<txt;
 
-if(_MCode>0){  
- type=WLElementTraj::mcode;
- data.mcode.MCode=_MCode;
- data.mcode.point=_Point;
+if(!txt.isEmpty()){
+ type=WLElementTraj::script;
+ escript.script=txt;
+ escript.point=_Point;
+ escript.singleRun=singleRun;
  return true;
  }
  else {
@@ -91,7 +94,7 @@ QList <WL6DPoint> WLElementTraj::calcMCodePoints(bool *ok,WLGModel *GModel)
 {
 QList <WL6DPoint> Points;
 
-Points+=GModel->getFrame(data.mcode.point).to6D();
+Points+=GModel->getFrame(escript.point).to6D();
 
 if(ok)
     *ok=true;
@@ -101,7 +104,7 @@ return Points;
 
 
 QList<WL6DPoint> WLElementTraj::calcPoints(bool *ok, WLGModel *GModel, double delta)
-{    
+{
 QList<WL6DPoint> List;
 
     switch (type)
@@ -109,7 +112,7 @@ QList<WL6DPoint> List;
     case line:  List=calcLinePoints(ok,GModel,delta);  break;
     case arc:   List=calcArcPoints(ok,GModel,delta);break;
     case uline: List=calcULinePoints(ok,GModel,delta); break;
-    case mcode: List=calcMCodePoints(ok,GModel);  break;
+    case script: List=calcMCodePoints(ok,GModel);  break;
     default: break;
     }
 
@@ -123,9 +126,10 @@ WLGPoint WLElementTraj::getStartPoint()
  case line:  return data.line.startPoint;
  case arc:   return data.arc.startPoint;
  case uline: return data.uline.startPoint;
- case mcode: return data.mcode.point;
  case delay: return data.delay.point;
  case empty: return data.empty.point;
+
+ case script:return escript.point;
  }
 }
 
@@ -136,9 +140,10 @@ WLGPoint WLElementTraj::getEndPoint()
  case line:  return data.line.endPoint;
  case arc:   return data.arc.endPoint;
  case uline: return data.uline.endPoint;
- case mcode: return data.mcode.point;
  case delay: return data.delay.point;
  case empty: return data.empty.point;
+
+ case script: return escript.point;
  }
 }
 
@@ -149,9 +154,10 @@ void WLElementTraj::setStartPoint(WLGPoint point)
  case line:   data.line.startPoint=point; break;
  case arc:     data.arc.startPoint=point; break;
  case uline: data.uline.startPoint=point; break;
- case mcode:      data.mcode.point=point; break;
  case delay:      data.delay.point=point; break;
  case empty:      data.empty.point=point; break;
+
+ case script:        escript.point=point; break;
  }
 }
 
@@ -162,9 +168,10 @@ void WLElementTraj::setEndPoint(WLGPoint point)
  case line:   data.line.endPoint=point; break;
  case arc:     data.arc.endPoint=point; break;
  case uline: data.uline.endPoint=point; break;
- case mcode:    data.mcode.point=point; break;
  case delay:    data.delay.point=point; break;
  case empty:    data.empty.point=point; break;
+
+ case script:      escript.point=point; break;
  }
 }
 
@@ -175,6 +182,7 @@ data.line.startPoint=_startPoint;
 data.line.endPoint  =_endPoint;
 
 if(_startPoint!=_endPoint){
+   //qDebug()<<"WLElementTraj::setLine"<<str<<index;
     type=WLElementTraj::line;
     }
     else{
@@ -376,8 +384,8 @@ ay[2]=startPoint.y*T(2,0)+midPoint.y*T(2,1)+endPoint.y*T(2,2);
 
 az[0]=startPoint.z*T(0,0)+midPoint.z*T(0,1)+endPoint.z*T(0,2);
 az[1]=startPoint.z*T(1,0)+midPoint.z*T(1,1)+endPoint.z*T(1,2);
-az[2]=startPoint.z*T(2,0)+midPoint.z*T(2,1)+endPoint.z*T(2,2);  
-   
+az[2]=startPoint.z*T(2,0)+midPoint.z*T(2,1)+endPoint.z*T(2,2);
+
 dt=1.0f/20;
 
 Points+=startPoint;
@@ -388,7 +396,7 @@ for(float d=dt;d<1;d+=dt)
  P.y=ay[0]+ay[1]*d+ay[2]*d*d;
  P.z=az[0]+az[1]*d+az[2]*d*d;
 
- Points+=P; 
+ Points+=P;
  }
 
 Points+=endPoint;
@@ -401,13 +409,13 @@ for(int i=1;i<Points.size();i++)
  }
 
 startV.x=ax[1];
-startV.y=ay[1];	
-startV.z=az[1];	
+startV.y=ay[1];
+startV.z=az[1];
 startV=startV.normalize();
 
 endV.x=2*ax[2]+ax[1];
-endV.y=2*ay[2]+ay[1];	
-endV.z=2*az[2]+az[1];	
+endV.y=2*ay[2]+ay[1];
+endV.z=2*az[2]+az[1];
 endV=endV.normalize();
 
 
@@ -429,8 +437,8 @@ glBegin(GL_LINE_STRIP);
 for(int i=0;i<Points.size();i++)
    {
    glVertex3f(Points[i].x
-	         ,Points[i].y
-			 ,Points[i].z);
+             ,Points[i].y
+             ,Points[i].z);
    }
 glEnd();
 }
@@ -459,6 +467,7 @@ if(R1>(R2*1.02)||R1<(R2*0.92))
       return false;
       }
       else {
+      //qDebug()<<"WLElementTraj::setArc"<<str;
       type=arc;
       data.arc.R=(R1+R2)/2.0;
       data.arc.startPoint=_startPoint;
@@ -482,7 +491,7 @@ if(!isCirc()
  ||!data.arc.centerPoint.isValid()
  ||!data.arc.endPoint.isValid())
     {
-	return Points;
+    return Points;
     }
 
 double dl= delta < 1 ? 1: delta;
@@ -578,7 +587,7 @@ for(i=0;;i++)
  Point.z=startPoint.z+dz*i;
 
  Points+=Point;
- 
+
 //qDebug("Point  %f:%f:%f",Point.x,Point.y,Point.z);
   A_now+=da;
 
@@ -666,9 +675,9 @@ Points[i].y=GP.y;
 Points[i].z=GP.z;
 */
 }
-  
+
 if(ok) *ok=true;
-return Points;  
+return Points;
 }
 
 void WLElementTraj::removeEmpty(QList<WLElementTraj> &Traj)
@@ -677,10 +686,10 @@ for(int i=0;i<Traj.size();i++)
     if(Traj[i].isEmpty()) Traj.removeAt(i--);
 }
 
-bool WLElementTraj::detectMCode(QList<WLElementTraj> &Traj)
+bool WLElementTraj::detectScript(QList<WLElementTraj> &Traj)
 {
 for(int i=0;i<Traj.size();i++)
-    if(Traj[i].isMCode()){
+    if(Traj[i].isScript()){
      return true;
      }
 
@@ -688,9 +697,9 @@ return false;
 }
 
 int WLElementTraj::simpliTrajectory(QList<WLElementTraj> &simpliTraj
-	                               ,QList<WLElementTraj> baseTraj
-								   ,float simpliDist
-								   ,bool oneSimpli,float simpliAngle,int Ar,int Br,int Cr)
+                                   ,QList<WLElementTraj> baseTraj
+                                   ,float simpliDist
+                                   ,bool oneSimpli,float simpliAngle,int Ar,int Br,int Cr)
 {
 QList <int> indexs;
 WL6DPoint A,B,O;
@@ -712,31 +721,28 @@ if(baseTraj.size()==1)
 
 for(i=0;i<baseTraj.size();i++)
 {
-indexs+=i;
-//if(baseTraj[i].Type!=WLElementTraj::circ)//если теущий элемент линия
+indexs+=i; //индексы подходящих элементов
 
-//qDebug()<<"baseTraj[i].getG64Q()="<<baseTraj[i].getG64Q();
-
-if(baseTraj[i].isLine()) //если нет M комманд
+if(baseTraj[i].isLine()) //если линия
 {
 if(indexs.size()==1)
   {
   A=baseTraj[indexs.first()].data.line.startPoint.to6D();//первая точка текущей пачки
-  vZA.fromV(A.toM(Ar,Br,Cr).column(2));
+  vZA.fromV(A.toM(Ar,Br,Cr).column(2)); //берем вектор ориентации Z
   }
 
 if(indexs.size()>=2)
  {
  if(simpliAngle!=0.0f) //по углу
-	{
-    ////KUKA    
+    {
+    //KUKA
     vZO.fromV(baseTraj[indexs.last()].data.line.endPoint.to6D().toM(Ar,Br,Cr).column(2));
-	if((calcAngleGrd(vZA,vZO)>simpliAngle)&&(!baseTraj[i].isFast())) goto endpack;
+    if((calcAngleGrd(vZA,vZO)>simpliAngle)&&(!baseTraj[i].isFast())) goto endpack;
 
     //if(baseTraj[indexs.first()].data.line.startPoint.a!=baseTraj[indexs.last()].data.line.endPoint.a
     // ||baseTraj[indexs.first()].data.line.startPoint.b!=baseTraj[indexs.last()].data.line.endPoint.b
     // ||baseTraj[indexs.first()].data.line.startPoint.c!=baseTraj[indexs.last()].data.line.endPoint.c) goto endpack;
-	}
+    }
 
   if(!baseTraj[indexs.first()].isEqFS(baseTraj[indexs.last()])) goto endpack;
 
@@ -747,60 +753,51 @@ if(indexs.size()>=2)
 
   if(baseTraj[i].isLine())
   for(j=0;j<(indexs.size()-1);j++) //по дистанции
-     {	
+     {
      O=baseTraj[indexs[j]].data.line.endPoint.to6D(); //перебор
      dist=fabs((O.to3D()-A.to3D()).r()*calcAngleRad((O.to3D()-A.to3D()),(B.to3D()-A.to3D()))); //находим расстояние от общей прямой до всех точек
-	 
+
      //qDebug()<<"distSimpl"<<dist<<qMax(simpliDist,baseTraj[i].getG64Q());
      if(baseTraj[i].getSmoothQ()==0.0
       ||dist>(qMax(simpliDist,(float)baseTraj[i].getSmoothQ()))) //если нельзя дальше считать
-     //if(simpliDist==0.0f
-     // ||dist>simpliDist) //если нельзя дальше считать
-	     {
-		 endpack:
-		 indexs.removeLast();
-		 i--;
-		 goto endspack;
-	     }
-	 } 
+         {
+         endpack:
+         i--;
+         indexs.removeLast();
+         goto endspack;
+         }
+     }
   }
 }
 else
  {
- endspack:
+  endspack:
   //qDebug()<<"endspack:";
-
   if(!indexs.isEmpty()) //если 2 и больше
   {
-  simpliTraj+=baseTraj[indexs.first()];
-    
-  if(indexs.size()>1)
+  simpliTraj+=baseTraj[indexs.first()]; //добавляем первый
+
+  if(indexs.size()>1)  //если есть сглаженные то добавляем его
    {
-   simpliTraj+=baseTraj[indexs.last()];	   	
-   simpliTraj[simpliTraj.size()-2].setEndPoint(simpliTraj[simpliTraj.size()-1].getStartPoint());
+   if(!oneSimpli) {
+    simpliTraj+=baseTraj[indexs.last()];  //добавляем последний, который не прошёл фильтр
+    simpliTraj[simpliTraj.size()-2].setEndPoint(baseTraj[indexs.last()].getStartPoint()); //соединяем их
+    }
+   else {
+    simpliTraj[simpliTraj.size()-1].setEndPoint(baseTraj[indexs.last()].getStartPoint()); //соединяем их
+    return i-1;
+    }
+
    }
-  
-  indexs.clear(); 
+
+  indexs.clear();
   }
 
-  if(oneSimpli) return i;
-  }
+ if(oneSimpli) return i;
+ }
 }
 
- if(!indexs.isEmpty())
-  {
-  simpliTraj+=baseTraj[indexs.first()];
-
-  if(indexs.size()>1)
-   {
-   simpliTraj+=baseTraj[indexs.last()];	   	
-   simpliTraj[simpliTraj.size()-2].setEndPoint(simpliTraj[simpliTraj.size()-1].getStartPoint());
-   }
-
-  indexs.clear(); 
-  }
-
-return i;
+goto endspack;
 }
 
 
@@ -836,11 +833,11 @@ return (F==ET.F)
      &&(S==ET.S);
 }
 
-QString WLElementTraj::toString() 
+QString WLElementTraj::toString()
 {
 QString ret;
-ret=    "i"+QString::number(index)+	  
-	" type"+QString::number(type)+
+ret=    "i"+QString::number(index)+
+    " type"+QString::number(type)+
       " S:"+QString::number(S)+
       " F:"+QString::number(F);
 
