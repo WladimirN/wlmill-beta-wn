@@ -2395,6 +2395,7 @@ switch(status)
                        break;
  }
 
+updateBusy();
 updatePosible();
 QTimer::singleShot(0,this,SLOT(setFinished()));
 }

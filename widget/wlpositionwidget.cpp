@@ -610,19 +610,6 @@ labelActivGCode->setWordWrap(true);
 
 horLayout->addWidget(labelActivGCode);
 
-
-connect(MillMachine,&WLGMachine::changedBusy,[=](bool en){
-                                                            //pbPause->setEnabled(en);
-                                                            //if(en)
-                                                            //  pbPause->setChecked(false);
-
-                                                            ui.cbExGCode->setDisabled(en);
-                                                            });
-//connect(MillMachine,&WLMillMachine::changedPause,pbPause,&QToolButton::setChecked);
-
-//connect(pbPause,&QToolButton::toggled,MillMachine,[=](bool checked){MillMachine->setPause(checked);});
-//connect(pbPause,&QToolButton::clicked,MillMachine,QOverload<>::of(&WLMillMachine::setPause));
-
 connect(pbPause,&QToolButton::clicked,MillMachine,[=](){
   MillMachine->setPause();
  });
