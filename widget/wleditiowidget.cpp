@@ -259,7 +259,8 @@ void WLEditIOWidget::mousePressEvent(QMouseEvent *event)
 QMenu menu(this);
 
 if(!m_Module
- ||!isChecked()) return;
+ ||!isChecked()
+ ||(value()<0)) return;
 
 switch(m_Module->getTypeModule())
 {
