@@ -16,8 +16,6 @@ setGCode(01);
 setGCode(54);
 setGCode(61);
 
-setMCode(5);
-
 push();
 }
 
@@ -145,7 +143,7 @@ case 'T': str>>buf;
 //	        break;
  case 'M': str>>(i1);
            MList+=i1;
-           setMCode(i1);
+//setMCode(i1);
            break;
 }
 
@@ -500,25 +498,6 @@ m_data.GCode[iG]=false;
 }
 }
 
-void WLGCode::resetMCode(int iM)
-{
-if(iM==-1)
-{
-for(int i=0;i<MCodeSize;i++)
-   m_data.MCode[i]=false;
-}
-else
-   m_data.MCode[iM]=false;
-}
-
-bool WLGCode::getMCode(int iM)
-{
-if(0<=iM&&iM<MCodeSize)
-    return m_data.MCode[iM];
-else
-    return false;
-}
-
 
 int WLGCode::setGCode(QString val)
 {
@@ -721,50 +700,6 @@ switch(code)
    }
 
 return code;
-}
-
-int WLGCode::setMCode(int code)
-{
- switch(code)
-  {
-  case 3: m_data.MCode[3]=1;
-          m_data.MCode[4]=0;
-          m_data.MCode[5]=0; break; //вращение вперед
-
-  case 4: m_data.MCode[3]=0;
-          m_data.MCode[4]=1;
-          m_data.MCode[5]=0; break; //вращение назад
-
-  case 5: m_data.MCode[3]=0;
-          m_data.MCode[4]=0;
-          m_data.MCode[5]=1; break; //остановить вращение
-
-  case 7: m_data.MCode[7]=1;
-          m_data.MCode[8]=0;
-          m_data.MCode[9]=0; break; //дополнительное охлаждение
-
-  case 8: m_data.MCode[8]=1;
-          m_data.MCode[7]=0;
-          m_data.MCode[9]=0; break; //основное охлаждение
-
-  case 9: m_data.MCode[7]=0;
-          m_data.MCode[8]=0;
-          m_data.MCode[9]=1; break; //выключить охлаждение
-
-  case 13: setMCode(3);
-           setMCode(8); break;//вращение + осн охл
-
-  case 14: setMCode(4);
-           setMCode(8); break;//вращение + осн охл
-   
-  case 30: setMCode(5);
-           setMCode(9);break;//Конец программы, со сбросом модальных функций
-
-  default: return -1;
-
-
-   }
-return 1;
 }
 
 bool WLGCode::setValue(char name,double data) 
