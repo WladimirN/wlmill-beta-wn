@@ -1197,7 +1197,7 @@ if(!(MillMachine->isSafeProbe()&&MillMachine->getActSafeProbe()!=INPUT_actNo)){
   }
 
 QPalette palette = labelS->palette();
-palette.setColor(QPalette::WindowText,MillMachine->getGCode()->isMCode(5)? Qt::black : Qt::red);
+palette.setColor(QPalette::WindowText,MillMachine->isSpindleStop()? Qt::black : Qt::red);
 labelS->setPalette(palette);
 
 palette = labelF->palette();

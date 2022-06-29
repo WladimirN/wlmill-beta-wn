@@ -14,7 +14,7 @@ QMAKE_LFLAGS = -no-pie
 #           QT_NO_WARNING_OUTPUT\
 
 #DEFINES += DEF_CAMERA
-
+DEFINES  += GCODE_MILL
 
 contains(DEFINES, DEF_CAMERA) {
 QT += multimedia multimediawidgets

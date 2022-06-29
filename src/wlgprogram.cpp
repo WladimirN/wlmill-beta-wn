@@ -377,17 +377,15 @@ if(GCode->getValue('F')<0) return false;
 GCode->verifyG51();
 GCode->verifyG43();
 
+ElementTraj.useHMap=true;
 
 if(GCode->isGCode(53))
 {
-ElementTraj.G53=true;
 GCode->resetGCode(53);
 GCode->data()->curGPoint=GCode->getPointG53(GCode->data()->lastGPoint);
 }
 else
  {
- ElementTraj.G53=false;
- GCode->movPointToActivToolOfst(iLastToolOfst,GCode->data()->lastGPoint);
  GCode->movPointToActivSC(iLastSC,GCode->data()->lastGPoint);
  GCode->data()->curGPoint=GCode->getPointGCode(GCode->data()->lastGPoint);
  }

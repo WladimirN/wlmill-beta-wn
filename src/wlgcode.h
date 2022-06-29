@@ -35,7 +35,7 @@ void set(double _val) {value=_val; valid=true;}
 #define GPointNames "X,Y,Z,A,B,C,U,V,W"
 
 typedef struct WLGPoint
-{    
+{
 double x;
 double y;
 double z;
@@ -360,7 +360,7 @@ struct WLGCodeData
 
  bool absIJK;
  bool stopMode;
- bool initDrillPlane; 
+ bool initDrillPlane;
 
 
  bool MCode[MCodeSize];
@@ -405,29 +405,29 @@ class WLGCode: public QObject
 
 public:
 
-	enum Code
-	 {
+    enum Code
+     {
      fast_motion=00,
-    
-	 line       =01,
+
+     line       =01,
      circle_cw  =02,
      circle_ccw =03,
 
-	 wait_motion=04,
+     wait_motion=04,
 
      plane_xy   =17,
-	 plane_zx   =18,
-	 plane_yz   =19,
-     
-	 drill      =81,
-	 drill_long =83,
-	 drill_off  =80,
+     plane_zx   =18,
+     plane_yz   =19,
 
-	 absolute   =90,
-	 incremental=91,
+     drill      =81,
+     drill_long =83,
+     drill_off  =80,
 
-	 plane_drill =98,
-	 plane_drillR =99
+     absolute   =90,
+     incremental=91,
+
+     plane_drill =98,
+     plane_drillR =99
      };
 
 public:
@@ -475,7 +475,7 @@ public:
    static WLGPoint convertPlane(WLGPoint Point,int plane,bool front);
 
    int getActivSC(WLGPoint *P=nullptr);
-   
+
    WLGPoint getSC(int i,bool *ok=nullptr);
    WLGPoint getOffsetSC(int i,bool *ok=nullptr);
    WLGPoint getOffsetActivSC(bool *ok=nullptr) {return getOffsetSC(m_data.iSC,ok);}
@@ -484,7 +484,7 @@ public:
 
    bool setOffsetActivSC(WLGPoint P)    {return setOffsetSC(m_data.iSC,P);}
    bool setOffsetSC(int i,WLGPoint P,bool send=true);
-   
+
    bool setRefPoint0SC(int i,WLGPoint P)  {if(0<i&&i<sizeSC) {m_data.refPoint0SC[i]=P; return 1;} else return 0;}
    bool setRefPoint1SC(int i,WLGPoint P)  {if(0<i&&i<sizeSC) {m_data.refPoint1SC[i]=P; return 1;} else return 0;}
 
@@ -497,20 +497,19 @@ public:
    void setXSC(double X,int i)       {m_data.offsetSC[i].x=X;}
    void setYSC(double Y,int i)       {m_data.offsetSC[i].y=Y;}
    void setZSC(double Z,int i)       {m_data.offsetSC[i].z=Z;}
-													   					 
+
    void setOffsetASC(double A,int i) {m_data.offsetSC[i].a=A; }
 
     bool calcCenterPointR(WLGPoint startPoint,WLGPoint endPoint);
-	 
-	int setGCode(QString val);
-    int setGCode(int val) {return setGCode(QString::number(val));}
-	
-	void resetGCode(int iG=-1);
 
-	void resetMCode(int iM=-1);
+    int setGCode(QString val);
+    int setGCode(int val) {return setGCode(QString::number(val));}
+
+    void resetGCode(int iG=-1);
+
     bool getMCode(int);
-	     
-    void reset(void) {resetValid();resetGCode();resetMCode();}
+
+    void reset(void) {resetValid();resetGCode();}
 
     WLGPoint getG28Position()        {return m_data.G28Position;}
     void setG28Position(WLGPoint hp) {m_data.G28Position=hp;}
@@ -518,9 +517,9 @@ public:
     WLGPoint getG43Position()        {return m_data.G43Position;}
     void setG43Position(WLGPoint hp) {m_data.G43Position=hp;}
 
-	int getPlane();
+    int getPlane();
 
-	QString getActivGCodeString();
+    QString getActivGCodeString();
     QStringList getContextGCodeList();
 
     double getHToolOfst();
@@ -556,7 +555,7 @@ public:
 
     QVariant getDataTool(int ikey,QString key,QVariant defvalue);
 
-    WLGTools *getTools() {return &m_data.Tools;}    
+    WLGTools *getTools() {return &m_data.Tools;}
 
 
 private:
@@ -581,8 +580,6 @@ public:
 
     Q_INVOKABLE double  getDataCurToolNum(QString key,double  defvalue) {return getDataTool(getT(),key,defvalue).toDouble();}
     Q_INVOKABLE QString getDataCurToolStr(QString key,QString defvalue) {return getDataTool(getT(),key,defvalue).toString();}
-
-    Q_INVOKABLE  int setMCode(int);
 
     Q_INVOKABLE void setHTool(int i,float h);
     Q_INVOKABLE void setDTool(int i,float d);

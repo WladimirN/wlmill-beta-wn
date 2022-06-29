@@ -17,7 +17,7 @@ while(!Traj.isEmpty())
 {
 WLElementTraj ET=Traj.takeFirst();
 
-if(!ET.G53){
+if(ET.useHMap){
 
 switch(ET.type)
 {
@@ -249,7 +249,7 @@ return 0;
 double WLHeightMap::getValue(double x, double y)
 {
 if(!isValid()
-        ||!isEnable())   return 0.0;
+ ||!isEnable())   return 0.0;
 // Setup grid
 int gridPointsX = countX();
 int gridPointsY = countY();
