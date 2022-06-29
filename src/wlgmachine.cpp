@@ -2570,9 +2570,12 @@ if(isEnable())
 
 if(MillTraj.isEmpty())
    {
-   m_GCode.data()->lastGPoint=getCurrentPositionActivSC();
-   m_GCode.data()->lastGPoint.z-=m_HeightMap.getValue(m_GCode.data()->lastGPoint.x
-                                                     ,m_GCode.data()->lastGPoint.y);
+   WLGPoint curPos=getCurrentPosition();
+
+   m_GCode.data()->lastGPoint=m_GCode.getPointActivSC(curPos,true);
+   m_GCode.data()->lastGPoint.z-=m_HeightMap.getValue(curPos.x
+                                                     ,curPos.y);
+
    lastMillGPoint=getAxisPosition();
 
    qDebug()<<"WLGMachine::runGProgram updateLastGPoint"<<m_GCode.data()->lastGPoint.toString(0);
@@ -2791,9 +2794,15 @@ if(MillTraj.isEmpty()
 && ModulePlanner->isEmpty()
 &&!ModulePlanner->isMoving())
     {    
-    m_GCode.data()->lastGPoint=m_GCode.getPointActivSC(getCurrentPosition(),true);
-    m_GCode.data()->lastGPoint.z-=m_HeightMap.getValue(m_GCode.data()->lastGPoint.x
-                                                      ,m_GCode.data()->lastGPoint.y);
+    WLGPoint curPos=getCurrentPosition();
+
+    m_GCode.data()->lastGPoint=m_GCode.getPointActivSC(curPos,true);
+
+    if(!isRunMScript()){
+    m_GCode.data()->lastGPoint.z-=m_HeightMap.getValue(curPos.x
+                                                      ,curPos.y);
+    }
+
     lastMillGPoint=getAxisPosition();
 
     qDebug()<<"WLGMachine::runGCode updateLastGPoint"<<m_GCode.data()->lastGPoint.toString(0);
@@ -3555,7 +3564,8 @@ QList<WLElementTraj>  addModelTraj;
 if(!ListTraj.isEmpty())
 {
 #ifdef DEF_HMAP
-   getHeightMap()->addHeighMapPoints(ListTraj);
+if(!isRunMScript())
+    getHeightMap()->addHeighMapPoints(ListTraj);
 #endif
 
 while(!ListTraj.isEmpty()){
