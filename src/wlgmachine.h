@@ -147,6 +147,14 @@ private:
     typeActionInput m_actSafeProbe=INPUT_actEmgStop;
 
     QStringList preRunProgramList;
+
+    enum statesSpindle{Stop,CW,CCW};
+
+    statesSpindle stateSpindle=Stop;
+    statesSpindle pauseStateSpindle=Stop;
+
+    bool coolWater=false;
+    bool coolAir=false;
 public:
     WLGMachine(WLGProgram *_Program,WLEVScript *_MScript,WLEVScript *_LScript,QObject *parent=nullptr);
     ~WLGMachine();
@@ -164,6 +172,10 @@ QList<WLElementTraj>  showMillTraj;
  QMutex MutexShowTraj;
  QMutex MutexSaveConfig;
  QMutex MutexScript;
+
+Q_INVOKABLE bool isSpindleStop() {return stateSpindle==Stop;}
+Q_INVOKABLE bool isSpindleCW()   {return stateSpindle==CW;}
+Q_INVOKABLE bool isSpindleCCW()  {return stateSpindle==CCW;}
 
 Q_INVOKABLE bool isIngnoreInPause() {return motDevice->getModulePlanner()->isIgnoreInPause();}
 Q_INVOKABLE bool isIngnoreInStop()  {return motDevice->getModulePlanner()->isIgnoreInStop();}

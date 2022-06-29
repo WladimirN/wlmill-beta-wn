@@ -2277,7 +2277,7 @@ if(pause!=m_pause)
 {
 if(pause)
      {
-     if(Planner->isMoving())
+     if(Planner->isBusy())
        {
        if(!isRunMScript())
           {
@@ -2297,28 +2297,24 @@ if(pause)
         //verify M3 M4 M5           
         m_waitMScript=false;
 
-        qDebug()<<">>>m_GCodePause M3"<<m_GCodePause.MCode[3]<<" M5"<<m_GCodePause.MCode[5];
+        qDebug()<<">>>m_GCodePause M3"<<pauseStateSpindle<<stateSpindle;
 
-        if(m_GCodePause.MCode[3]) {
-          if((m_GCodePause.MCode[3]!=getGCode()->getMCode(3))){
-                       m_waitMScript=true;
+        if(pauseStateSpindle!=stateSpindle){
+            switch (pauseStateSpindle) {
+            case Stop: m_waitMScript=true;
+                       runMCode(5);
+                       break;
+            case CW:   m_waitMScript=true;
                        runMCode(3);
-                       }
-          }else if(m_GCodePause.MCode[4]) {
-                  if((m_GCodePause.MCode[4]!=getGCode()->getMCode(4))){
-                          m_waitMScript=true;
-                          runMCode(4);
-                          }
-                  }else if(m_GCodePause.MCode[5]) {
-                          if((m_GCodePause.MCode[5]!=getGCode()->getMCode(5))){
-                                    m_waitMScript=true;
-                                    runMCode(5);
-                                    }
-                          }
+                       break;
+            case CCW:  m_waitMScript=true;
+                       runMCode(4);
+                       break;
+            }
+          }
 
-
-
-        if(!m_waitMScript)  QTimer::singleShot(0,this,&WLGMachine::startMov);
+        if(!m_waitMScript)
+            QTimer::singleShot(0,this,&WLGMachine::startMov);
         }
         else
         {
@@ -2363,8 +2359,9 @@ switch(status)
 
                          if(isRunGProgram()){
                              sendMessage("program pause: \""+m_Program->getName()+"\"",QString(" element: %1").arg(m_Program->getLastMovElement()),1);
+                             pauseStateSpindle=stateSpindle;
                              m_GCodePause=getGCode()->getData();
-                             qDebug()<<"<<<m_GCodePause M3"<<m_GCodePause.MCode[3]<<" M5"<<m_GCodePause.MCode[5];
+                             //qDebug()<<"<<<m_GCodePause M3"<<m_GCodePause.MCode[3]<<" M5"<<m_GCodePause.MCode[5];
                              }
 
                          if(!isRunMScript())
@@ -3850,7 +3847,11 @@ void WLGMachine::runMScript(QString txt)
       iM=M.toInt(&ok);
       qDebug()<<"detect MCode:"<<iM<<ok;
 
-      getGCode()->setMCode(iM);
+      switch (iM) {
+          case 3: stateSpindle=CW;   break;
+          case 4: stateSpindle=CCW;  break;
+          case 5: stateSpindle=Stop; break;
+          }
       }
 
     m_MScript->runFunction(txt);

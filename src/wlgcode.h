@@ -19,7 +19,6 @@
 #define GErr    -1
 
 #define GCodeSize 100
-#define MCodeSize 100
 #define sizeSC 7
 
 typedef struct GPar
@@ -361,9 +360,6 @@ struct WLGCodeData
  bool stopMode;
  bool initDrillPlane; 
 
-
- bool MCode[MCodeSize];
-
  QString strRunProgram;
  QString strInit="G64 P0.05 Q0.05";
 
@@ -505,10 +501,7 @@ public:
 	
 	void resetGCode(int iG=-1);
 
-	void resetMCode(int iM=-1);
-    bool getMCode(int);
-	     
-    void reset(void) {resetValid();resetGCode();resetMCode();}
+    void reset(void) {resetValid();resetGCode();}
 
     WLGPoint getG28Position()        {return m_data.G28Position;}
     void setG28Position(WLGPoint hp) {m_data.G28Position=hp;}
@@ -567,8 +560,6 @@ public:
     Q_INVOKABLE double  getDataToolNum(int ikey,QString key,double  defvalue) {return getDataTool(ikey,key,defvalue).toDouble();}
     Q_INVOKABLE QString getDataToolStr(int ikey,QString key,QString defvalue) {return getDataTool(ikey,key,defvalue).toString();}
 
-    Q_INVOKABLE  int setMCode(int);
-
     Q_INVOKABLE void setHTool(int i,float h);
     Q_INVOKABLE void setDTool(int i,float d);
 
@@ -582,7 +573,6 @@ public:
     Q_INVOKABLE double getDTool(int index);
 
     Q_INVOKABLE  bool isGCode(int i) {return m_data.GCode[i];}
-    Q_INVOKABLE  bool isMCode(int i) {return m_data.MCode[i];}
 
     Q_INVOKABLE  void push() {m_dataStack=m_data;}
 
