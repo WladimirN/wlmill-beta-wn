@@ -378,13 +378,13 @@ ElementTraj.useHMap=true;
 
 if(GCode->isGCode(53))
 {
-//ElementTraj.useHMap=false;
+ElementTraj.useHMap=false;
 GCode->resetGCode(53);
 GCode->data()->curGPoint=GCode->getPointG53(GCode->data()->lastGPoint);
 }
 else
  {
- //ElementTraj.useHMap=true;
+ ElementTraj.useHMap=true;
  GCode->movPointToActivSC(iLastSC,GCode->data()->lastGPoint);
  GCode->data()->curGPoint=GCode->getPointGCode(GCode->data()->lastGPoint);
  }
