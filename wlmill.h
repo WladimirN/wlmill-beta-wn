@@ -17,6 +17,9 @@
 #include <QActionGroup>
 #include <QSplashScreen>
 #include <QShortcut>
+#include <QQuickWidget>
+#include <QQmlEngine>
+#include <QQmlContext>
 
 #include "wlpamlistwidget.h"
 #include "wlvisualwidget.h"
@@ -130,6 +133,7 @@
 #define   _mScriptFile QCoreApplication::applicationDirPath()+"//wlmillconfig//script//mscript.js"
 #define   _lScriptFile QCoreApplication::applicationDirPath()+"//wlmillconfig//script//lscript.js"
 #define    _scriptPath QCoreApplication::applicationDirPath()+"//wlmillconfig//script//"
+#define       _qmlPath QCoreApplication::applicationDirPath()+"//wlmillconfig//qml//"
 
 class WLMill : public QMainWindow
 {
@@ -261,6 +265,14 @@ QDialog *MW;
 public:
         void setLifeM(unsigned int M) {m_lifeM=M;  emit changedLife();}
 unsigned int getLifeM() {return m_lifeM;}
+
+private:
+QQuickWidget *createQuickWidget(QString file);
+
+public slots:
+void runQML(QString file);
+void addTabQML(QString file);
+void addDockQML(QString file);
 
 private: 
 	

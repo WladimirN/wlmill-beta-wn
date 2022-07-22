@@ -71,26 +71,13 @@ WLMill::WLMill(QWidget *parent)
 
 //  connect(Program,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
 
-
-//#ifdef Q_OS_WIN
     MScript=new WLEVScript();
     MScript->start();
 
     LScript=new WLEVScript();
     LScript->moveToThread(LScript);
     LScript->start();
-//#endif
-/*
-#ifdef Q_OS_LINUX  //иначе долгий ответ с подвисанием от MillMachine::isActiv() в скрипте ставит парент MillMachine?
-    MScript=new WLEVScript(0);  //nullptr
-    MScript->moveToThread(MScript);
-    MScript->start();
 
-    LScript=new WLEVScript(0); //nullptr
-    LScript->moveToThread(LScript);
-    LScript->start();
-#endif
-*/
     while(!MScript->isReady()
         ||!LScript->isReady()) QThread::msleep(50);
 
@@ -99,6 +86,7 @@ WLMill::WLMill(QWidget *parent)
 
     MScript->addObject(new WLFileScript(MScript),"FILE");
     MScript->addObject(new WLTimerScript(MScript),"TIMER");
+    MScript->addObject(this,"WLMILL");
 
     DialogM= new WLDialogScript(this);
 
@@ -1064,10 +1052,84 @@ switch(QMessageBox::question(this, tr("Confirmation:"),
 void WLMill::leaveEvent ( QEvent * event )
 {
 Q_UNUSED(event)
-//Machine->Pause(1);
+    //Machine->Pause(1);
 }
 
 
+QQuickWidget *WLMill::createQuickWidget(QString file)
+{
+QQuickWidget *view  = new QQuickWidget;
+view->setSource(QUrl::fromLocalFile(_qmlPath+file));
+
+QQmlContext *context = view->engine()->rootContext();
+
+context->setContextProperty("view", view);
+context->setContextProperty("MSCRIPT", MScript);
+context->setContextProperty("MACHINE", MillMachine);
+
+if (view->status() == QQuickWidget::Error)
+ {
+ MessManager->setMessage("WLMill","Error file QML:"+file,1);
+ qDebug()<<"Error QML:"<<file;
+
+ view->deleteLater();
+
+ return nullptr;
+ }
+
+view->setResizeMode(QQuickWidget::SizeViewToRootObject);
+view->setWindowModality(Qt::ApplicationModal);
+
+return view;
+
+}
+
+void WLMill::runQML(QString file)
+{
+QQuickWidget *view  = createQuickWidget(file);
+
+if(view)
+   view->show();
+}
+
+void WLMill::addTabQML(QString file)
+{
+QFileInfo FI(file);
+
+for (int i=0;i<tabWidget->count();i++) {
+if(tabWidget->tabText(i)==FI.baseName())
+     return;
+}
+
+QQuickWidget *view  = createQuickWidget(file);
+
+if(view) {
+ tabWidget->addTab(view,FI.baseName());
+ }
+}
+
+void WLMill::addDockQML(QString file)
+{
+QFileInfo FI(file);
+
+foreach (QDockWidget *dock, findChildren<QDockWidget *>()) {
+if(dock->objectName()==(FI.baseName()+"QML"))
+    return;
+}
+
+QQuickWidget *view  = createQuickWidget(file);
+
+if(view){
+QDockWidget *dockQML =new QDockWidget(this);
+
+dockQML->setWindowTitle(FI.baseName());
+dockQML->setObjectName(FI.baseName()+"QML");
+
+dockQML->setWidget(view);
+
+addDockWidget(Qt::BottomDockWidgetArea,dockQML);
+}
+}
 	
 void WLMill::readyMachine()
 {	

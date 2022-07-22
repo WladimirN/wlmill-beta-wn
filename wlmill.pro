@@ -5,6 +5,7 @@
 TEMPLATE = app
 TARGET = wlmill
 QT += core widgets serialport gui network opengl script
+QT += qml quick quickwidgets
 
 
 QMAKE_LFLAGS = -no-pie
@@ -13,15 +14,15 @@ QMAKE_LFLAGS = -no-pie
 #           QT_NO_INFO_OUTPUT\
 #           QT_NO_WARNING_OUTPUT\
 
-#DEFINES += DEF_CAMERA
+DEFINES  += DEF_CAMERA
 DEFINES  += GCODE_MILL
 
 contains(DEFINES, DEF_CAMERA) {
 QT += multimedia multimediawidgets
-SOURCES +=../../wlqt/form/wlcamera.cpp
-HEADERS +=../../wlqt/form/wlcamera.h
-FORMS += ../../wlqt/form/wlcamera.ui
-TARGET = TARGET+cam
+SOURCES +=widget/wlcamera.cpp
+HEADERS +=widget/wlcamera.h
+FORMS   +=widget/wlcamera.ui
+TARGET = WLMill_cam
 }
 
 DEFINES += DEF_HMAP
@@ -76,6 +77,7 @@ HEADERS += \
     widget/wlgaxislabel.h \
     widget/wleditpoint.h \
     widget/wlgdrivewidget.h \
+    widget/wlcameraview.h \
     src/wl3dpoint.h \
     src/wlcalc.h \
     src/wldrive.h \
@@ -98,7 +100,7 @@ HEADERS += \
     src/wldoublespinbox.h \
     src/wljoysticks.h \
     src/wlheightmap.h \
-    src/wlgmachine.h \
+    src/wlgmachine.h \    
     model/wlheightmaptablemodel.h \
     model/wlgtoolstablemodel.h \
     wlmill.h \
@@ -133,6 +135,7 @@ SOURCES += \
     widget/wleditpoint.cpp \
     widget/wlpositionwidget.cpp \
     widget/wlgdrivewidget.cpp \
+    widget/wlcameraview.cpp \
     src/wl3dpoint.cpp \
     src/wlcalc.cpp \
     src/wldrive.cpp \
