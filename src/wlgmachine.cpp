@@ -2794,7 +2794,6 @@ return ret;
 bool WLGMachine::runGCode(QString gtxt)
 {
 //WL6DPoint lastGPoint=getCurrentPositionActivSC();
-
 WLFrame Fr;	
 QList <WLElementTraj> curListTraj;
 QList <WLElementTraj>    ListTraj;
@@ -2814,17 +2813,16 @@ const float simpliD=m_mainDim*(1<<xPD);
 WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 
 if(MillTraj.isEmpty()
-&& ModulePlanner->isEmpty()
-&&!ModulePlanner->isMoving())
+&&!ModulePlanner->isBusy())
     {    
     WLGPoint curPos=getCurrentPosition();
 
     m_GCode.data()->lastGPoint=m_GCode.getPointActivSC(curPos,true);
-
+/*
     if(!isRunMScript()){
     m_GCode.data()->lastGPoint.z-=m_HeightMap.getValue(curPos.x
                                                       ,curPos.y);
-    }
+    }*/
 
     lastMillGPoint=getAxisPosition();
 
@@ -3779,7 +3777,8 @@ QList<WLElementTraj>  addModelTraj;
 if(!ListTraj.isEmpty())
 {
 #ifdef DEF_HMAP
-if(!isRunMScript())
+if(!isRunMScript()
+  &&isRunGProgram())
     getHeightMap()->addHeighMapPoints(ListTraj);
 #endif
 
