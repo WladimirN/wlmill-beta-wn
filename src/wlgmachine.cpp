@@ -3550,7 +3550,7 @@ return (ModulePlanner->getFree()>0)&&(!MillTraj.isEmpty())&&(!m_MScript->isBusy(
 }
 
 
-void  WLGMachine::addElementTraj(QList<WLElementTraj>  ListTraj)
+void WLGMachine::addElementTraj(QList<WLElementTraj>  ListTraj)
 {
 WLElementTraj         ETraj;
 QList<WLElementTraj>  addTraj;
@@ -3559,9 +3559,13 @@ QList<WLElementTraj>  addModelTraj;
 if(!ListTraj.isEmpty())
 {
 #ifdef DEF_HMAP
-if(!isRunMScript()
-  &&isRunGProgram())
-    getHeightMap()->addHeighMapPoints(ListTraj);
+if(isRunMScript()
+||!isRunGProgram())
+    for(int i=0;i<ListTraj.size();i++){
+    ListTraj[i].useHMap=false;
+    }
+
+getHeightMap()->addHeighMapPoints(ListTraj);
 #endif
 
 while(!ListTraj.isEmpty()){

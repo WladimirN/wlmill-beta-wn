@@ -6,18 +6,9 @@ WLHeightMap::typeInterpoliation WLHeightMap::getTypeInterpoliation() const
     return m_typeInterpoliation;
 }
 
-void WLHeightMap::addHeighMapPoints(QList<WLElementTraj> &Traj)
+QList<WLElementTraj> WLHeightMap::addHeighMapMidPoints(WLElementTraj ET)
 {
 QList<WLElementTraj> newTraj;
-
-if(!isValid()
- ||!isEnable()) return;
-
-while(!Traj.isEmpty())
-{
-WLElementTraj ET=Traj.takeFirst();
-
-if(ET.useHMap){
 
 switch(ET.type)
 {
@@ -185,9 +176,70 @@ case WLElementTraj::delay:
 
 default: newTraj+=ET;
 }
+
+return newTraj;
 }
-else
-  newTraj+=ET;
+
+void WLHeightMap::addHeighMapPoints(QList<WLElementTraj> &Traj)
+{
+QList<WLElementTraj> newTraj;
+
+if(!isValid()) {
+m_state=disable;
+return;
+}
+
+while(!Traj.isEmpty())
+{
+WLElementTraj ET=Traj.takeFirst();
+
+bool enable=ET.useHMap && isEnable();
+
+WLHeightMap::stateHMap lastState=m_state;
+
+if(enable){
+ switch(m_state)  {
+  case disable:m_state=start;  break;
+  case start:  m_state=middle; break;
+  case middle: m_state=middle; break;
+  case end:    m_state=start;  break;
+  }
+ }
+ else switch(m_state){
+ case disable:m_state=disable; break;
+ case start:  m_state=end;     break;
+ case middle: m_state=end;     break;
+ case end:    m_state=disable; break;
+ }
+
+if(lastState!=m_state) {
+  qDebug()<<"HMap changed state: "<<QVariant::fromValue(lastState).toString()
+                                  <<">>"
+                                  <<QVariant::fromValue(m_state).toString()
+                                  <<" str:"<<ET.str;
+  }
+
+WLGPoint GPoint;
+
+switch(m_state){
+case disable:newTraj+=ET;
+             break;
+
+case start:  GPoint=ET.getEndPoint();
+             GPoint.z+=getValue(GPoint.x,GPoint.y);
+             ET.setEndPoint(GPoint);
+             newTraj+=ET;
+             break;
+
+case end:    GPoint=ET.getStartPoint();
+             GPoint.z+=getValue(GPoint.x,GPoint.y);
+             ET.setStartPoint(GPoint);
+             newTraj+=ET;
+             break;
+
+case middle: newTraj+=addHeighMapMidPoints(ET);
+             break;
+}
 }
 
 
