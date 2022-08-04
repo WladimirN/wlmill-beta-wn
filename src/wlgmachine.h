@@ -648,6 +648,7 @@ signals:
 private slots:
 
     void updateStatusMPlanner(int status);
+    void updateInProbe(bool);
     void updatePosible();
 	
 friend class WLPositionWidget;

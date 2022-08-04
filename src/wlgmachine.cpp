@@ -1475,13 +1475,12 @@ if(FileXML.isOpen())
   if(ModulePlanner)
   {
   connect(ModulePlanner,&WLModulePlanner::changedStatus,this,&WLGMachine::updateStatusMPlanner,Qt::DirectConnection);//Qt::QueuedConnection);
-  //connect(ModulePlanner,&WLModulePlanner::changedStatus,this,&WLGMachine::updateStatusMPlanner,Qt::QueuedConnection);
+  connect(ModulePlanner,&WLModulePlanner::changedProbe,this,&WLGMachine::updateInProbe,Qt::DirectConnection);//Qt::QueuedConnection);
+
   connect(ModulePlanner,&WLModulePlanner::changedEmpty,this,&WLGMachine::setFinished,Qt::QueuedConnection);
 
   connect(ModulePlanner,&WLModulePlanner::reset,this,&WLGMachine::reset,Qt::QueuedConnection);
   connect(ModulePlanner,&WLModulePlanner::changedFree,this,&WLGMachine::setFinished,Qt::QueuedConnection);
-
- // connect(ModulePlanner,&WLModulePlanner::changedStatus,this,&WLGMachine::verifyPosibleManual);
 
   connect(motDevice->getModulePlanner(),SIGNAL(changedSOut(float)),SLOT(setDataSOut(float)));
 
@@ -1630,9 +1629,6 @@ qDebug()<<"WLGMachine::updateGProbe() ioper="<<iOperation<<"size="<<GProbeList.s
 
 SGProbe   *GProbe=nullptr;
 int index;
-
-
-//qDebug()<<"WLGMachine::updateGProbe planner::isBusy"<<Planner->isBusy();
 
 for(index=0;index<GProbeList.size();index++)
     if(!GProbeList.at(index).ex)
@@ -2451,6 +2447,16 @@ switch(status)
 updateBusy();
 updatePosible();
 QTimer::singleShot(0,this,SLOT(setFinished()));
+}
+
+void WLGMachine::updateInProbe(bool state)
+{
+if(state){
+ if(m_safeProbe
+  &&isRunGProgram()
+  &&!isRunGProbe())
+  sendMessage(metaObject()->className(),"detect safe Probe",0);
+ }
 }
 
 void WLGMachine::updatePosible()
@@ -3768,7 +3774,7 @@ return (ModulePlanner->getFree()>0)&&(!MillTraj.isEmpty())&&(!m_MScript->isBusy(
 }
 
 
-void  WLGMachine::addElementTraj(QList<WLElementTraj>  ListTraj)
+void WLGMachine::addElementTraj(QList<WLElementTraj>  ListTraj)
 {
 WLElementTraj         ETraj;
 QList<WLElementTraj>  addTraj;
@@ -3777,9 +3783,13 @@ QList<WLElementTraj>  addModelTraj;
 if(!ListTraj.isEmpty())
 {
 #ifdef DEF_HMAP
-if(!isRunMScript()
-  &&isRunGProgram())
-    getHeightMap()->addHeighMapPoints(ListTraj);
+if(isRunMScript()
+||!isRunGProgram())
+    for(int i=0;i<ListTraj.size();i++){
+    ListTraj[i].useHMap=false;
+    }
+
+getHeightMap()->addHeighMapPoints(ListTraj);
 #endif
 
 while(!ListTraj.isEmpty()){
@@ -4105,6 +4115,8 @@ if(m_waitMScript)
   m_waitMScript=false;
   QTimer::singleShot(0,this,SLOT(startMov()));
   }
+
+setSafeProbe();
 
 updateBusy();
 updatePosible();

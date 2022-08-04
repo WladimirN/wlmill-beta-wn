@@ -11,15 +11,7 @@ win32* {
 
 
 win32-g++* {
- # contains (QMAKE_TARGET.arch, x86_64) {
- #     LIBS += -L$$PWD/bin/windows/mingw/x64/ -lSDL2
- # }
- #
- # else {
- #     LIBS += -L$$PWD/bin/windows/mingw/x86/ -lSDL2
- # }
- #
-   LIBS += -L$$PWD/bin/windows/mingw/x86/ -lSDL2
+    LIBS += -L$$PWD/bin/windows/mingw/x86/ -lSDL2
 }
 
 win32-msvc* {

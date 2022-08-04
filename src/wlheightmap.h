@@ -71,6 +71,9 @@ Q_OBJECT
 
 public:
   enum  typeInterpoliation {bicubic,bileniar};
+  enum  stateHMap {start,middle,end,disable};
+
+  Q_ENUM(stateHMap)
 
 public:
 
@@ -87,6 +90,7 @@ bool m_showGrid =false;
 bool m_updateShow=true;
 
 WLHeightMap::typeInterpoliation m_typeInterpoliation=bicubic;
+WLHeightMap::stateHMap          m_state=disable;
 
 signals:
 
@@ -147,6 +151,8 @@ void setTypeInterpoliation(const WLHeightMap::typeInterpoliation &typeInterpolia
 WLHeightMap::typeInterpoliation getTypeInterpoliation() const;
 
 void addHeighMapPoints(QList<WLElementTraj> &Traj);
+private:
+QList<WLElementTraj> addHeighMapMidPoints(WLElementTraj ET);
 
 signals:
   void changedEnable(bool);
