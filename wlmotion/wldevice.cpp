@@ -638,7 +638,7 @@ foreach(WLModule *Module,m_modules)
  {
   qDebug()<<Module->metaObject()->className()<<"update";
   Module->update();
-}
+ }
 }
 
 void WLDevice::backup()

@@ -21,41 +21,38 @@ void WLIOPut::setData(quint8 _flags)
 {
 const auto last=Flags.m_Data;
 
-Flags.m_Data&=//IOPF_inv
-              //IOPF_enable
-                IOPF_input
-               |IOPF_asend
-               |IOPF_pulse;
+uint8_t mask= IOPF_input
+             |IOPF_asend
+             |IOPF_pulse
+             |(isOutput() ? IOPF_old:0);
 
-if(isOutput())
-   Flags.m_Data&=IOPF_old;
+_flags&=~mask;
 
-if((_flags&IOPF_inv)^(Flags.m_Data&IOPF_inv))
+Flags.m_Data=(Flags.m_Data&mask)|_flags;
+
+if((_flags&IOPF_inv)^(last&IOPF_inv))
 {
 if(isInput())
   qDebug()<<"WLIOPut::input"<<getIndex()<<"changed inv"<<((_flags&IOPF_inv)!=0);
 else
   qDebug()<<"WLIOPut::output"<<getIndex()<<"changed inv"<<((_flags&IOPF_inv)!=0);
 
-// emit changedInv(_flags&IOPF_inv);
+//emit changedInv(_flags&IOPF_inv);
 }
 
-Flags.m_Data|=_flags;
-
-if(last!=Flags.m_Data)  emit changed(getIndex());
+if(last!=Flags.m_Data)
+    emit changed(getIndex());
 }
-
-
 
 
 unsigned char getByteFrom (WLIOPut *B0
-	                      ,WLIOPut *B1
-						  ,WLIOPut *B2
-						  ,WLIOPut *B3
-						  ,WLIOPut *B4
-						  ,WLIOPut *B5
-						  ,WLIOPut *B6
-						  ,WLIOPut *B7)
+                          ,WLIOPut *B1
+                          ,WLIOPut *B2
+                          ,WLIOPut *B3
+                          ,WLIOPut *B4
+                          ,WLIOPut *B5
+                          ,WLIOPut *B6
+                          ,WLIOPut *B7)
 {
 unsigned char ret=0;
 
@@ -71,21 +68,21 @@ if(B2) ret|=B2->getNow()? bit2:0;
  if(B5) ret|=B5->getNow()? bit5:0;
  else
  if(B6) ret|=B6->getNow()? bit6:0;
- else 
+ else
  if(B7) ret|=B7->getNow()? bit7:0;
 
 return ret;
 }
 
 void setByteTo(unsigned char byte
-	             ,WLIOPut *B0
-				 ,WLIOPut *B1
-				 ,WLIOPut *B2
-				 ,WLIOPut *B3
-				 ,WLIOPut *B4
-				 ,WLIOPut *B5
-				 ,WLIOPut *B6
-				 ,WLIOPut *B7)
+                 ,WLIOPut *B0
+                 ,WLIOPut *B1
+                 ,WLIOPut *B2
+                 ,WLIOPut *B3
+                 ,WLIOPut *B4
+                 ,WLIOPut *B5
+                 ,WLIOPut *B6
+                 ,WLIOPut *B7)
 {
 B0->setOut(byte&bit0);
 B1->setOut(byte&bit1);
@@ -108,10 +105,10 @@ void setIOPutInvStr(QString data,WLIOPut *ioputs,int size)
 QStringList List=data.split(",");
 int index;
 for(int i=0;i<List.size();i++)
-    { 
-	index=List[i].toInt();
-	if((index<size)
-	 &&(index>=0))  ioputs[index].setInv(); 
+    {
+    index=List[i].toInt();
+    if((index<size)
+     &&(index>=0))  ioputs[index].setInv();
     }
 }
 
@@ -120,12 +117,12 @@ QString getIOPutInvStr(WLIOPut *ioputs,int size)
 QString List;
 
 for(int i=0;i<size;i++)
-     if(ioputs[i].isInv()) 
+     if(ioputs[i].isInv())
      {
-	  if(List.isEmpty())
-		  List+=QString::number(i);
-	  else
-		  List+=","+QString::number(i);
+      if(List.isEmpty())
+          List+=QString::number(i);
+      else
+          List+=","+QString::number(i);
       }
 return  List;
 }
@@ -138,7 +135,7 @@ void WLIOPut::setInv(bool _inv)
 
  QByteArray data;
  QDataStream Stream(&data,QIODevice::WriteOnly);
- 
+
  Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
  Stream.setByteOrder(QDataStream::LittleEndian);
 
