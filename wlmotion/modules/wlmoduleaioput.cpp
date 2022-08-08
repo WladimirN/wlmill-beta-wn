@@ -137,6 +137,7 @@ case  comAIOPut_setDataOutput: Stream>>index;//index8
 
 case  sendModule_prop: Stream>>ui1>>ui2;
                        Init(ui1,ui2);
+
                        setReady(true);
 
                        break;
@@ -214,5 +215,5 @@ if(stream.name()=="outputs")
     }
    }
 }
-update();
+
 }

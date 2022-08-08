@@ -20,12 +20,12 @@ while(Outputs.isEmpty())
 
 bool WLModuleIOPut::Init(int _sizeInputs, int _sizeOutputs)
 {
-if(InitInputs(_sizeInputs)&&InitOutputs(_sizeOutputs))
-{
-update();
+if(InitInputs(_sizeInputs)&&InitOutputs(_sizeOutputs)){
 return true;
 }
+else {
 return false;
+}
 }
 
 bool WLModuleIOPut::InitInputs(int sizeInputs)
@@ -245,8 +245,6 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)typeMIOPut<<(quint8)comIOPut_getInputData<<index;
 
-//qDebug()<<"Call getIData";
-
 emit sendCommand(data);
 }
 
@@ -305,6 +303,9 @@ for(quint8 i=0;i<Outputs.size();i++)
 
 void WLModuleIOPut::update()
 {
+setInputInvStr(getInputInvStr());
+setOutputInvStr(getOutputInvStr());
+
 for(int i=2;i<getSizeInputs();i++) {
    callInputData(i);
    }
@@ -381,7 +382,7 @@ if(stream.name()=="outputs")
     }	
    }
 }
-update();
+
 }
 
 void WLModuleIOPut::writeXMLData(QXmlStreamWriter &stream)

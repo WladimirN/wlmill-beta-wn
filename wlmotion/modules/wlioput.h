@@ -78,7 +78,7 @@ Q_PROPERTY(bool now READ getNow() NOTIFY changed)
 Q_PROPERTY(bool out READ getNow() WRITE setOut())
 
 private:
-         WLFlags Flags;
+    WLFlags Flags;
 		 
 public:
     WLIOPut (WLModuleIOPut *_ModuleIOPut,QString _comment="",bool input=false);
