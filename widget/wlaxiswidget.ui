@@ -109,6 +109,9 @@
           <property name="prefix">
            <string notr="true">max:</string>
           </property>
+          <property name="decimals">
+           <number>20</number>
+          </property>
           <property name="maximum">
            <double>10000000.000000000000000</double>
           </property>
