@@ -21,6 +21,8 @@
 #define comSpindle_resetOutElement  5 //
 #define comSpindle_setAcc  6 //
 #define comSpindle_setDec  7 //
+#define comSpindle_setOutput 8 //
+#define comSpindle_setFastChange 9 //
 
 //Planner
 #define comPlanner_addCirc       2 //
@@ -203,6 +205,8 @@ QList<qint32> m_posProbe3;
 bool m_validProbe2=false;
 bool m_validProbe3=false;
 
+bool m_fastChangeSOut=false;
+
 QVector <quint8> m_indexsAxis;
 
 QTimer *updateTimer;
@@ -315,6 +319,9 @@ statusPlanner getStatus()  const {return m_status;}
 
    void setData(QDataStream &data);
    void getData(typeDataPlanner getTypeModule);
+
+   bool isFastChangeSOut() {return m_fastChangeSOut;}
+   void setFastChangeSOut(bool enable=true);
 
 private slots:
 

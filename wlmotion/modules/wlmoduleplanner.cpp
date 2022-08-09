@@ -274,6 +274,21 @@ Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_getData<<(quint8)type;
 emit sendCommand(data);
 }
 
+void WLModulePlanner::setFastChangeSOut(bool enable)
+{
+m_fastChangeSOut=enable;
+
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_toSpindle<<(quint8)comSpindle_setFastChange<<(uint8_t)m_fastChangeSOut;
+
+emit sendCommand(data);
+}
+
 void WLModulePlanner::callTrackPlanner()
 {
 getData(typeDataPlanner::dataPlanner_curSpindleInValue);
@@ -814,6 +829,8 @@ stream.writeAttribute("SOut",QString::number(getTypeSOut())
 stream.writeAttribute("accSOut",QString::number(getAccSpindle()));
 stream.writeAttribute("decSOut",QString::number(getDecSpindle()));
 
+stream.writeAttribute("fastChangeSOut",QString::number(isFastChangeSOut()));
+
 stream.writeAttribute("inProbe",QString::number(getInput(PLANNER_inProbe)->getIndex()));
 stream.writeAttribute("inPause",QString::number(getInput(PLANNER_inPause)->getIndex()));
 stream.writeAttribute("inStop",QString::number(getInput(PLANNER_inStop)->getIndex()));
@@ -869,6 +886,9 @@ if(!stream.attributes().value("accSOut").isEmpty())
 
 if(!stream.attributes().value("decSOut").isEmpty())
      setDecSpindle(stream.attributes().value("decSOut").toFloat());
+
+if(!stream.attributes().value("fastChangeSOut").isEmpty())
+     setFastChangeSOut(stream.attributes().value("fastChangeSOut").toInt());
 
 stream.readNextStartElement();
 

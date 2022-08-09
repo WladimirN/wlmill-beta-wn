@@ -116,6 +116,8 @@ WLEditMillWidget::WLEditMillWidget(WLGMachine *_MillMachine,QDialog *parent)
     ui.sbFeedZG1->setValue(MillMachine->getFeedG1StartAt());
     ui.sbDistZG1->setValue(MillMachine->getDistG1StartAt());
 
+    ui.cbFastChangeSOut->setChecked(MillMachine->getMotionDevice()->getModulePlanner()->isFastChangeSOut());
+
 	setModal(true);
 
 }
@@ -305,6 +307,8 @@ MillMachine->setPercentManualStr(ui.lePercentManual->text());
 
 MillMachine->setFeedG1StartAt(ui.sbFeedZG1->value());
 MillMachine->setDistG1StartAt(ui.sbDistZG1->value());
+
+MillMachine->getMotionDevice()->getModulePlanner()->setFastChangeSOut(ui.cbFastChangeSOut->isChecked());
 return ret;
 }
 

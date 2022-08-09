@@ -289,6 +289,13 @@
              <item row="1" column="0">
               <widget class="WLEditIOWidget" name="editOutSAOUT" native="true"/>
              </item>
+             <item row="2" column="0">
+              <widget class="QCheckBox" name="cbFastChangeSOut">
+               <property name="text">
+                <string>fast change</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>

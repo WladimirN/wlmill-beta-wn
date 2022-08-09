@@ -1493,16 +1493,7 @@ if(FileXML.isOpen())
   setSOut(m_GCode.getValue('S'));
 
   ModulePlanner->setModeRun(PLANNER_normal);  
-
-/*
-  if(m_motDevice->getModulePWM())
-     {   
-     setEnablePWMS(isUsePWMS());//устанавливаем связь
-	 
-     connect(m_motDevice->getModulePlanner(),SIGNAL(changedSOut(float)),SLOT(setDataSOut(float)));
-     setSOut(m_GCode.getValue('S'));
-     }
-*/
+  ModulePlanner->setEnableSOut(false);
   }
 
   getGCode()->getTools()->readFromFile(toolsFile);
