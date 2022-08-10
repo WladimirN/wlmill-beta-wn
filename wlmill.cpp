@@ -687,7 +687,11 @@ WLMill::~WLMill()
 {
 qDebug("WLMill::~WLMill()");
 MillMachine->setEnable(false);
-MillMachine->reset();
+
+while(MScript->isBusy()
+    ||LScript->isBusy()) {
+QCoreApplication::processEvents();
+}
 
 LScript->quit();
 LScript->wait();
@@ -1039,7 +1043,6 @@ switch(QMessageBox::question(this, tr("Confirmation:"),
 		
         case QMessageBox::Yes:     qDebug()<<"WLMill close";
                                    saveDataState();
-                                   MillMachine->setEnable(false);
 			                       break;
 
         default:                   event->ignore();
