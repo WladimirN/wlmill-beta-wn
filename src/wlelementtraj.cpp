@@ -818,6 +818,15 @@ for(int i=0;i<Traj.size();i++)
 
 }
 
+void WLElementTraj::calcPoints(QList<WLElementTraj> &Traj, WLGModel *GModel, double delta)
+{
+bool ok;
+
+for(int i=0;i<Traj.size();i++){
+  Traj[i].calcPoints(&ok,GModel);
+  }
+}
+
 inline bool WLElementTraj::isEqFS(WLElementTraj ET)
 {
 return (F==ET.F)

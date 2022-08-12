@@ -164,8 +164,10 @@ static void removeEmpty(QList<WLElementTraj> &Traj);
 static bool detectMCode(QList<WLElementTraj> &Traj);
 static  int simpliTrajectory(QList<WLElementTraj> &simpliTraj,QList<WLElementTraj> baseTraj,float simpliDist ,bool oneSimpli=false,float simpliAngle=0,int Ar=0,int Br=0,int Cr=0);
 static void updateFS(QList<WLElementTraj> &Traj);
+static void calcPoints(QList<WLElementTraj> &Traj,WLGModel *GModel,double delta=0);
 
 bool calcVector(WL3DPoint &startV,WL3DPoint &endV);
+
 
 private:
 
