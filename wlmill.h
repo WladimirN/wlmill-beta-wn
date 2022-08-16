@@ -274,6 +274,10 @@ void runQML(QString file);
 void addTabQML(QString file);
 void addDockQML(QString file);
 
+void runQMLFile(QString file);
+void addTabQMLFile(QString file);
+void addDockQMLFile(QString file);
+
 private: 
 	
  void autoSaveChekers();

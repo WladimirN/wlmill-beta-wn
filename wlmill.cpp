@@ -1062,7 +1062,7 @@ Q_UNUSED(event)
 QQuickWidget *WLMill::createQuickWidget(QString file)
 {
 QQuickWidget *view  = new QQuickWidget;
-view->setSource(QUrl::fromLocalFile(_qmlPath+file));
+view->setSource(QUrl::fromLocalFile(file));
 
 QQmlContext *context = view->engine()->rootContext();
 
@@ -1089,6 +1089,11 @@ return view;
 
 void WLMill::runQML(QString file)
 {
+runQMLFile(_qmlPath+file);
+}
+
+void WLMill::runQMLFile(QString file)
+{
 QQuickWidget *view  = createQuickWidget(file);
 
 if(view)
@@ -1096,6 +1101,11 @@ if(view)
 }
 
 void WLMill::addTabQML(QString file)
+{
+addTabQMLFile(_qmlPath+file);
+}
+
+void WLMill::addTabQMLFile(QString file)
 {
 QFileInfo FI(file);
 
@@ -1112,6 +1122,11 @@ if(view) {
 }
 
 void WLMill::addDockQML(QString file)
+{
+addDockQML(_qmlPath+file);
+}
+
+void WLMill::addDockQMLFile(QString file)
 {
 QFileInfo FI(file);
 
