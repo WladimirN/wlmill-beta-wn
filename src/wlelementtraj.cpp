@@ -26,7 +26,7 @@ type=empty;
 data.empty.point=WLGPoint();
 
 if(all){
-    stopMode=false;
+    m_stopMode=false;
     }
 }
 

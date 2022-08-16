@@ -68,7 +68,7 @@ struct WLElementLine  line;
 struct WLElementULine uline;
 struct WLElementMCode mcode;
 struct WLElementDelay delay;
-struct WLElementDelay empty;
+struct WLElementEmpty empty;
 
  WLElementData(){}
 ~WLElementData(){}
@@ -77,10 +77,11 @@ struct WLElementDelay empty;
 struct WLElementTraj 
 {
 private:
-    bool stopMode   =false;
+    bool m_stopMode   =false;
+    bool m_preBacklah =false;
 
-    double m_P = 0.0;
-    double m_Q = 0.0;
+    double m_smoothP = 0.0;
+    double m_smoothQ = 0.0;
 public:
     enum TypeElement {empty,line,arc,uline,delay,mcode};
 
@@ -108,15 +109,18 @@ void setF(double _F) {F=_F;}
 void setFast() {setF(-1.0);}
 bool isFast() {return F==-1.0;}
 
-void setStopMode(bool enable) {stopMode=enable;}
+void setPreBacklash(bool enable=true) {m_preBacklah=enable;}
+bool isPreBacklash() {return m_preBacklah;}
 
-bool isStopMode(){return stopMode;}
+void setStopMode(bool enable) {m_stopMode=enable;}
+
+bool isStopMode(){return m_stopMode;}
 bool isSmooth() {return !isStopMode();}
 
-void setSmooth(double P,double Q) {if(P>=0&&Q>=0) {m_P=P; m_Q=Q; stopMode=false;}}
+void setSmooth(double P,double Q) {if(P>=0&&Q>=0) {m_smoothP=P; m_smoothQ=Q; m_stopMode=false;}}
 
-double getSmoothP() {return m_P;}
-double getSmoothQ() {return m_Q;}
+double getSmoothP() {return m_smoothP;}
+double getSmoothQ() {return m_smoothQ;}
 
 QList<WL6DPoint> calcPoints(bool *ok,WLGModel *GModel,double delta=0);
 

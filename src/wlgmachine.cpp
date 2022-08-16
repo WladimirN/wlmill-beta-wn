@@ -3276,7 +3276,8 @@ if(Traj[i].isFast()
 else  if(!deltaBL.isNull()) { //add line backlash
 
          if(i>0
-         &&Traj[i-1].isLine())  {
+         &&Traj[i-1].isLine()
+         &&Traj[i-1].isPreBacklash()) {
             bool ok;
             Traj[i-1].calcPoints(&ok,getGModel());
             WLGPoint lastV=Traj[i-1].startV;
