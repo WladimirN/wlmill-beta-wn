@@ -148,6 +148,12 @@ emit changedEnable(m_enable);
 
 void WLMachine::setPercentManual(double per)
 {
+foreach(WLDrive *Drive,WLDrive::getDriveList()) { //если все проценты равны либо ось стоит
+ if(Drive->getPercentManual()!=m_percentManual
+  &&Drive->isManual())
+  return;
+ }
+
 m_percentManual=qBound(0.01,per,100.0);
 
 emit changedPercentManual(m_percentManual);

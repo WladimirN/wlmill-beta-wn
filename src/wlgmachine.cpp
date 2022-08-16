@@ -2635,7 +2635,7 @@ if(MillTraj.isEmpty())
    m_GCode.data()->lastGPoint.z-=m_HeightMap.getValue(curPos.x
                                                      ,curPos.y);
 
-   lastMillGPoint=getAxisPosition();
+   lastMillGPoint=curPos;
 
    qDebug()<<"WLGMachine::runGProgram updateLastGPoint"<<m_GCode.data()->lastGPoint.toString(0);
 
@@ -2824,13 +2824,8 @@ if(MillTraj.isEmpty()
     WLGPoint curPos=getCurrentPosition();
 
     m_GCode.data()->lastGPoint=m_GCode.getPointActivSC(curPos,true);
-/*
-    if(!isRunMScript()){
-    m_GCode.data()->lastGPoint.z-=m_HeightMap.getValue(curPos.x
-                                                      ,curPos.y);
-    }*/
 
-    lastMillGPoint=getAxisPosition();
+    lastMillGPoint=curPos;
 
     qDebug()<<"WLGMachine::runGCode updateLastGPoint"<<m_GCode.data()->lastGPoint.toString(0);
     }
@@ -3208,21 +3203,24 @@ Traj=newTraj;
 #define useULine
 void WLGMachine::addSmooth(QList<WLElementTraj> &addTraj)
 {
-if(!MillTraj.isEmpty())
-    {
-    addTraj.prepend(MillTraj.takeLast());
-
-    MutexShowTraj.lock();
-    showMillTraj.removeLast();
-    MutexShowTraj.unlock();
-    }
-
 WLElementTraj ET;
 WL3DPoint PS,PE,PO,Pm,P;
 WLGPoint GPm;
 float B;
 float V=0,L=0;
 bool ok;
+bool add=false;
+
+if(!MillTraj.isEmpty()){
+  add=true;
+
+  addTraj.prepend(MillTraj.takeLast());
+
+  MutexShowTraj.lock();
+  showMillTraj.removeLast();
+  MutexShowTraj.unlock();
+  }
+
 
 #ifndef useULine
 QMatrix3x3 T;
@@ -3341,6 +3339,14 @@ for(int i=1;i<addTraj.size();i++)
 
    }
   }
+
+if(add){
+  MutexShowTraj.lock();
+  showMillTraj+=addTraj.first();
+  MutexShowTraj.unlock();
+
+  MillTraj.append(addTraj.takeFirst());
+  }
 }
 
 void WLGMachine::addCalcGModel(QList<WLElementTraj> &addTraj)
@@ -3360,11 +3366,11 @@ for(int i=0;i<addTraj.size();i++)
 addTraj=addModelTraj;
 }
 
-void WLGMachine::addRotaryPosition(WLGPoint startPoint,QList<WLElementTraj> &addTraj)
+void WLGMachine::addRotaryPosition(WLGPoint &lastPoint,QList<WLElementTraj> &addTraj)
 {
 QList<WLElementTraj> addModelTraj;
 
-//qDebug()<<"WLGMachine::addRotaryPosition";
+qDebug()<<"WLGMachine::addRotaryPosition";
 
 for(int i=0;i<addTraj.size();i++)
    {
@@ -3372,7 +3378,7 @@ for(int i=0;i<addTraj.size();i++)
       addTraj[i].setStartPoint(addTraj[i-1].getEndPoint());
       }
       else {
-      addTraj[i].setStartPoint(startPoint);
+      addTraj[i].setStartPoint(lastPoint);
       }
 
    WLGPoint   endPoint=addTraj[i].getEndPoint();
@@ -3380,23 +3386,26 @@ for(int i=0;i<addTraj.size();i++)
    if(getDrive("A")
     &&getDrive("A")->getType()==WLDrive::Rotary
     &&getDrive("A")->isInfinity())
-      endPoint.a=getDrive("A")->calcRotaryInfEndPosition(startPoint.a,endPoint.a);
+      endPoint.a=getDrive("A")->calcRotaryInfEndPosition(lastPoint.a,endPoint.a);
 
    if(getDrive("B")
     &&getDrive("B")->getType()==WLDrive::Rotary
     &&getDrive("B")->isInfinity())
-      endPoint.b=getDrive("B")->calcRotaryInfEndPosition(startPoint.b,endPoint.b);
+      endPoint.b=getDrive("B")->calcRotaryInfEndPosition(lastPoint.b,endPoint.b);
 
    if(getDrive("C")
     &&getDrive("C")->getType()==WLDrive::Rotary
     &&getDrive("C")->isInfinity())
-     endPoint.c=getDrive("C")->calcRotaryInfEndPosition(startPoint.c,endPoint.c);
+     endPoint.c=getDrive("C")->calcRotaryInfEndPosition(lastPoint.c,endPoint.c);
 
-   startPoint=addTraj[i].getStartPoint();
+   lastPoint=addTraj[i].getStartPoint();
 
    addTraj[i].setEndPoint(endPoint);
    }
 
+
+if(!addTraj.isEmpty())
+    lastMillGPoint=addTraj.last().getEndPoint();
 }
 
 void WLGMachine::addBacklash(QList<WLElementTraj> &Traj)
@@ -3409,7 +3418,6 @@ WLGPoint nextBL;
 WLGPoint nextNBL;
 
 WLGPoint deltaBL;
-WLGPoint lastDeltaBL;
 
 WLGPoint lastBL;
 WLGPoint movV;
@@ -3418,11 +3426,22 @@ WLGPoint lastMBL;
 
 QStringList GDrive=QString(GPointNames).split(",");
 
-lastDeltaBL=m_nowBL;
+bool add=false;
+
+if(!MillTraj.isEmpty()){
+  add=true;
+
+  Traj.prepend(MillTraj.takeLast());
+
+  MutexShowTraj.lock();
+  showMillTraj.removeLast();
+  MutexShowTraj.unlock();
+  }
+
 
 bool ok;
 
-for(int i=0;i<Traj.size();i++)
+for(int i= add ? 1 : 0;i<Traj.size();i++)
 {
 //qDebug()<<"Traj:"<<Traj[i].str;
 
@@ -3444,8 +3463,7 @@ foreach(QString name,GDrive)
  if(getDrive(name))
  {
   if(movV.get(name)!=0.0)
-     {
-   //  qDebug()<<"name !=0"<<name<<movV.get(name);
+     {  
      nextBL.set(name,movV.get(name) > 0 ?  getDrive(name)->getHalfBacklash():-getDrive(name)->getHalfBacklash());
      }
  }
@@ -3466,17 +3484,45 @@ if(Traj[i].isFast()
   //if(deltaBL.x==0.0&&nextNBL.x!=0.0) nextBL.x=nextNBL.x;
   Traj[i].setLine(Traj[i].data.line.startPoint+m_nowBL,Traj[i].data.line.endPoint+nextBL);
   }
-else  if(!deltaBL.isNull()) //add line backlash
-        {
-        ETraj=Traj[i];
-        //ETraj.setBckl();
-        ETraj.setLine(Traj[i].getStartPoint()+m_nowBL,Traj[i].getStartPoint()+nextBL);
+else  if(!deltaBL.isNull()) { //add line backlash
 
-        if(m_Fbacklash!=0.0f)    ETraj.setF(m_Fbacklash);
+         if(i>0
+         &&Traj[i-1].isLine()
+         &&Traj[i-1].isPreBacklash()) {
+            bool ok;
+            Traj[i-1].calcPoints(&ok,getGModel());
+            WLGPoint lastV=Traj[i-1].startV;
+            WLGPoint lastBL;
 
-        ETraj.calcPoints(&ok,getGModel());
+            foreach(QString name,GDrive)
+             {
+             if(lastV.get(name)==0.0  //если нет движения у предыдущего
+               &&deltaBL.get(name)!=0.0) { //и мы можем перенести выборку на предыдущий элемент
+                lastBL.set(name,deltaBL.get(name)); //переносим
+                deltaBL.set(name,0);
+               }
+             }
 
-        Traj.insert(i,ETraj);
+            if(!lastBL.isNull()) //что то перенесли
+            {
+            qDebug()<<"release preview backlash";
+            Traj[i-1].setEndPoint(Traj[i-1].getEndPoint()+lastBL);
+            Traj[i-1].calcPoints(&ok,getGModel());
+            }
+          }
+
+         if(!deltaBL.isNull()){ //добавляем линию если не всё перенесли
+         ETraj=Traj[i];
+         //ETraj.setBckl();
+         ETraj.setLine(Traj[i].getStartPoint()+m_nowBL,Traj[i].getStartPoint()+nextBL);
+
+         if(m_Fbacklash!=0.0f)    ETraj.setF(m_Fbacklash);
+
+         ETraj.calcPoints(&ok,getGModel());
+         Traj.insert(i,ETraj);
+         }
+         else
+           i--; //так как мы не добавляем элемент а всё перенесли впредыдущий
         }
         else if(Traj[i].isCirc()){ //circ corr
              Traj[i].setArc(Traj[i].data.arc.startPoint+m_nowBL
@@ -3497,9 +3543,17 @@ else  if(!deltaBL.isNull()) //add line backlash
               }
 
 
-lastDeltaBL=deltaBL;
 m_nowBL=nextBL;
 }
+
+
+if(add){
+  MutexShowTraj.lock();
+  showMillTraj+=Traj.first();
+  MutexShowTraj.unlock();
+
+  MillTraj.append(Traj.takeFirst());
+  }
 
 }
 
@@ -3547,6 +3601,9 @@ if(isEmptyMotion())   {
 
 while((ModulePlanner->getFree()>0)
    &&(!MillTraj.isEmpty())
+   &&( MillTraj.size()>1
+     ||MillTraj.first().isScript()
+     ||m_iProgram==(m_Program->getElementCount()))
    &&m_runList
    &&ok) //если можно отправлять
 {
@@ -3802,28 +3859,28 @@ while(!ListTraj.isEmpty()){
     }
 
 WLElementTraj::removeEmpty(addTraj);
+WLElementTraj::calcPoints(addTraj,getGModel());
 
 addRotaryPosition(lastMillGPoint,addTraj);
 
-if(isUseGModel())
-   addCalcGModel(addTraj);
+if(isUseGModel()){
+ addCalcGModel(addTraj);
 
-for(int i=0;i<addTraj.size();i++)
-   {
-   bool ok;
-   addTraj[i].calcPoints(&ok,getGModel());
-   }
+ //Backlash
+ WLElementTraj::calcPoints(addTraj,getGModel());
+ addBacklash(addTraj);
+ }
+ else {
+ //Backlash
+ WLElementTraj::calcPoints(addTraj,getGModel());
+ addBacklash(addTraj);
 
-addBacklash(addTraj);
+ addSmooth(addTraj); //G64 P - ULine
+ }
 
-//G64 P - ULine
-if(!isUseGModel())
-   addSmooth(addTraj);
+WLElementTraj::calcPoints(addTraj,getGModel());
 
 MillTraj+=addTraj;
-
-if(!addTraj.isEmpty())
-    lastMillGPoint=addTraj.last().getEndPoint();
 
 MutexShowTraj.lock();
 showMillTraj+=addTraj;

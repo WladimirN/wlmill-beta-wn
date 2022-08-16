@@ -444,7 +444,7 @@ if(!isEnable()
    return;
    }
 
-setPercentManual(qAbs(_rot)*100.0);
+setPercentManual(qAbs(_rot)*100);
 
 if(isMotion()) 
    {
@@ -457,6 +457,8 @@ if(isMotion())
    return;
    }
 
+setKSpeed(m_percentManual/100.0);
+
 pad()->Load("main");
 
 if(_rot<0.0) pad()->Load("mainMinus");
@@ -464,8 +466,6 @@ if(_rot<0.0) pad()->Load("mainMinus");
 pad()->Load("manual");
 
 setCurPad();
-
-setKSpeed(manualPercent/100.0);
 
 Flag.set(fl_manual,1);
 
@@ -935,10 +935,10 @@ return true;
 
 void WLDrive::toStartAccel()
 {
-Flag.reset(fl_pause);
+    Flag.reset(fl_pause);
 
-//if(getAxis())
-//   getAxis()->acc();
+    //if(getAxis())
+    //   getAxis()->acc();
 
 foreach(WLAxis *axis,getAxisList()) {
  axis->acc();
@@ -966,13 +966,13 @@ void WLDrive::setPercentManual(float per)
 {
 if((0.0f<per)&&(per<=100.0f))
  {
- manualPercent=per;
+ m_percentManual=per;
 
  qDebug()<<getName()<<"setManualPercent"<<per<<isManual();
 
  if(isMotion()
   &&!isAuto())
-     setKSpeed(manualPercent/100.0f);
+     setKSpeed(m_percentManual/100.0f);
  }
 
 };

@@ -18,8 +18,8 @@
 #define GNO_use  0
 #define GErr    -1
 
-#define GCodeSize 100
-#define MCodeSize 100
+#define GCodeSize 1000
+
 #define sizeSC 7
 
 typedef struct GPar
@@ -362,9 +362,6 @@ struct WLGCodeData
  bool stopMode;
  bool initDrillPlane;
 
-
- bool MCode[MCodeSize];
-
  QString strRunProgram;
  QString strInit="G64 P0.05 Q0.05";
 
@@ -593,7 +590,6 @@ public:
     Q_INVOKABLE double getDTool(int index);
 
     Q_INVOKABLE  bool isGCode(int i) {return m_data.GCode[i];}
-    Q_INVOKABLE  bool isMCode(int i) {return m_data.MCode[i];}
 
     Q_INVOKABLE  void push() {m_dataStack=m_data;}
 

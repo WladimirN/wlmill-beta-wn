@@ -195,7 +195,7 @@ private:
 void addHeightMap(QList<WLElementTraj> &Traj);
 void addBacklash(QList<WLElementTraj> &Traj);
 void addCalcGModel(QList<WLElementTraj> &addTraj);
-void addRotaryPosition(WLGPoint startPoint,QList<WLElementTraj> &addTraj);
+void addRotaryPosition(WLGPoint &lastPoint,QList<WLElementTraj> &addTraj);
 void addSmooth(QList<WLElementTraj> &addTraj);
 void enableBacklash(bool enable);
 

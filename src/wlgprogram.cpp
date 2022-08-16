@@ -415,8 +415,13 @@ else
    ElementTraj.setStopMode(GCode->isStopMode());
    }
 
+if(GCode->isGCode(10)) {
+  ElementTraj.setPreBacklash();
+  }
+
 if(GCode->isValidValue('R') //Если R для круга то перещитываем в I и J
- &&GCode->isGCode(80)){                      
+ &&(GCode->isGCode(2)||GCode->isGCode(3))
+ &&GCode->isGCode(80)){
                       ok=GCode->calcCenterPointR(GCode->data()->lastGPoint
                                                 ,GCode->data()->curGPoint);
                       }
