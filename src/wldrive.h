@@ -394,11 +394,8 @@ inline double getLatch3Pos(quint8 i=0) {return (double)getLatch3PosL(i)*dimensio
 inline bool isActiv()                  {return Flag.get(fl_activ)||isAuto();}
 inline bool isMotion()                 {return getAxis()? getAxis()->isMotion(): false;}// {return Flag.get(fl_motion);}
        bool isMotionSubAxis();
-/*
-inline void setMotion(bool mot=true) {bool last=Flag.get(fl_motion); 
-                                      Flag.set(fl_motion,mot); 
-                                     if(last!=mot) emit changedMotion(mot);}
-*/
+
+  float getPercentManual() {return m_percentManual;}
 
 inline bool isManual() {return Flag.get(fl_manual);}
 
@@ -568,11 +565,7 @@ public:
 private:
 
 	bool startInterp();
-   float manualPercent;
-
-public:
-   float getManualPercent() {return manualPercent;}
-
+   float m_percentManual;
 
 signals:
 
