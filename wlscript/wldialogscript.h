@@ -11,7 +11,7 @@
 #include "wlenternum.h"
 #include "wlenterstring.h"
 
-class WLDialogScript : public QDialog
+class WLDialogScript : public QObject
 {
 	Q_OBJECT
 
@@ -19,12 +19,12 @@ public:
     WLDialogScript(QWidget *parent);
     ~WLDialogScript();
 
-
 private:    
 bool    retOk=false;
 double  scaleFont=1.5;
 double  num=0;
 QString str;
+QWidget *parentWidget=nullptr;
 
 public:
 
@@ -42,6 +42,8 @@ Q_INVOKABLE int isOk()     {return  retOk;}
 Q_INVOKABLE int isCancel() {return !retOk;}
 Q_INVOKABLE int isShow()   {return      0;}
 	
+public slots:
+  void close() {}
 };
 
 #endif //  WLDIALOGSCRIPT_H

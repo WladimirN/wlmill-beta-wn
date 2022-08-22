@@ -1,9 +1,9 @@
 #include "wldialogscript.h"
 
 WLDialogScript::WLDialogScript(QWidget *parent)
-    : QDialog(parent)
+    : QObject(parent)
 {
-
+parentWidget=parent;
 }
 
 WLDialogScript::~WLDialogScript()
@@ -15,13 +15,14 @@ int WLDialogScript::question(QString txt)
 {    
 QMessageBox ques(QMessageBox::Question,tr("Question:"),txt,QMessageBox::Yes|QMessageBox::No);
 
+connect(this,&WLDialogScript::close,&ques,&QMessageBox::close);
+
 ques.setWindowFlags(ques.windowFlags()|Qt::FramelessWindowHint);
 
 QFont font=ques.font();
 font.setPointSizeF(font.pointSize()*scaleFont);
 
 ques.setFont(font);
-
 ques.show();
 
 if(ques.exec()==QMessageBox::Yes)
@@ -34,7 +35,10 @@ return retOk;
 
 double WLDialogScript::enterNum(QString txt,double def,int decimals)
 {
-WLEnterNum EnterNum(this);
+WLEnterNum EnterNum(parentWidget);
+
+connect(this,&WLDialogScript::close,&EnterNum,&QMessageBox::close);
+
 EnterNum.setMinMaxNow(-100000,100000,def);
 EnterNum.setDecimals(decimals);
 EnterNum.setLabel(txt);
@@ -61,7 +65,9 @@ return num=def;
 
 QString WLDialogScript::enterString(QString txt,QString def)
 {
-WLEnterString EnterString(this);
+WLEnterString EnterString(parentWidget);
+
+connect(this,&WLDialogScript::close,&EnterString,&QMessageBox::close);
 
 EnterString.setLabel(txt);
 EnterString.setString(def);
@@ -88,15 +94,13 @@ return str=def;
 
 QString WLDialogScript::enterSaveFile(QString txt,QString lastFile)
 {
-str = QFileDialog::getSaveFileName(this, txt,lastFile,"(*.txt)");
+str = QFileDialog::getSaveFileName(parentWidget, txt,lastFile,"(*.txt)");
 
 retOk=false;
 
-if(!str.isEmpty())
-  {
+if(!str.isEmpty()) {
   retOk=true;
   }
-
 
 return str;
 }
@@ -105,7 +109,9 @@ return str;
 
 int WLDialogScript::message(QString txt)
 {
-QMessageBox msg(QMessageBox::Information, tr("Message: "),txt,QMessageBox::Ok,this);
+QMessageBox msg(QMessageBox::Information, tr("Message: "),txt,QMessageBox::Ok,parentWidget);
+
+connect(this,&WLDialogScript::close,&msg,&QMessageBox::close);
 
 msg.setWindowFlags(msg.windowFlags()|Qt::FramelessWindowHint);
 
