@@ -3030,8 +3030,8 @@ for(int i=1;i<addTraj.size();i++)
    ||!addTraj[i].isLine()   
    ||addTraj[i-1].isFast()
    ||addTraj[i].isFast()
-   //||addTraj[i].isBacklash()
-   //||addTraj[i-1].isBacklash()
+   ||addTraj[i].isStopMode()
+   ||addTraj[i-1].isStopMode()
    ||addTraj[i].getSmoothP()==0.0
    ) continue;
 
@@ -3304,7 +3304,7 @@ else  if(!deltaBL.isNull()) { //add line backlash
 
          if(!deltaBL.isNull()){ //добавляем линию если не всё перенесли
          ETraj=Traj[i];
-         //ETraj.setBckl();
+         ETraj.setStopMode(true);
          ETraj.setLine(Traj[i].getStartPoint()+m_nowBL,Traj[i].getStartPoint()+nextBL);
 
          if(m_Fbacklash!=0.0f)    ETraj.setF(m_Fbacklash);
