@@ -3241,8 +3241,8 @@ for(int i=1;i<addTraj.size();i++)
    ||!addTraj[i].isLine()   
    ||addTraj[i-1].isFast()
    ||addTraj[i].isFast()
-   //||addTraj[i].isBacklash()
-   //||addTraj[i-1].isBacklash()
+   ||addTraj[i].isStopMode()
+   ||addTraj[i-1].isStopMode()
    ||addTraj[i].getSmoothP()==0.0
    ) continue;
 
@@ -3485,12 +3485,14 @@ if(Traj[i].isFast()
   Traj[i].setLine(Traj[i].data.line.startPoint+m_nowBL,Traj[i].data.line.endPoint+nextBL);
   }
 else  if(!deltaBL.isNull()) { //add line backlash
-
          if(i>0
          &&Traj[i-1].isLine()
          &&Traj[i-1].isPreBacklash()) {
+
             bool ok;
+
             Traj[i-1].calcPoints(&ok,getGModel());
+
             WLGPoint lastV=Traj[i-1].startV;
             WLGPoint lastBL;
 
@@ -3513,7 +3515,7 @@ else  if(!deltaBL.isNull()) { //add line backlash
 
          if(!deltaBL.isNull()){ //добавляем линию если не всё перенесли
          ETraj=Traj[i];
-         //ETraj.setBckl();
+         ETraj.setStopMode(true);
          ETraj.setLine(Traj[i].getStartPoint()+m_nowBL,Traj[i].getStartPoint()+nextBL);
 
          if(m_Fbacklash!=0.0f)    ETraj.setF(m_Fbacklash);
@@ -3525,19 +3527,13 @@ else  if(!deltaBL.isNull()) { //add line backlash
            i--; //так как мы не добавляем элемент а всё перенесли впредыдущий
         }
         else if(Traj[i].isCirc()){ //circ corr
-             Traj[i].setArc(Traj[i].data.arc.startPoint+m_nowBL
-                           ,Traj[i].data.arc.centerPoint+m_nowBL
-                           ,Traj[i].data.arc.endPoint+m_nowBL
-                           ,Traj[i].data.arc.CCW
-                           ,Traj[i].data.arc.plane);
-              }
-              else  { //line corr
-               foreach(QString name,GDrive)
-                {
-                if(deltaBL.get(name)==0.0
-                 &&nextNBL.get(name)!=0.0) nextBL.set(name,nextNBL.get(name));
-                }
-
+               Traj[i].setArc(Traj[i].data.arc.startPoint+m_nowBL
+                             ,Traj[i].data.arc.centerPoint+m_nowBL
+                             ,Traj[i].data.arc.endPoint+m_nowBL
+                             ,Traj[i].data.arc.CCW
+                             ,Traj[i].data.arc.plane);
+               }
+               else  { //line corr
                Traj[i].setLine(Traj[i].data.line.startPoint+m_nowBL
                               ,Traj[i].data.line.endPoint+nextBL);
               }

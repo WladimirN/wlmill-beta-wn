@@ -415,7 +415,7 @@ else
    ElementTraj.setStopMode(GCode->isStopMode());
    }
 
-if(GCode->isGCode(10)) {
+if(GCode->isGCode(111)) {
   ElementTraj.setPreBacklash();
   }
 

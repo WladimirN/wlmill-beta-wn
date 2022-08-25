@@ -16,7 +16,6 @@ setGCode(01);
 setGCode(54);
 setGCode(61);
 
-setGCode(9);
 //setGCode(7); //radius Turn Mode
 
 push();
@@ -546,14 +545,7 @@ switch(code)
   case 103:m_data.GCode[2]=0;
            m_data.GCode[3]=0;
            break;
-//Backlash
-  case 9: m_data.GCode[9] =1; //"backlash";
-          m_data.GCode[10]=0;
-          break;
- case 10: m_data.GCode[9] =0; //"pre backlash";
-          m_data.GCode[10]=1;
-          break;
-   //**03
+
    case 17:m_data.GCode[17]=1;//"Plane XY";
            m_data.GCode[18]=0;
            m_data.GCode[19]=0;
@@ -703,6 +695,15 @@ switch(code)
    case 99:m_data.GCode[99]=1;//"To R 80";
            m_data.GCode[98]=0;
            break;
+
+  //Backlash
+   case 110: m_data.GCode[110]=0; //"backlash";
+             m_data.GCode[111]=0;
+             break;
+   case 111: m_data.GCode[110]=0; //"pre backlash";
+             m_data.GCode[111]=1;
+             break;
+
   default: return -1;
 
 
