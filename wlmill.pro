@@ -13,16 +13,6 @@ QMAKE_LFLAGS = -no-pie
 #           QT_NO_INFO_OUTPUT\
 #           QT_NO_WARNING_OUTPUT\
 
-#DEFINES += DEF_CAMERA
-
-
-#contains(DEFINES, DEF_CAMERA) {
-#QT += multimedia multimediawidgets
-#SOURCES +=../../wlqt/form/wlcamera.cpp
-#HEADERS +=../../wlqt/form/wlcamera.h
-#FORMS += ../../wlqt/form/wlcamera.ui
-#TARGET = wlmill-cam
-#}
 
 DEFINES += DEF_HMAP
 
@@ -102,7 +92,7 @@ HEADERS += \
     model/wlheightmaptablemodel.h \
     model/wlgtoolstablemodel.h \
     wlmill.h \
-    wlmilldrive.h \
+    wlgdrive.h \
     wlmillmachine.h
 
 

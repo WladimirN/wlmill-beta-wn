@@ -9,7 +9,7 @@
 #include <QTextCodec>
 
 #include "wlelementtraj.h"
-#include "wlmilldrive.h"
+#include "wlgdrive.h"
 #include "wlmotion.h"
 #include "wlevscript.h"
 #include "wl3dpoint.h"

@@ -2,7 +2,7 @@
 #define WLMILLDRIVEDIALOG_H
 
 #include <QDialog>
-#include "wlmilldrive.h"
+#include "wlgdrive.h"
 #include "ui_wlgdrivewidget.h"
 
 namespace Ui {
