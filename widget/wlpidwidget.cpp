@@ -7,6 +7,9 @@ WLPidWidget::WLPidWidget(QString name,WLPidData data,QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->sbFFP->setValue(data.ffp);
+    ui->sbFFD->setValue(data.ffd);
+
     ui->sbP->setValue(data.p);
     ui->sbI->setValue(data.i);
     ui->sbD->setValue(data.d);
@@ -16,6 +19,9 @@ WLPidWidget::WLPidWidget(QString name,WLPidData data,QWidget *parent) :
     m_name=name;
 
     ui->pbApply->setDisabled(true);
+
+    connect(ui->sbFFP,QOverload<double>::of(&QDoubleSpinBox::valueChanged),[=](){ui->pbApply->setEnabled(true);});
+    connect(ui->sbFFD,QOverload<double>::of(&QDoubleSpinBox::valueChanged),[=](){ui->pbApply->setEnabled(true);});
 
     connect(ui->sbP,QOverload<double>::of(&QDoubleSpinBox::valueChanged),[=](){ui->pbApply->setEnabled(true);});
     connect(ui->sbI,QOverload<double>::of(&QDoubleSpinBox::valueChanged),[=](){ui->pbApply->setEnabled(true);});
@@ -35,9 +41,13 @@ WLPidData WLPidWidget::getPidData()
 {
 WLPidData ret;
 
+ret.ffp=ui->sbFFP->value();
+ret.ffd=ui->sbFFD->value();
+
 ret.p=ui->sbP->value();
 ret.i=ui->sbI->value();
 ret.d=ui->sbD->value();
+
 
 return ret;
 }

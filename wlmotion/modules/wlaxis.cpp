@@ -320,6 +320,7 @@ emit sendCommand(data);
 return true;
 }
 
+
 bool WLAxis::setTypeMotor(typeMotorAxis _typeMotor)
 {
 typeMotor=_typeMotor;
