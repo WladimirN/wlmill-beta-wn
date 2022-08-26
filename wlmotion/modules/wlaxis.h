@@ -245,31 +245,57 @@ return Aacc!=B.Aacc
 };
 
 struct WLPidData{
-float p;
-float i;
-float d;
+float ffp=0;
+float ffd=0;
 
-WLPidData(float _p=1,float _i=0,float _d=0){p=_p;i=_i;d=_d;}
+float p=1;
+float i=0;
+float d=0;
+
+WLPidData(float _p=1,float _i=0,float _d=0,float _ffp=0,float _ffd=0)
+     {
+     ffp=_ffp;
+     ffd=_ffd;
+
+     p=_p;
+     i=_i;
+     d=_d;
+     }
 
 bool isValid() {
- return  p>=0
+ return  ffp>=0
+       &&ffd>=0
+       &&p>=0
        &&i>=0
        &&d>=0;
  }
 
 QString toString(){
- return QString("%1,%2,%3").arg(p,0,'f',5).arg(i,0,'f',5).arg(d,0,'f',5);
+ return QString("%1,%2,%3,%4,%5").arg(p,0,'f',5)
+                                 .arg(i,0,'f',5)
+                                 .arg(d,0,'f',5)
+                                 .arg(ffp,0,'f',5)
+                                 .arg(ffd,0,'f',5);
  }
 
 bool fromString(QString str)
  {
  QStringList list=str.split(",");
 
- if(list.size()!=3) return false;
+ if(list.size()<3) return false;
 
  p=list.at(0).toFloat();
  i=list.at(1).toFloat();
  d=list.at(2).toFloat();
+
+ if(list.size()>=5) {
+   ffp=list.at(3).toFloat();
+   ffd=list.at(4).toFloat();
+   }
+   else {
+   ffp=0;
+   ffd=0;
+   }
 
  return true;
  }

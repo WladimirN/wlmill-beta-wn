@@ -27,7 +27,6 @@ FORMS   +=widget/wlcamera.ui
 TARGET = wlmill_cam
 }
 
-
 DEFINES += DEF_HMAP
 
 VERSION = 21.06.18.1

@@ -1,4 +1,4 @@
-#include "wlmilldrive.h"
+#include "wlgdrive.h"
 
 WLGDrive::WLGDrive(QString _name,WLModuleAxis *_MAxis)
     : WLDrive(_name,_MAxis)
