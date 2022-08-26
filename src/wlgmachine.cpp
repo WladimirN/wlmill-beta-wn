@@ -3386,7 +3386,8 @@ if(isEmptyMotion())   {
 
 while((ModulePlanner->getFree()>0)
    &&(!MillTraj.isEmpty())
-   &&( MillTraj.size()>1
+   &&(!isRunGProgram()
+     ||MillTraj.size()>1
      ||MillTraj.first().isMCode()
      ||m_iProgram==(m_Program->getElementCount()))
    &&m_runList
