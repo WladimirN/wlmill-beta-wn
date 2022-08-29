@@ -18,7 +18,7 @@
 #define GNO_use  0
 #define GErr    -1
 
-#define GCodeSize 100
+#define GCodeSize 1000
 #define sizeSC 7
 
 typedef struct GPar

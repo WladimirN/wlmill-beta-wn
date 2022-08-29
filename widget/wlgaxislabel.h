@@ -5,7 +5,7 @@
 #include <QPainter>
 #include <QSizePolicy>
 #include "wlgcode.h"
-#include "wlmilldrive.h"
+#include "wlgdrive.h"
 
 class WLGAxisLabel : public QWidget
 {

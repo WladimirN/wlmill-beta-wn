@@ -382,7 +382,7 @@ if(stream.name()=="outputs")
     }	
    }
 }
-update();
+
 }
 
 void WLModuleIOPut::writeXMLData(QXmlStreamWriter &stream)

@@ -9,7 +9,7 @@
 #include <QTextCodec>
 
 #include "wlelementtraj.h"
-#include "wlmilldrive.h"
+#include "wlgdrive.h"
 #include "wlmotion.h"
 #include "wlevscript.h"
 #include "wl3dpoint.h"
@@ -217,7 +217,7 @@ private:
 
 void addBacklash(QList<WLElementTraj> &Traj);
 void addCalcGModel(QList<WLElementTraj> &addTraj);
-void addRotaryPosition(WLGPoint startPoint,QList<WLElementTraj> &addTraj);
+void addRotaryPosition(WLGPoint &lastPoint,QList<WLElementTraj> &addTraj);
 void addSmooth(QList<WLElementTraj> &addTraj);
 void enableBacklash(bool enable);
 

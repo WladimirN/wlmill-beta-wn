@@ -314,11 +314,14 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 Stream<<(quint8)comAxis_setPid<<getIndex()
                               <<m_pidData.p
                               <<m_pidData.i
-                              <<m_pidData.d;
+                              <<m_pidData.d
+                              <<m_pidData.ffp
+                              <<m_pidData.ffd;
 
 emit sendCommand(data);
 return true;
 }
+
 
 bool WLAxis::setTypeMotor(typeMotorAxis _typeMotor)
 {

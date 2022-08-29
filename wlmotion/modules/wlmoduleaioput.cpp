@@ -215,5 +215,5 @@ if(stream.name()=="outputs")
     }
    }
 }
-update();
+
 }

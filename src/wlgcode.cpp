@@ -16,8 +16,7 @@ setGCode(01);
 setGCode(54);
 setGCode(61);
 
-//setMCode(5);
-//setMCode(9);
+//setGCode(7); //radius Turn Mode
 
 push();
 }
@@ -496,25 +495,24 @@ switch(code)
            m_data.GCode[3]=0;
            break;
 
-   //**03
-   case 17:m_data.GCode[17]=1;//"Plos XY";
+   case 17:m_data.GCode[17]=1;//"Plane XY";
            m_data.GCode[18]=0;
            m_data.GCode[19]=0;
            m_data.GCode[20]=0;
            break;
-   case 18:m_data.GCode[17]=0;//"Plos ZX";
+   case 18:m_data.GCode[17]=0;//"Plane ZX";
            m_data.GCode[18]=1;
            m_data.GCode[19]=0;
            m_data.GCode[20]=0;
          //  cout<<" no Use";
            break;
-   case 19:m_data.GCode[17]=0;//"Plos YZ";
+   case 19:m_data.GCode[17]=0;//"Plane YZ";
            m_data.GCode[18]=0;
            m_data.GCode[19]=1;
            m_data.GCode[20]=0;
          //  cout<<" no Use";
            break;
-   case 20:m_data.GCode[17]=1;//"Plos proizvol";
+   case 20:m_data.GCode[17]=1;//"Plane proizvol";
            m_data.GCode[18]=0;
            m_data.GCode[19]=0;
            m_data.GCode[20]=1;
@@ -575,16 +573,16 @@ switch(code)
             }
            break;
    //--smooth
-   case 61: m_data.GCode[61]=1; //"Increm SK";
+   case 61: m_data.GCode[61]=1; //No smooth
             m_data.GCode[64]=0;
 
             if((List.size()>1)&&(List.at(1).toInt()==1))
-                m_data.stopMode=true;
+                m_data.stopMode=true; //stop mode G61.1
             else
                 m_data.stopMode=false;
            break;
 
-   case 64:m_data.GCode[61]=0; //"Increm SK";
+   case 64:m_data.GCode[61]=0;
            m_data.GCode[64]=1;
            m_data.stopMode=false;
            break;
@@ -646,6 +644,15 @@ switch(code)
    case 99:m_data.GCode[99]=1;//"To R 80";
            m_data.GCode[98]=0;
            break;
+
+  //Backlash
+   case 110: m_data.GCode[110]=0; //"backlash";
+             m_data.GCode[111]=0;
+             break;
+   case 111: m_data.GCode[110]=0; //"pre backlash";
+             m_data.GCode[111]=1;
+             break;
+
   default: return -1;
 
 

@@ -26,7 +26,7 @@ type=empty;
 data.empty.point=WLGPoint();
 
 if(all){
-    stopMode=false;
+    m_stopMode=false;
     }
 }
 
@@ -816,6 +816,15 @@ for(int i=0;i<Traj.size();i++)
  // qDebug()<<"F="<<Traj[i].speedF;
   }
 
+}
+
+void WLElementTraj::calcPoints(QList<WLElementTraj> &Traj, WLGModel *GModel, double delta)
+{
+bool ok;
+
+for(int i=0;i<Traj.size();i++){
+  Traj[i].calcPoints(&ok,GModel);
+  }
 }
 
 inline bool WLElementTraj::isEqFS(WLElementTraj ET)
