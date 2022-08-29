@@ -3689,7 +3689,7 @@ case WLElementTraj::line:  {
 
                               foreach(WLGDrive *mD,getGDrives()){
                               if(!mD->getAxis()) continue;
-                              ePos+=ME.data.line.endPoint.get(mD->getName())/mD->dimension();
+                              ePos+=round(ME.data.line.endPoint.get(mD->getName())/mD->dimension());
                               indexs+=i;
                               i++;
                               }
@@ -3716,8 +3716,8 @@ case WLElementTraj::uline:   {
 
                              foreach(WLGDrive *mD,getGDrives()){
                               if(!mD->getAxis()) continue;
-                              ePos+=ME.data.uline.endPoint.get(mD->getName())/mD->dimension();
-                              mPos+=ME.data.uline.midPoint.get(mD->getName())/mD->dimension();
+                              ePos+=round(ME.data.uline.endPoint.get(mD->getName())/mD->dimension());
+                              mPos+=round(ME.data.uline.midPoint.get(mD->getName())/mD->dimension());
                               indexs+=i;
                               i++;
                               }
@@ -3748,8 +3748,8 @@ case WLElementTraj::arc: {
 
                           foreach(WLGDrive *mD,getGDrives()){
                            if(!mD->getAxis()) continue;
-                           ePos+=ME.data.arc.endPoint.get(mD->getName())/mD->dimension();
-                           cPos+=ME.data.arc.centerPoint.get(mD->getName())/mD->dimension();
+                           ePos+=round(ME.data.arc.endPoint.get(mD->getName())/mD->dimension());
+                           cPos+=round(ME.data.arc.centerPoint.get(mD->getName())/mD->dimension());
                            indexs+=i;
 
                            if(mD->getName()=="X") Ib=i;
