@@ -77,7 +77,9 @@ void reset()
 class WLGMachine : public WLMachine
 {
 	Q_OBJECT
-	
+
+Q_PROPERTY(bool busy  READ isBusy NOTIFY changedBusy())
+
 private:
     enum StateMMachine{noInit,Init,Ready};
     enum TypeAutoMMachine{AUTO_no
@@ -294,6 +296,8 @@ public:
 
   WLMPG *getMPG();
 public:
+
+  bool isBusy() {return m_busy;}
 
   double getTimeElement() const {double ret=m_programTime.elapsed(); return m_iProgram==m_elementsTime ? 0 : ret/(m_iProgram-m_elementsTime);}
 

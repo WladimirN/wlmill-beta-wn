@@ -133,6 +133,11 @@ Q_INVOKABLE  void setEnabledSub(int index,bool en)      {if(0<=index&&index<tbut
 
 Q_INVOKABLE   int addButtonMenu(QString txt,QString script,QString toolTip="")
                                                             {
+                                                            foreach(WLTButtonScript *tbut,tbuttonList) {
+                                                             if(tbut->text()==txt)
+                                                                 return  tbuttonList.size()-1;
+                                                             }
+
                                                             WLTButtonScript *tbutton = new WLTButtonScript(txt,txt,script,this);
 
                                                             if(!toolTip.isEmpty())

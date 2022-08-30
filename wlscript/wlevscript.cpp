@@ -109,6 +109,23 @@ if(m_enable)
 return ret;
 }
 
+double WLEVScript::getValueNum(QString name,double def)
+{
+bool ok;
+double ret=engine->globalObject().property(name).toVariant().toDouble(&ok);
+
+if(!ok){
+ ret=def;
+ }
+
+return ret;
+}
+
+QString WLEVScript::getValueStr(QString name)
+{
+return engine->globalObject().property(name).toVariant().toString();
+}
+
 bool WLEVScript::addObject(QObject *obj, QString name)
 {
 if(obj){     

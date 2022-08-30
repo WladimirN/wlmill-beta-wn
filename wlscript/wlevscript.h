@@ -11,23 +11,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QElapsedTimer>
-/*
-class WLValueScript: public QObject
-{
-Q_OBJECT
 
-public:
-    WLValueScript(QString file):values(file, QSettings::IniFormat) {}
-   ~WLValueScript() {}
-
-Q_INVOKABLE void     set(QString name,QVariant value)     {values.setValue(name,value);}
-Q_INVOKABLE QVariant get(QString name,QVariant defvalue) {return values.value(name,defvalue);}
-
-private:
-
-QSettings values;
-};
-*/
 
 struct SLoadCode
 {
@@ -115,6 +99,8 @@ public:
 
 Q_INVOKABLE bool runFunction(QString _func,bool _detectError=true);
 Q_INVOKABLE bool runScript(QString _script,bool _detectError=true);
+Q_INVOKABLE double  getValueNum(QString name,double def=0);
+Q_INVOKABLE QString getValueStr(QString name);
 
     bool setProperty(QString name,QScriptValue value);
     bool addObject(QObject *obj,QString name);

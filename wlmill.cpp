@@ -526,6 +526,7 @@ void WLMill::createTabTools()
 ToolsWidget = new WLToolsWidget(MillMachine->getGCode(),this);
 
 WLTBarTools *tBarTools = new WLTBarTools(MScript,this);
+
 MScript->addObject(tBarTools,"TOOLBARTOOLS");
 MScript->addBeforeInitScript("TOOLBARTOOLS.removeButtons();");
 
