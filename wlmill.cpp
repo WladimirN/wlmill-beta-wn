@@ -516,7 +516,7 @@ dockPosition->setFeatures(QDockWidget::DockWidgetFloatable
 addDockWidget(Qt::RightDockWidgetArea,dockPosition);
 }
 
-void WLMill::createDockTools()
+void WLMill::createTabTools()
 {
 //dockTools=new QDockWidget(this);
 //
@@ -1061,8 +1061,18 @@ Q_UNUSED(event)
 
 QQuickWidget *WLMill::createQuickWidget(QString file)
 {
-QQuickWidget *view  = new QQuickWidget;
+QQuickWidget *view  = new QQuickWidget(this);
+
 view->setSource(QUrl::fromLocalFile(file));
+
+if (view->status() == QQuickWidget::Error)
+ {
+ MessManager->setMessage("WLMill","Error file QML:"+file,1);
+ qDebug()<<"Error createQuickWidget:"<<file;
+
+ view->deleteLater();
+ return nullptr;
+ }
 
 QQmlContext *context = view->engine()->rootContext();
 
@@ -1070,21 +1080,7 @@ context->setContextProperty("view", view);
 context->setContextProperty("MSCRIPT", MScript);
 context->setContextProperty("MACHINE", MillMachine);
 
-if (view->status() == QQuickWidget::Error)
- {
- MessManager->setMessage("WLMill","Error file QML:"+file,1);
- qDebug()<<"Error QML:"<<file;
-
- view->deleteLater();
-
- return nullptr;
- }
-
-view->setResizeMode(QQuickWidget::SizeViewToRootObject);
-view->setWindowModality(Qt::ApplicationModal);
-
 return view;
-
 }
 
 void WLMill::runQML(QString file)
@@ -1097,7 +1093,15 @@ void WLMill::runQMLFile(QString file)
 QQuickWidget *view  = createQuickWidget(file);
 
 if(view)
-   view->show();
+ {
+ view->setWindowFlag(Qt::WindowType::Dialog);
+ view->setResizeMode(QQuickWidget::SizeRootObjectToView);
+ view->setWindowModality(Qt::ApplicationModal);
+
+ view->show(); 
+
+ connect(view,&QWidget::close,view,&QWidget::deleteLater);
+ }
 }
 
 void WLMill::addTabQML(QString file)
@@ -1116,48 +1120,24 @@ if(tabWidget->tabText(i)==FI.baseName())
 
 QQuickWidget *view  = createQuickWidget(file);
 
-if(view) {
+if(view) { 
+ view->setResizeMode(QQuickWidget::SizeRootObjectToView);
+ view->setWindowModality(Qt::ApplicationModal);
+
  tabWidget->addTab(view,FI.baseName());
  }
 }
 
-void WLMill::addDockQML(QString file)
-{
-addDockQML(_qmlPath+file);
-}
-
-void WLMill::addDockQMLFile(QString file)
-{
-QFileInfo FI(file);
-
-foreach (QDockWidget *dock, findChildren<QDockWidget *>()) {
-if(dock->objectName()==(FI.baseName()+"QML"))
-    return;
-}
-
-QQuickWidget *view  = createQuickWidget(file);
-
-if(view){
-QDockWidget *dockQML =new QDockWidget(this);
-
-dockQML->setWindowTitle(FI.baseName());
-dockQML->setObjectName(FI.baseName()+"QML");
-
-dockQML->setWidget(view);
-
-addDockWidget(Qt::BottomDockWidgetArea,dockQML);
-}
-}
-	
 void WLMill::readyMachine()
 {	
 qDebug()<<"WLMill::readyMachine() <<<";
 
 createMenuBar();
 
+createTabTools();
+
 createDockIOPut();
 createDockPosition();
-createDockTools();
 createDockMPG();
 createDockHeightMap();
 
