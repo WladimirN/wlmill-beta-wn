@@ -788,6 +788,7 @@ else
  }
 }
 
+oneSimpli=true; //чтобы вышел из цикла
 goto endspack;
 }
 
