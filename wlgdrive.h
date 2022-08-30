@@ -31,8 +31,8 @@ inline double getAxisPosition() {return position();}
 inline double getBacklash()      {return m_halfBacklash*2;}
 inline double getHalfBacklash()  {return m_halfBacklash;}
 
-virtual int setMov(double d);//движение на заданное расстояние в размере
-virtual int setMot(double p);//движение в заданное положение в размере
+   int setMovBl(double d);//движение на заданное расстояние в размере
+   int setMotBl(double p);//движение в заданное положение в размере
 
 virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual void  readXMLData(QXmlStreamReader &stream);
