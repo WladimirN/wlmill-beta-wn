@@ -1059,7 +1059,7 @@ Q_UNUSED(event)
     //Machine->Pause(1);
 }
 
-
+#ifdef DEF_QML
 QQuickWidget *WLMill::createQuickWidget(QString file)
 {
 QQuickWidget *view  = new QQuickWidget(this);
@@ -1083,6 +1083,7 @@ context->setContextProperty("MACHINE", MillMachine);
 
 return view;
 }
+#endif
 
 void WLMill::runQML(QString file)
 {
@@ -1091,6 +1092,7 @@ runQMLFile(_qmlPath+file);
 
 void WLMill::runQMLFile(QString file)
 {
+#ifdef DEF_QML
 QQuickWidget *view  = createQuickWidget(file);
 
 if(view)
@@ -1103,6 +1105,9 @@ if(view)
 
  connect(view,&QWidget::close,view,&QWidget::deleteLater);
  }
+#else
+qDebug()<<"no runQMLFile"<<file;
+#endif
 }
 
 void WLMill::addTabQML(QString file)
@@ -1112,6 +1117,7 @@ addTabQMLFile(_qmlPath+file);
 
 void WLMill::addTabQMLFile(QString file)
 {
+#ifdef DEF_QML
 QFileInfo FI(file);
 
 for (int i=0;i<tabWidget->count();i++) {
@@ -1127,6 +1133,9 @@ if(view) {
 
  tabWidget->addTab(view,FI.baseName());
  }
+#else
+qDebug()<<"no addQMLFile"<<file;
+#endif
 }
 
 void WLMill::readyMachine()

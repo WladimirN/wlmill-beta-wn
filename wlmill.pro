@@ -5,8 +5,6 @@
 TEMPLATE = app
 TARGET = wlmill
 QT += core widgets serialport gui network opengl script
-QT += qml quick quickwidgets
-
 
 QMAKE_LFLAGS = -no-pie
 
@@ -14,6 +12,7 @@ QMAKE_LFLAGS = -no-pie
 #           QT_NO_INFO_OUTPUT\
 #           QT_NO_WARNING_OUTPUT\
 
+#DEFINES  += DEF_QML
 #DEFINES  += DEF_CAMERA
 DEFINES  += GCODE_MILL
 
@@ -26,6 +25,11 @@ HEADERS +=widget/wlcamera.h \
 FORMS   +=widget/wlcamera.ui
 TARGET = wlmill_cam
 }
+
+contains(DEFINES, DEF_QML) {
+QT += multimedia multimediawidgets
+}
+
 
 DEFINES += DEF_HMAP
 

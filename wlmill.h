@@ -17,9 +17,6 @@
 #include <QActionGroup>
 #include <QSplashScreen>
 #include <QShortcut>
-#include <QQuickWidget>
-#include <QQmlEngine>
-#include <QQmlContext>
 
 #include "wlpamlistwidget.h"
 #include "wlvisualwidget.h"
@@ -46,6 +43,12 @@
 
 #ifdef DEF_CAMERA
 #include "wlcamera.h"
+#endif
+
+#ifdef DEF_CAMERA
+#include <QQuickWidget>
+#include <QQmlEngine>
+#include <QQmlContext>
 #endif
 
 #define FileState       QCoreApplication::applicationDirPath()+"//state.dat"
@@ -267,7 +270,9 @@ public:
 unsigned int getLifeM() {return m_lifeM;}
 
 private:
+#ifdef DEF_QML
 QQuickWidget *createQuickWidget(QString file);
+#endif
 
 public slots:
 void runQML(QString file);
