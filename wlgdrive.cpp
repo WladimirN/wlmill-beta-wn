@@ -65,12 +65,12 @@ int WLGDrive::setAxisPosition(double pos)
 return setPosition(pos);
 }
 
-int WLGDrive::setMov(double d)//движение на заданное расстояние в размере
+int WLGDrive::setMovBl(double d)//движение на заданное расстояние в размере
 {
 return setMot(getRealPosition()+d);
 }
 
-int WLGDrive::setMot(double p)//движение в заданное положение в размере
+int WLGDrive::setMotBl(double p)//движение в заданное положение в размере
 {
 double pos=getRealPosition();
 
