@@ -1,5 +1,5 @@
-#ifndef WLFILESCRIPT_H
-#define WLFILESCRIPT_H
+#ifndef WLFILE_H
+#define WLFILE_H
 
 #include <QObject>
 #include <QFile>
@@ -13,19 +13,16 @@
 #include <QApplication>
 
 
-class WLFileScript : public QObject
+class WLFile : public QObject
 {
 	Q_OBJECT
 
 public:
-    WLFileScript(QObject *parent);
-    ~WLFileScript();
-/*
+    WLFile(QObject *parent);
+    ~WLFile();
+
 Q_INVOKABLE QVariant loadValue(QString namefile,QString nameData,QVariant dataDef);
 Q_INVOKABLE bool saveValue(QString namefile,QString nameData,QVariant data);
-*/
-Q_INVOKABLE QScriptValue loadValue(QString namefile,QString nameData,QScriptValue dataDef);
-Q_INVOKABLE bool saveValue(QString namefile,QString nameData,QScriptValue data);
 
 Q_INVOKABLE QString curPath(){return  QCoreApplication::applicationDirPath();}
 
@@ -35,4 +32,4 @@ private:
 	QMutex mutex;
 };
 
-#endif // WLFILESCRIPT_H
+#endif // WLFILE_H

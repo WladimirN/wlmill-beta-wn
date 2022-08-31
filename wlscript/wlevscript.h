@@ -99,8 +99,8 @@ public:
 
 Q_INVOKABLE bool runFunction(QString _func,bool _detectError=true);
 Q_INVOKABLE bool runScript(QString _script,bool _detectError=true);
-Q_INVOKABLE double  getValueNum(QString name,double def=0);
-Q_INVOKABLE QString getValueStr(QString name);
+Q_INVOKABLE QVariant getValue(QString name,QVariant def = QVariant());
+Q_INVOKABLE bool setValue(QString name,QVariant);
 
     bool setProperty(QString name,QScriptValue value);
     bool addObject(QObject *obj,QString name);

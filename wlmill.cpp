@@ -107,6 +107,8 @@ WLMill::WLMill(QWidget *parent)
 
     tabWidget = new QTabWidget(this);
 
+    tabWidget->setFocusPolicy(Qt::NoFocus);
+
     VisualWidget=new WLVisualWidget(Program,MillMachine);
 
     tabWidget->addTab(VisualWidget,tr("Visual"));
@@ -1080,6 +1082,7 @@ QQmlContext *context = view->engine()->rootContext();
 context->setContextProperty("view", view);
 context->setContextProperty("MSCRIPT", MScript);
 context->setContextProperty("MACHINE", MillMachine);
+context->setContextProperty("FILE",new WLFile(view));
 
 return view;
 }
@@ -1130,6 +1133,8 @@ QQuickWidget *view  = createQuickWidget(file);
 if(view) { 
  view->setResizeMode(QQuickWidget::SizeRootObjectToView);
  view->setWindowModality(Qt::ApplicationModal);
+
+ view->setFocusPolicy(Qt::WheelFocus);
 
  tabWidget->addTab(view,FI.baseName());
  }

@@ -45,7 +45,7 @@ void WLToolsWidget::addToolBar(WLTBarTools *toolBar)
 
 int WLToolsWidget::curIndexTool()
 {
- return m_GCode->getTools()->getKeyAt(ui->tableViewTools->currentIndex().row());
+return m_GCode->getTools()->getKeyAt(ui->tableViewTools->currentIndex().row());
 }
 
 QString WLToolsWidget::curRowTool()
@@ -60,6 +60,7 @@ void WLTBarTools::setTWidget(WLToolsWidget *_toolsWidget)
 
 int WLTBarTools::selectTool()
 {
+
 return toolsWidget ? toolsWidget->curIndexTool() : -1;
 }
 

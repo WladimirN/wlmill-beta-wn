@@ -56,7 +56,11 @@ return defvalue;
 
 int WLGTools::getKeyAt(int index) const
 {
-return index<count() ? m_tools.keys().at(index) : -1;
+if(0<=index&&index<count()) {
+ return  m_tools.keys().at(index);
+ }else {
+ return -1;
+ }
 }
 
 int WLGTools::count() const

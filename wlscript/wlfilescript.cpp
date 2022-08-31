@@ -64,3 +64,32 @@ if(dataDef.isNumber())
 else
     return load.value(nameData,dataDef.toVariant()).toString();
 }
+/*
+bool WLFileScript::saveValue(QString namefile,QString nameData,QVariant data)
+{
+QMutexLocker locker(&mutex);
+
+QVariant val;
+
+QSettings save(namefile, QSettings::IniFormat);
+
+save.setIniCodec("UTF-8");
+
+save.setValue(nameData,data);
+
+return save.isWritable();
+}
+
+QVariant WLFileScript::loadValue(QString namefile,QString nameData,QVariant dataDef)
+{
+QMutexLocker locker(&mutex);
+
+QVariant val;
+
+QSettings load(namefile, QSettings::IniFormat);
+
+load.setIniCodec("UTF-8");
+
+return load.value(nameData,dataDef);
+}
+*/

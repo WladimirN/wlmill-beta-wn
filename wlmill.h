@@ -45,10 +45,11 @@
 #include "wlcamera.h"
 #endif
 
-#ifdef DEF_CAMERA
+#ifdef DEF_QML
 #include <QQuickWidget>
 #include <QQmlEngine>
 #include <QQmlContext>
+#include "wlfile.h"
 #endif
 
 #define FileState       QCoreApplication::applicationDirPath()+"//state.dat"
@@ -270,6 +271,7 @@ public:
 unsigned int getLifeM() {return m_lifeM;}
 
 private:
+
 #ifdef DEF_QML
 QQuickWidget *createQuickWidget(QString file);
 #endif
