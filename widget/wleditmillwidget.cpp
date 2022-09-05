@@ -118,6 +118,13 @@ WLEditMillWidget::WLEditMillWidget(WLGMachine *_MillMachine,QDialog *parent)
 
     ui.cbFastChangeSOut->setChecked(MillMachine->getMotionDevice()->getModulePlanner()->isFastChangeSOut());
 
+    ui.editOutENBSpindle->setModule(MillMachine->getMotionDevice()->getModuleIOPut(),false);
+    ui.editOutENBSpindle->setValue(MillMachine->getMotionDevice()->getModulePlanner()->getOutputSpindle(WLModulePlanner::SPINDLE_outENB)->getIndex());
+
+    ui.editOutENBSpindle->setCheckable(true);
+    ui.editOutENBSpindle->setChecked(ui.editOutENBSpindle->value()!=0);
+    ui.editOutENBSpindle->setLabel("outENB");
+
 	setModal(true);
 
 }
@@ -309,6 +316,7 @@ MillMachine->setFeedG1StartAt(ui.sbFeedZG1->value());
 MillMachine->setDistG1StartAt(ui.sbDistZG1->value());
 
 MillMachine->getMotionDevice()->getModulePlanner()->setFastChangeSOut(ui.cbFastChangeSOut->isChecked());
+MillMachine->getMotionDevice()->getModulePlanner()->setOutENBSpindle(ui.editOutENBSpindle->isChecked() ? ui.editOutENBSpindle->value():0);
 return ret;
 }
 

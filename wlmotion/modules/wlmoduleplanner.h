@@ -23,6 +23,7 @@
 #define comSpindle_setDec  7 //
 #define comSpindle_setOutput 8 //
 #define comSpindle_setFastChange 9 //
+#define comSpindle_setInput 10 //
 
 //Planner
 #define comPlanner_addCirc       2 //
@@ -150,6 +151,8 @@ class WLModulePlanner : public WLModule
 	Q_OBJECT
 
 public:
+    enum typeInputSpindle{SPINDLE_inEMGStop};
+    enum typeOutputSpindle{SPINDLE_outENB};
 
 public:
     WLModulePlanner(WLDevice *_Device);
@@ -206,6 +209,7 @@ bool m_validProbe2=false;
 bool m_validProbe3=false;
 
 bool m_fastChangeSOut=false;
+WLIOPut *outENBSpindle;
 
 QVector <quint8> m_indexsAxis;
 
@@ -220,7 +224,7 @@ private:
      bool addDataSpindle(WLSpindleData data);
    //bool setOutput(typeOutputAxis type,quint8 num);
 public:
-     WLIOPut*  getInput(typeInputPlanner getTypeModule);
+     WLIOPut*  getInput(typeInputPlanner type);
 
      QList<WLSpindleData> getSpindleDataList() {return spindleDataList;}
      void setSpindleDataList(QList<WLSpindleData> dataList);
@@ -323,10 +327,17 @@ statusPlanner getStatus()  const {return m_status;}
    bool isFastChangeSOut() {return m_fastChangeSOut;}
    void setFastChangeSOut(bool enable=true);
 
+   void setOutENBSpindle(int index);
+
+    WLIOPut*  getInputSpindle(typeInputSpindle type);
+    WLIOPut*  getOutputSpindle(typeOutputSpindle type);
+
+private:
+    bool setInputSpindle(typeInputSpindle type,quint8 num);
+    bool setOutputSpindle(typeOutputSpindle type,quint8 num);
+
 private slots:
-
    void callTrackPlanner();
-
 
 public slots:
 	void sendGetDataBuf();

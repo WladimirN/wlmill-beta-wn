@@ -359,6 +359,8 @@ WLElementTraj ElementTraj;
 QString com,data,buf;
 data=dataStr.toUpper();
 
+double lastS=GCode->getValue('S');
+
 bool ok=true;;
 
 //qDebug()<<dataStr;
@@ -478,13 +480,6 @@ else if(GCode->isGCode(28))
                     if(GCode->isGCode(0)) ElementTraj.F=-1;
 
                     ok=convertArc(ElementTraj,curListTraj,GCode);
-                    //ok=ElementTraj.setArc(GCode->getPointActivSC(GCode->data()->lastGPoint)
-                    //                          ,GCode->getPointActivSC(GCode->getPointIJK(GCode->data()->lastGPoint))
-                    //                          ,GCode->getPointActivSC(GCode->data()->curGPoint)
-                    //                          ,GCode->isGCode(3)
-                    //                          ,GCode->getPlane());
-                    //
-                    //if(ok) curListTraj+=ElementTraj;
                     }
                    }
                    else if(GCode->isValidValue('X') //line
@@ -500,16 +495,14 @@ else if(GCode->isGCode(28))
                            if(GCode->isGCode(0)) ElementTraj.F=-1;
 
                            ok=convertLine(ElementTraj,curListTraj,GCode);
-
-                           //ok=ElementTraj.setLineXYZ(GCode->getPointActivSC(GCode->data()->lastGPoint)
-                           //                      ,GCode->getPointActivSC(GCode->data()->curGPoint));
-                           //
-                           //if(ok) curListTraj+=ElementTraj;
                            }
-                           else {
-                           if(MList.isEmpty())
-                                   curListTraj+=ElementTraj;
-                           }
+                           else if(lastS!=ElementTraj.S){
+                                ElementTraj.setDelay(GCode->getPointActivSC(GCode->data()->curGPoint),0);
+                                curListTraj+=ElementTraj;
+                                }
+                                else if(MList.isEmpty()){
+                                     curListTraj+=ElementTraj;
+                                     }
 
 GCode->data()->lastGPoint=GCode->data()->curGPoint;
 

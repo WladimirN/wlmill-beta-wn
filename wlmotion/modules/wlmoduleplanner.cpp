@@ -26,6 +26,8 @@ inStop=&WLIOPut::In0;
 m_validProbe2=false;
 m_validProbe3=false;
 
+outENBSpindle=&WLIOPut::Out;
+
 updateTimer= new QTimer;
 connect(updateTimer,&QTimer::timeout,this,&WLModulePlanner::callTrackPlanner);
 updateTimer->start(500);
@@ -287,6 +289,63 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_toSpindle<<(quint8)comSpindle_setFastChange<<(uint8_t)m_fastChangeSOut;
 
 emit sendCommand(data);
+}
+
+void WLModulePlanner::setOutENBSpindle(int index)
+{
+outENBSpindle->removeComment("outENBSpindle"+QString::number(getIndex()));
+
+WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getDevice()->getModule(typeMIOPut));
+
+if(index>=ModuleIOPut->getSizeOutputs()) index=0;
+
+outENBSpindle=ModuleIOPut->getOutput(index);
+outENBSpindle->addComment("outENBSpindle"+QString::number(getIndex()));
+
+setOutputSpindle(SPINDLE_outENB,index);
+}
+
+WLIOPut *WLModulePlanner::getInputSpindle(WLModulePlanner::typeInputSpindle type)
+{
+return nullptr;
+}
+
+WLIOPut *WLModulePlanner::getOutputSpindle(WLModulePlanner::typeOutputSpindle type)
+{
+switch(type)
+{
+case SPINDLE_outENB:  return outENBSpindle;
+}
+
+return nullptr;
+}
+
+bool WLModulePlanner::setInputSpindle(WLModulePlanner::typeInputSpindle type, quint8 num)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_toSpindle<<(quint8)comSpindle_setInput<<(quint8)type<<num;
+
+emit sendCommand(data);
+return true;
+}
+
+bool WLModulePlanner::setOutputSpindle(WLModulePlanner::typeOutputSpindle type,quint8 num)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_toSpindle<<(quint8)comSpindle_setOutput<<(quint8)type<<num;
+
+emit sendCommand(data);
+return true;
 }
 
 void WLModulePlanner::callTrackPlanner()
@@ -834,7 +893,7 @@ stream.writeAttribute("fastChangeSOut",QString::number(isFastChangeSOut()));
 stream.writeAttribute("inProbe",QString::number(getInput(PLANNER_inProbe)->getIndex()));
 stream.writeAttribute("inPause",QString::number(getInput(PLANNER_inPause)->getIndex()));
 stream.writeAttribute("inStop",QString::number(getInput(PLANNER_inStop)->getIndex()));
-
+stream.writeAttribute("outENBSpindle",QString::number(getOutputSpindle(SPINDLE_outENB)->getIndex()));
 quint8 index=0;
 
 foreach(WLSpindleData sdata,getSpindleDataList())
@@ -890,6 +949,9 @@ if(!stream.attributes().value("decSOut").isEmpty())
 if(!stream.attributes().value("fastChangeSOut").isEmpty())
      setFastChangeSOut(stream.attributes().value("fastChangeSOut").toInt());
 
+if(!stream.attributes().value("outENBSpindle").isEmpty())
+    setOutENBSpindle(stream.attributes().value("outENBSpindle").toString().toInt());
+
 stream.readNextStartElement();
 
 if(stream.name()==metaObject()->className()) break;
@@ -904,6 +966,7 @@ if(stream.name()=="spindleData")
 
        addDataSpindle(sdata);
        }
+
 }
 
 }

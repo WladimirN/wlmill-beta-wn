@@ -54,7 +54,7 @@ if(_startPoint!=_midPoint
 
 bool WLElementTraj::setDelay(WLGPoint _Point,quint32 ms)
 {
-if(ms!=0){
+if(ms>=0){
     type=WLElementTraj::delay;
     data.delay.time=ms;
     data.delay.point=_Point;

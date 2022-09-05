@@ -135,6 +135,18 @@ motDevice->deleteLater();
 qDebug()<<"end GMachine";
 }
 
+double WLGMachine::getSSpindle(int index)
+{
+switch(stateSpindle)
+{
+case  CW: return  curSOut;
+case CCW: return -curSOut;
+
+default: return 0;
+}
+
+}
+
 void WLGMachine::plusPercentManual()
 {
 int index=m_percentManualList.indexOf(getPercentManual());
@@ -695,39 +707,7 @@ m_LScript->setObject(m_ValueScript,"VALUES");
 
 void WLGMachine::setDataSOut(float S)
 {
- /*
-val*=m_percentSOut;
-
-if(val>m_maxSOut) {
-  val=m_maxSOut;
-  }
-  else if(val<m_minSOut){
-  val=m_minSOut;
-  }
-
-double k=(m_maxSOut-m_minSOut)/(m_maxS-m_minS);
-
-float S=(val-m_minSOut)/k+m_minS;
-
-if(isUseCorrectSOut()&&m_correctSList.size()>2)
- {
- if(S<=m_correctSList.first().Scor)  S=m_correctSList.first().Sadj;
- else
-  if(S>=m_correctSList.last().Scor)  S=m_correctSList.last().Sadj;
-  else {
-   for(int i=1;i<m_correctSList.size();i++)
-     {
-     if(m_correctSList[i].Scor>S)
-      {
-      double k=(m_correctSList[i].Sadj-m_correctSList[i-1].Sadj)/(m_correctSList[i].Scor-m_correctSList[i-1].Scor);
-      S=m_correctSList[i-1].Sadj+k*(S-m_correctSList[i-1].Scor);
-      break;
-      }
-     }
-   }
- }
-*/
-emit changedSValue(curSOut=S);
+ emit changedSSpindle(curSOut=S);
 }
 
 
@@ -2801,19 +2781,11 @@ if(WLGProgram::translate(gtxt,curListTraj,&m_GCode))
 
 	addElementTraj(curListTraj);
 	
-	if(!curListTraj.isEmpty())
-	 {
-     if(curListTraj.first().isEmpty()
-     &&!isRunGProgram())
-		 {
-         setSOut(curListTraj.first().S);
-	     }
-	 }
-     emit changedTrajSize(MillTraj.size());
-     emit changedReadyRunList(m_readyRunList=true);
+    emit changedTrajSize(MillTraj.size());
+    emit changedReadyRunList(m_readyRunList=true);
 	  
 
-      if(!isPause())
+     if(!isPause())
        {
        if(isRunList())
          {
@@ -2824,7 +2796,6 @@ if(WLGProgram::translate(gtxt,curListTraj,&m_GCode))
                startMov();
                }
         }
-
 
     updateBusy();
 	return true;

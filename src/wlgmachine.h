@@ -173,9 +173,10 @@ QList<WLElementTraj>  showMillTraj;
  QMutex MutexSaveConfig;
  QMutex MutexScript;
 
-Q_INVOKABLE bool isSpindleStop() {return stateSpindle==Stop;}
-Q_INVOKABLE bool isSpindleCW()   {return stateSpindle==CW;}
-Q_INVOKABLE bool isSpindleCCW()  {return stateSpindle==CCW;}
+Q_INVOKABLE bool   isSpindleStop(int index=0) {return stateSpindle==Stop;}
+Q_INVOKABLE bool   isSpindleCW(int index=0)   {return stateSpindle==CW;}
+Q_INVOKABLE bool   isSpindleCCW(int index=0)  {return stateSpindle==CCW;}
+Q_INVOKABLE double getSSpindle(int index=0);
 
 Q_INVOKABLE bool isIngnoreInPause() {return motDevice->getModulePlanner()->isIgnoreInPause();}
 Q_INVOKABLE bool isIngnoreInStop()  {return motDevice->getModulePlanner()->isIgnoreInStop();}
@@ -637,7 +638,7 @@ signals:
     void changedEMG(bool);
     void changedRDY(bool);
 
-    void changedSValue(int);   
+    void changedSSpindle(float);
 
     void changedBusy(bool);
 
