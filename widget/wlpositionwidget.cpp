@@ -954,7 +954,7 @@ WLPidWidget PW(QString("Axis %1").arg(axis->getIndex()),axis->getPidData(),this)
 
 PW.show();
 
-connect(&PW,&WLPidWidget::pidChanged,[=](WLPidData data){axis->setPidData(data);});
+connect(&PW,&WLPidWidget::changedPidData,[=](WLPidData data){axis->setPidData(data);});
 
 if(PW.exec()) {
   axis->setPidData(PW.getPidData());

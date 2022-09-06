@@ -93,7 +93,8 @@ HEADERS += \
     model/wlgtoolstablemodel.h \
     wlmill.h \
     wlgdrive.h \
-    wlmillmachine.h
+    wlmillmachine.h \
+    widget/wlerrorpidwidget.h
 
 
 SOURCES += \
@@ -150,7 +151,8 @@ SOURCES += \
     main.cpp \    
     wlmill.cpp \
     wlmillmachine.cpp \
-    wlgdrive.cpp
+    wlgdrive.cpp \
+    widget/wlerrorpidwidget.cpp
 
 
 FORMS += \
@@ -178,7 +180,8 @@ FORMS += \
     widget/wlpositionwidget.ui \
     widget/wleditpoint.ui \
     widget/wltoolswidget.ui \
-    widget/wlgdrivewidget.ui
+    widget/wlgdrivewidget.ui \
+    widget/wlerrorpidwidget.ui
 
 
 RESOURCES += \

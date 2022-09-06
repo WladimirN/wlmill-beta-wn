@@ -339,14 +339,13 @@ emit sendCommand(data);
 return true;
 }
 
-bool WLAxis::setErrPid(quint16 err)
+bool WLAxis::setErrorPidData(WLErrorPidData _errPidData)
 {
-if(err==0){
-qDebug()<<"WLAxis::setErrPid error"<<err;
-return false;
-}
+if(!_errPidData.isValid())
+    return false;
 
-m_errPidMax=err;
+
+m_errorPidData=_errPidData;
 
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -354,7 +353,10 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comAxis_setErrPid<<getIndex()<<m_errPidMax;
+Stream<<(quint8)comAxis_setErrPid<<getIndex()<<(float)m_errorPidData.Fmin
+                                             <<(float)m_errorPidData.Emin
+                                             <<(float)m_errorPidData.Fmax
+                                             <<(float)m_errorPidData.Emax;
 
 emit sendCommand(data);
 return true;
@@ -388,7 +390,7 @@ setKGear(getKGear());
 setDelaySCurve(getDelaySCurve());
 
 setPidData(m_pidData);
-setErrPid(m_errPidMax);
+setErrorPidData(m_errorPidData);
 
 if(getMode()==AXIS_sub)
     setModeSub(m_iMasterAxis);
@@ -869,7 +871,11 @@ if(!stream.attributes().value("typeMotor").isEmpty()){
    }
 
 if(!stream.attributes().value("errPid").isEmpty())
-  setErrPid(stream.attributes().value("errPid").toInt());
+  {
+  WLErrorPidData errorPid;
+  errorPid.fromString(stream.attributes().value("errPid").toString());
+  setErrorPidData(errorPid);
+  }
 }
 
 void WLAxis::writeXMLData(QXmlStreamWriter &stream)
@@ -899,7 +905,7 @@ stream.writeAttribute("outENB",QString::number(outENB->getIndex()));
 stream.writeAttribute("encoder",QString::number(getEncoder()));
 stream.writeAttribute("pid",m_pidData.toString());
 
-stream.writeAttribute("errPid",QString::number(getErrPidMax()));
+stream.writeAttribute("errPid",getErrorPidData().toString());
 
 stream.writeAttribute("stepMotorMParPlus",stepMotorMParPlus.toString());
 stream.writeAttribute("stepMotorMParMinus",stepMotorMParMinus.toString());   

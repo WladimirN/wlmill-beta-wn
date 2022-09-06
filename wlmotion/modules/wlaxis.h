@@ -278,6 +278,8 @@ QString toString(){
                                  .arg(ffd,0,'f',5);
  }
 
+
+
 bool fromString(QString str)
  {
  QStringList list=str.split(",");
@@ -299,6 +301,45 @@ bool fromString(QString str)
 
  return true;
  }
+};
+
+struct WLErrorPidData
+{
+float Fmin=0;
+float Emin=0;
+
+float Fmax=0;
+float Emax=1;
+
+bool isValid(){
+  return   Fmin>=0
+         &&Fmax>=0
+         &&Emin>=0
+         &&Emax>=Emin;
+  }
+
+QString toString(){
+ return QString("%1,%2,%3,%4,%5").arg(Fmin,0,'f',5)
+                                 .arg(Fmax,0,'f',5)
+                                 .arg(Emin,0,'f',5)
+                                 .arg(Emax,0,'f',5);
+ }
+
+
+
+bool fromString(QString str)
+ {
+ QStringList list=str.split(",");
+
+ if(list.size()<4) return false;
+
+ Fmin=list.at(0).toFloat();
+ Fmax=list.at(1).toFloat();
+ Emin=list.at(2).toFloat();
+ Emax=list.at(3).toFloat();
+ return true;
+ }
+
 };
 
 class WLModuleAxis;
@@ -356,12 +397,11 @@ bool m_validLatch3;
 
 typeMotorAxis typeMotor=AXIS_stepMotor;
 
-WLPidData m_pidData;
+WLPidData      m_pidData;
+WLErrorPidData m_errorPidData;
 
 WLMParAxis stepMotorMParPlus;
 WLMParAxis stepMotorMParMinus;
-
-quint16 m_errPidMax=100;
 
 private:
 QMutex mutex;
@@ -427,9 +467,8 @@ void getData(typeDataAxis type);
 WLMParAxis getStepMotorMParPlus()  {return stepMotorMParPlus;}
 WLMParAxis getStepMotorMParMinus() {return stepMotorMParMinus;}
 
-WLPidData getPidData() {return m_pidData;}
-
-quint16 getErrPidMax() {return m_errPidMax;}
+WLPidData      getPidData() {return m_pidData;}
+WLErrorPidData getErrorPidData() {return m_errorPidData;}
 
 signals:
 
@@ -479,7 +518,7 @@ public:
     bool setEncoder(quint8 _iEncoder);
     bool setPidData(WLPidData _pidData);
     bool setTypeMotor(typeMotorAxis _typeMotor);
-    bool setErrPid(quint16 err);
+    bool setErrorPidData(WLErrorPidData _errPidData);
 
 public:
 //static qint32 calcI32Pos(double pos);

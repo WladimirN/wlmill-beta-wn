@@ -19,13 +19,14 @@ public:
     ~WLPidWidget();
 
     WLPidData getPidData();
-    private:
+
+private:
     Ui::WLPidWidget *ui;
 
     QString m_name;
-signals:
 
-    void pidChanged(WLPidData);
+signals:
+    void changedPidData(WLPidData);
 };
 
 #endif // WLPIDWIDGET_H
