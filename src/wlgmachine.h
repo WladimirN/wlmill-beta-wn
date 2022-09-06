@@ -22,29 +22,6 @@
 #include "wljoysticks.h"
 #include "wlheightmap.h"
 
-//#define XDrive 0
-//#define YDrive 1
-//#define ZDrive 2
-//#define ADrive 3
-//#define M_PI_4 M_PI/4
-
-
-#define   configMMPath QCoreApplication::applicationDirPath()+"//wlmillconfig//"
-#define   configMMFile QCoreApplication::applicationDirPath()+"//wlmillconfig//mmconfig.xml"
-#define   configMKFile QCoreApplication::applicationDirPath()+"//wlmillconfig//mkconfig.xml"
-#define        pamFile QCoreApplication::applicationDirPath()+"//wlmillconfig//pam.dat"
-#define      toolsFile QCoreApplication::applicationDirPath()+"//wlmillconfig//tools.csv"
-
-#define    iconsMMPath QCoreApplication::applicationDirPath()+"//icons//"
-#define   _iconsMMPath QCoreApplication::applicationDirPath()+"//wlmillconfig//icons//"
-
-#define  mScriptFile QCoreApplication::applicationDirPath()+"//wlmillconfig//mscript.js"
-#define  lScriptFile QCoreApplication::applicationDirPath()+"//wlmillconfig//lscript.js"
-
-#define     _mScriptFile QCoreApplication::applicationDirPath()+"//wlmillconfig//script//mscript.js"
-#define     _lScriptFile QCoreApplication::applicationDirPath()+"//wlmillconfig//script//lscript.js"
-#define      _scriptPath QCoreApplication::applicationDirPath()+"//wlmillconfig//script//"
-
 #define out_spindleCW  0
 //#define out_spindleCCW 1
 #define out_coolS      1
@@ -100,7 +77,9 @@ void reset()
 class WLGMachine : public WLMachine
 {
 	Q_OBJECT
-	
+
+Q_PROPERTY(bool busy  READ isBusy NOTIFY changedBusy())
+
 private:
     enum StateMMachine{noInit,Init,Ready};
     enum TypeAutoMMachine{AUTO_no
@@ -216,6 +195,7 @@ WLGModel *getGModel() {return &m_GModel;}
     void updateGModel();
 private:
 
+void addHeightMap(QList<WLElementTraj> &Traj);
 void addBacklash(QList<WLElementTraj> &Traj);
 void addCalcGModel(QList<WLElementTraj> &addTraj);
 void addRotaryPosition(WLGPoint &lastPoint,QList<WLElementTraj> &addTraj);
@@ -317,6 +297,8 @@ public:
 
   WLMPG *getMPG();
 public:
+
+  bool isBusy() {return m_busy;}
 
   double getTimeElement() const {double ret=m_programTime.elapsed(); return m_iProgram==m_elementsTime ? 0 : ret/(m_iProgram-m_elementsTime);}
 
@@ -422,10 +404,7 @@ public:
 
   bool isRunMScript()   {return   m_MScript->isBusy();}
 
-  float getCurSpeed() {return sqrt(pow(getDrive("X")->getVnow(),2)
-                                  +pow(getDrive("Y")->getVnow(),2)
-                                  +pow(getDrive("Z")->getVnow(),2));}
-
+  float getCurSpeed();
   float getCurSOut() {return curSOut;}
 
 public:
@@ -484,12 +463,12 @@ Q_INVOKABLE void rotAboutRotPointSC(int i,float a);
 
 Q_INVOKABLE bool isActiv() {
                            WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
-/*
-                           qDebug()<<!MillTraj.isEmpty()
-                                   <<ModulePlanner->isBusy()
-                                   <<isAuto()
-                                   <<isPause();
-*/
+
+                           //qDebug()<<"isActiv"<<!MillTraj.isEmpty()
+                           //        <<ModulePlanner->isBusy()
+                           //        <<isAuto()
+                           //        <<isPause();
+
 
                            return  !MillTraj.isEmpty()
                                   ||ModulePlanner->isBusy()
@@ -499,6 +478,9 @@ Q_INVOKABLE bool isActiv() {
 
 Q_INVOKABLE    void setCurPositionSC(QString nameCoord,double pos);
 Q_INVOKABLE double  getCurPositionSC(QString name);
+
+Q_INVOKABLE    void setCurPositionSCT(QString nameCoord,double pos);
+Q_INVOKABLE double  getCurPositionSCT(QString name);
 
 Q_INVOKABLE    void setCurPosition(QString nameCoord,double pos);
 Q_INVOKABLE double  getCurPosition(QString name);

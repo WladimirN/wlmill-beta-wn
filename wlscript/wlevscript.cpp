@@ -109,6 +109,30 @@ if(m_enable)
 return ret;
 }
 
+bool WLEVScript::setValue(QString name, QVariant value)
+{
+QMutexLocker locker(&Mutex);
+
+if(engine)
+  {
+  engine->globalObject().setProperty(name,engine->toScriptValue(value));
+  return true;
+  }
+
+return false;
+}
+
+QVariant WLEVScript::getValue(QString name,QVariant def)
+{
+QScriptValue svalue=engine->globalObject().property(name);
+
+if(svalue.isValid()){
+    return svalue.toVariant();
+    }else {
+    return def;
+    }
+}
+
 bool WLEVScript::addObject(QObject *obj, QString name)
 {
 if(obj){     
@@ -142,15 +166,7 @@ return false;
 
 bool WLEVScript::setProperty(QString name,QScriptValue value)
 {
-/*ueScript valScript;
-
-valScript.name=name;
-valScript.value=value;
-
-m_valList.append(valScript);
-*/
-engine->globalObject().setProperty(name,
-                                   value);
+engine->globalObject().setProperty(name,value);
 
 return true;
 }

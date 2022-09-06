@@ -19,6 +19,7 @@
 #define GErr    -1
 
 #define GCodeSize 1000
+
 #define sizeSC 7
 
 typedef struct GPar
@@ -34,7 +35,7 @@ void set(double _val) {value=_val; valid=true;}
 #define GPointNames "X,Y,Z,A,B,C,U,V,W"
 
 typedef struct WLGPoint
-{    
+{
 double x;
 double y;
 double z;
@@ -343,8 +344,7 @@ struct WLGCodeData
  WL3DPoint curPoint;//G41/42
  WL3DPoint endPoint;//G41/42
 
- int iCurTool=0;
-
+ int iOfstTool=0;
  int iSC=0;
 
   double drillPlane=0;
@@ -358,7 +358,7 @@ struct WLGCodeData
 
  bool absIJK;
  bool stopMode;
- bool initDrillPlane; 
+ bool initDrillPlane;
 
  QString strRunProgram;
  QString strInit="G64 P0.05 Q0.05";
@@ -400,29 +400,29 @@ class WLGCode: public QObject
 
 public:
 
-	enum Code
-	 {
+    enum Code
+     {
      fast_motion=00,
-    
-	 line       =01,
+
+     line       =01,
      circle_cw  =02,
      circle_ccw =03,
 
-	 wait_motion=04,
+     wait_motion=04,
 
      plane_xy   =17,
-	 plane_zx   =18,
-	 plane_yz   =19,
-     
-	 drill      =81,
-	 drill_long =83,
-	 drill_off  =80,
+     plane_zx   =18,
+     plane_yz   =19,
 
-	 absolute   =90,
-	 incremental=91,
+     drill      =81,
+     drill_long =83,
+     drill_off  =80,
 
-	 plane_drill =98,
-	 plane_drillR =99
+     absolute   =90,
+     incremental=91,
+
+     plane_drill =98,
+     plane_drillR =99
      };
 
 public:
@@ -465,11 +465,12 @@ public:
    WLGPoint getPointActivSC(WLGPoint GPoint,bool back=false);
 
    WLGPoint movPointToActivSC(int iLastSC,WLGPoint &lastGPoint);
+   WLGPoint movPointToActivToolOfst(int iLastTOfst,WLGPoint &lastGPoint);
 
    static WLGPoint convertPlane(WLGPoint Point,int plane,bool front);
 
    int getActivSC(WLGPoint *P=nullptr);
-   
+
    WLGPoint getSC(int i,bool *ok=nullptr);
    WLGPoint getOffsetSC(int i,bool *ok=nullptr);
    WLGPoint getOffsetActivSC(bool *ok=nullptr) {return getOffsetSC(m_data.iSC,ok);}
@@ -478,7 +479,7 @@ public:
 
    bool setOffsetActivSC(WLGPoint P)    {return setOffsetSC(m_data.iSC,P);}
    bool setOffsetSC(int i,WLGPoint P,bool send=true);
-   
+
    bool setRefPoint0SC(int i,WLGPoint P)  {if(0<i&&i<sizeSC) {m_data.refPoint0SC[i]=P; return 1;} else return 0;}
    bool setRefPoint1SC(int i,WLGPoint P)  {if(0<i&&i<sizeSC) {m_data.refPoint1SC[i]=P; return 1;} else return 0;}
 
@@ -491,15 +492,17 @@ public:
    void setXSC(double X,int i)       {m_data.offsetSC[i].x=X;}
    void setYSC(double Y,int i)       {m_data.offsetSC[i].y=Y;}
    void setZSC(double Z,int i)       {m_data.offsetSC[i].z=Z;}
-													   					 
+
    void setOffsetASC(double A,int i) {m_data.offsetSC[i].a=A; }
 
     bool calcCenterPointR(WLGPoint startPoint,WLGPoint endPoint);
-	 
-	int setGCode(QString val);
+
+    int setGCode(QString val);
     int setGCode(int val) {return setGCode(QString::number(val));}
-	
-	void resetGCode(int iG=-1);
+
+    void resetGCode(int iG=-1);
+
+    bool getMCode(int);
 
     void reset(void) {resetValid();resetGCode();}
 
@@ -509,14 +512,16 @@ public:
     WLGPoint getG43Position()        {return m_data.G43Position;}
     void setG43Position(WLGPoint hp) {m_data.G43Position=hp;}
 
-	int getPlane();
+    int getPlane();
 
-	QString getActivGCodeString();
+    QString getActivGCodeString();
     QStringList getContextGCodeList();
 
     double getHToolOfst();
     double getDToolOfst();
     double getCompToolRadius() {return qAbs(getDToolOfst()/2.0);}
+
+    WLGPoint getGToolOfst(int ikey=-1);
 
     void verifyG51();
     void verifyG43();
@@ -538,13 +543,15 @@ public:
 
     int getCompSide();
 
-    void setTool(int ikey,WLGTool Tool) {m_data.Tools.setTool(ikey,Tool); emit changedTool(ikey);}
+    void setTool(int ikey,WLGTool Tool);
 
     WLGTool const getTool(int ikey);
 
     QVariant getDataTool(int ikey,QString key,QVariant defvalue);
 
     WLGTools *getTools() {return &m_data.Tools;}
+
+
 private:
     void resetValid();
 
@@ -555,16 +562,27 @@ public:
     static bool detectMCode(QString gstr);
 public:
 
-    Q_INVOKABLE    void removeTool(int ikey);
-    Q_INVOKABLE    void setDataTool(int ikey,QString key,QVariant value,bool send=true);
+    Q_INVOKABLE void setOffsetTool(int index=0) {data()->iOfstTool=index;
+                                                emit changedTool(index);}
+    Q_INVOKABLE int getOfstTool();
+
+    Q_INVOKABLE void setXDiam(bool en=true) {setGCode(en ? 7 : 8);}
+    Q_INVOKABLE bool isXDiam()              {return isGCode(8);}
+
+    Q_INVOKABLE void removeTool(int ikey);
+    Q_INVOKABLE void setDataTool(int ikey,QString key,QVariant value,bool send=true);
+    Q_INVOKABLE void setDataCurTool(QString key,QVariant value,bool send=true){setDataTool(getT(),key,value,send);}
+
     Q_INVOKABLE double  getDataToolNum(int ikey,QString key,double  defvalue) {return getDataTool(ikey,key,defvalue).toDouble();}
     Q_INVOKABLE QString getDataToolStr(int ikey,QString key,QString defvalue) {return getDataTool(ikey,key,defvalue).toString();}
+
+    Q_INVOKABLE double  getDataCurToolNum(QString key,double  defvalue) {return getDataTool(getT(),key,defvalue).toDouble();}
+    Q_INVOKABLE QString getDataCurToolStr(QString key,QString defvalue) {return getDataTool(getT(),key,defvalue).toString();}
 
     Q_INVOKABLE void setHTool(int i,float h);
     Q_INVOKABLE void setDTool(int i,float d);
 
-    Q_INVOKABLE   int getT() {return getValue('T');}
-    Q_INVOKABLE  bool setT(int T) {return setValue('T',T);}
+    Q_INVOKABLE  int getT() {return getValue('T');}
     Q_INVOKABLE double getValue(QString name);
 
     Q_INVOKABLE double getGSC(){return m_data.iSC+53;}

@@ -46,9 +46,9 @@ WLMill::WLMill(QWidget *parent)
 
     QDir dir;
 
-    dir.mkdir(_iconsMMPath);
+    dir.mkdir(_iconsGMPath);
 
-    WLTButtonScript::setIconPath(_iconsMMPath);
+    WLTButtonScript::setIconPath(_iconsGMPath);
 
     QTimer::singleShot(3000,splash,SLOT(close()));
 
@@ -71,26 +71,13 @@ WLMill::WLMill(QWidget *parent)
 
 //  connect(Program,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
 
-
-//#ifdef Q_OS_WIN
     MScript=new WLEVScript();
     MScript->start();
 
     LScript=new WLEVScript();
     LScript->moveToThread(LScript);
     LScript->start();
-//#endif
-/*
-#ifdef Q_OS_LINUX  //иначе долгий ответ с подвисанием от MillMachine::isActiv() в скрипте ставит парент MillMachine?
-    MScript=new WLEVScript(0);  //nullptr
-    MScript->moveToThread(MScript);
-    MScript->start();
 
-    LScript=new WLEVScript(0); //nullptr
-    LScript->moveToThread(LScript);
-    LScript->start();
-#endif
-*/
     while(!MScript->isReady()
         ||!LScript->isReady()) QThread::msleep(50);
 
@@ -99,6 +86,7 @@ WLMill::WLMill(QWidget *parent)
 
     MScript->addObject(new WLFileScript(MScript),"FILE");
     MScript->addObject(new WLTimerScript(MScript),"TIMER");
+    MScript->addObject(this,"WLMILL");
 
     DialogM= new WLDialogScript(this);
 
@@ -118,6 +106,8 @@ WLMill::WLMill(QWidget *parent)
 
 
     tabWidget = new QTabWidget(this);
+
+    tabWidget->setFocusPolicy(Qt::NoFocus);
 
     VisualWidget=new WLVisualWidget(Program,MillMachine);
 
@@ -159,6 +149,7 @@ void WLMill::createTBar2()
 WLTBarScript *tBar = new WLTBarScript(MScript,tr("toolbar 2"),this);
 
 MScript->addObject(tBar,"TOOLBAR2");
+MScript->addBeforeInitScript("TOOLBAR1.removeButtons();");
 
 connect(tBar,&WLTBarScript::runScript,this,[=](QString txt){MScript->runScript(txt);});
 
@@ -170,12 +161,12 @@ tBar->setObjectName("tb2");
 addToolBar(tBar);
 }
 
-
 void WLMill::createTBar1()
 {
 WLTBarScript *tBar = new WLTBarScript(MScript,tr("toolbar 1"),this);
 
 MScript->addObject(tBar,"TOOLBAR1");
+MScript->addBeforeInitScript("TOOLBAR2.removeButtons();");
 
 connect(tBar,&WLTBarScript::runScript,this,[=](QString txt){MScript->runScript(txt);});
 
@@ -210,7 +201,6 @@ addToolBar(tBar);
 void WLMill::createTBControl()
 {
 QAction *Action;
-QAction *menuAct;
 QToolBar *TBControl = new QToolBar(tr("tollbar Control"));
 QFont font;
 
@@ -230,75 +220,18 @@ menuStart->addAction((tr("start at...")),this,SLOT(onPBStartAt()));
 menuStart->addAction((tr("continue...")),this,SLOT(onPBStartContinue()));
 Action->setMenu(menuStart);
 
-//connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEnabled);
-/*
-Action=TBControl->addAction(QIcon(":/data/icons/pause.png"),tr("pause"),MillMachine,SLOT(Pause()));
-Action->setShortcut(QKeySequence("Space"));
-*/
 Action=TBControl->addAction(QIcon(":/data/icons/H.png"),tr("h probe"),MillMachine,[=](){
     MillMachine->runMScript("WLProbeToolTabletDialog()");
-    //goHProbe(MillMachine->getFProbe1(),false);
-    //MillMachine->goHProbe(MillMachine->getFProbe1(),false);
-
     });
 connect(MillMachine,&WLGMachine::changedReadyRunList,Action,&QAction::setDisabled);
-//connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEnabled);
 
 Action=TBControl->addAction(QIcon(":/data/icons/HT.png"),tr("h tool probe"),MillMachine,[=](){
     MillMachine->runMScript("WLProbeToolHDialog()");
-    //goHProbe(MillMachine->getFProbe1(),false);
-    //MillMachine->goHProbe(MillMachine->getFProbe1(),false);
-
     });
 
 connect(MillMachine,&WLGMachine::changedReadyRunList,Action,&QAction::setDisabled);
 
 
-//Action=TBControl->addAction(QIcon(":/data/icons/HT.png"),tr("h tool probe"),this,SLOT(measureHTool()));
-//connect(MillMachine,&WLMillMachine::changedReadyRunList,Action,&QAction::setDisabled);
-
-
-//connect(MillMachine,&WLMillMachine::changedPossibleManual,Action,&QAction::setEnabled);
-
-//TBControl->addAction("update",MillMachine->getMotionDevice(),SLOT(update()));
-
-/*
-TBControl->setFont(font);
-
-TBControl->setBaseSize(QSize(32,32));
-TBControl->setIconSize(QSize(32,32));
-
-Action=TBControl->addAction(QIcon(":/data/icons/power_on.png"),tr("on wlmill"));
-Action->setCheckable(true);
-connect(Action,SIGNAL(toggled(bool)),MillMachine,SLOT(setOn(bool)));
-
-Action=TBControl->addAction(tr("R"),MillMachine,SLOT(reset()));
-Action->setShortcut((QKeySequence(Qt::Key_Escape)));
-
-Action=TBControl->addAction(QIcon(":/data/icons/home.png"),tr("find all axis position"),MillMachine,SLOT(goFindDrivePos()));
-
-Action=TBControl->addAction("G28",this,SLOT(onGoHome()));
-
-QMenu *menuPBG28 = new QMenu();
-menuPBG28->addAction((tr("set G28 position")),this,SLOT(onPBSetG28()));
-menuPBG28->addAction((tr("get G28 position")),this,SLOT(onPBGetG28()));
-Action->setMenu(menuPBG28);
-*/
-/*
-TBMCode->addAction(QIcon(":/data/icons/M4.png"),tr("run spindle ccw")+"(F4)",MillMachine,SLOT(runScriptM4()))->setShortcut(QKeySequence("F4"));;
-TBMCode->addAction(QIcon(":/data/icons/M5.png"),tr("stop spindle")+"(F5)",MillMachine,SLOT(runScriptM5()))->setShortcut(QKeySequence("F5"));;
-TBMCode->addAction(QIcon(":/data/icons/M7.png"),tr("run additional cooling")+"(F7)",MillMachine,SLOT(runScriptM7()))->setShortcut(QKeySequence("F7"));;
-TBMCode->addAction(QIcon(":/data/icons/M8.png"),tr("run cooling")+"(F8)",MillMachine,SLOT(runScriptM8()))->setShortcut(QKeySequence("F8"));;
-TBMCode->addAction(QIcon(":/data/icons/M9.png"),tr("stop cooling")+"(F9)",MillMachine,SLOT(runScriptM9()))->setShortcut(QKeySequence("F9"));
-
-TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFunc1.png"),("userFunc1()"),MillMachine,SLOT(runUserFunc1()));
-TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFunc2.png"),("userFunc2()"),MillMachine,SLOT(runUserFunc2()));
-TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFunc3.png"),("userFunc3()"),MillMachine,SLOT(runUserFunc3()));
-TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFunc4.png"),("userFunc4()"),MillMachine,SLOT(runUserFunc4()));
-TBMCode->addAction(QIcon(QCoreApplication::applicationDirPath()+"\\icons\\userFunc5.png"),("userFunc5()"),MillMachine,SLOT(runUserFunc5()));
-
-connect(MillMachine,SIGNAL(changedReadyRunList(bool)),TBMCode,SLOT(setDisabled(bool)));
-*/
 
 TBControl->setObjectName("tb1Control");
 addToolBar(TBControl);
@@ -518,7 +451,7 @@ QMenu *MHelp= new QMenu(tr("Help"));
 MHelp->addAction("WLMill.pdf",this,[=](){QDesktopServices::openUrl(QUrl("http://wldev.ru/data/doc/WLMill.pdf"));});
 MHelp->addAction("WLMill-Script.pdf",this,[=](){QDesktopServices::openUrl(QUrl("http://wldev.ru/data/doc/WLMill-Script.pdf"));});
 MHelp->addAction(tr("Device"),this,[=](){QDesktopServices::openUrl(QUrl("http://wldev.ru/data/doc/"+MillMachine->getMotionDevice()->getNameDevice()+".pdf"));});
-MHelp->addAction(tr("Dir"),this,[=](){QDesktopServices::openUrl(configMMPath);});
+MHelp->addAction(tr("Dir"),this,[=](){QDesktopServices::openUrl(configGMPath);});
 MHelp->addSeparator();
 
 MHelp->addAction(tr("save debug file"),this,SLOT(onSaveDebugFile()));///??
@@ -585,23 +518,39 @@ dockPosition->setFeatures(QDockWidget::DockWidgetFloatable
 addDockWidget(Qt::RightDockWidgetArea,dockPosition);
 }
 
-void WLMill::createDockTools()
+void WLMill::createTabTools()
 {
-dockTools=new QDockWidget(this);
-
-dockTools->setWindowTitle(tr("Tools"));
-dockTools->setObjectName("DTools");
+//dockTools=new QDockWidget(this);
+//
+//dockTools->setWindowTitle(tr("Tools"));
+//dockTools->setObjectName("DTools");
 
 ToolsWidget = new WLToolsWidget(MillMachine->getGCode(),this);
+
+WLTBarTools *tBarTools = new WLTBarTools(MScript,this);
+
+MScript->addObject(tBarTools,"TOOLBARTOOLS");
+MScript->addBeforeInitScript("TOOLBARTOOLS.removeButtons();");
+
+connect(tBarTools,&WLTBarScript::runScript,this,[=](QString txt){MScript->runScript(txt);});
+tBarTools->setIconSize(QSize(48,48));
+
+connect(MillMachine,&WLGMachine::changedPossibleManual,tBarTools,&QToolBar::setEnabled);
+
+tBarTools->setObjectName("tbtool");
+
+ToolsWidget->addToolBar(tBarTools);
+
 ToolsWidget->show();
 
-dockTools->setWidget(ToolsWidget);
-
-dockTools->setFeatures(QDockWidget::DockWidgetFloatable
-                      |QDockWidget::DockWidgetMovable
-                      |QDockWidget::DockWidgetClosable);
-
-addDockWidget(Qt::LeftDockWidgetArea,dockTools);
+//dockTools->setWidget(ToolsWidget);
+//
+//dockTools->setFeatures(QDockWidget::DockWidgetFloatable
+//                      |QDockWidget::DockWidgetMovable
+//                      |QDockWidget::DockWidgetClosable);
+//
+//addDockWidget(Qt::LeftDockWidgetArea,dockTools);
+tabWidget->addTab(ToolsWidget,"Tools");
 }
 
 void WLMill::createDockIOPut()
@@ -1109,20 +1058,101 @@ switch(QMessageBox::question(this, tr("Confirmation:"),
 void WLMill::leaveEvent ( QEvent * event )
 {
 Q_UNUSED(event)
-//Machine->Pause(1);
+    //Machine->Pause(1);
 }
 
+#ifdef DEF_QML
+QQuickWidget *WLMill::createQuickWidget(QString file)
+{
+QQuickWidget *view  = new QQuickWidget(this);
 
-	
+view->setSource(QUrl::fromLocalFile(file));
+
+if (view->status() == QQuickWidget::Error)
+ {
+ MessManager->setMessage("WLMill","Error file QML:"+file,1);
+ qDebug()<<"Error createQuickWidget:"<<file;
+
+ view->deleteLater();
+ return nullptr;
+ }
+
+QQmlContext *context = view->engine()->rootContext();
+
+context->setContextProperty("view", view);
+context->setContextProperty("MSCRIPT", MScript);
+context->setContextProperty("MACHINE", MillMachine);
+context->setContextProperty("FILE",new WLFile(view));
+
+return view;
+}
+#endif
+
+void WLMill::runQML(QString file)
+{
+runQMLFile(_qmlPath+file);
+}
+
+void WLMill::runQMLFile(QString file)
+{
+#ifdef DEF_QML
+QQuickWidget *view  = createQuickWidget(file);
+
+if(view)
+ {
+ view->setWindowFlag(Qt::WindowType::Dialog);
+ view->setResizeMode(QQuickWidget::SizeRootObjectToView);
+ view->setWindowModality(Qt::ApplicationModal);
+
+ view->show(); 
+
+ connect(view,&QWidget::close,view,&QWidget::deleteLater);
+ }
+#else
+qDebug()<<"no runQMLFile"<<file;
+#endif
+}
+
+void WLMill::addTabQML(QString file)
+{
+addTabQMLFile(_qmlPath+file);
+}
+
+void WLMill::addTabQMLFile(QString file)
+{
+#ifdef DEF_QML
+QFileInfo FI(file);
+
+for (int i=0;i<tabWidget->count();i++) {
+if(tabWidget->tabText(i)==FI.baseName())
+     return;
+}
+
+QQuickWidget *view  = createQuickWidget(file);
+
+if(view) { 
+ view->setResizeMode(QQuickWidget::SizeRootObjectToView);
+ view->setWindowModality(Qt::ApplicationModal);
+
+ view->setFocusPolicy(Qt::WheelFocus);
+
+ tabWidget->addTab(view,FI.baseName());
+ }
+#else
+qDebug()<<"no addQMLFile"<<file;
+#endif
+}
+
 void WLMill::readyMachine()
 {	
 qDebug()<<"WLMill::readyMachine() <<<";
 
 createMenuBar();
 
+createTabTools();
+
 createDockIOPut();
 createDockPosition();
-createDockTools();
 createDockMPG();
 createDockHeightMap();
 
@@ -1261,7 +1291,7 @@ if(Dialog.exec()) {
 
 void WLMill::loadDataState()
 {
-QSettings settings(configMMPath+"state",QSettings::IniFormat);
+QSettings settings(configGMPath+"state",QSettings::IniFormat);
 settings.setIniCodec("UTF-8");
 restoreGeometry(settings.value("geometry").toByteArray());
 restoreState(settings.value("windowState").toByteArray());
@@ -1310,7 +1340,7 @@ void WLMill::saveDataState()
 {
 if(!MillMachine->isReady()) return;
 
-QSettings settings(configMMPath+"state",QSettings::IniFormat);
+QSettings settings(configGMPath+"state",QSettings::IniFormat);
 settings.setIniCodec("UTF-8");
 settings.setValue("geometry", saveGeometry());
 settings.setValue("windowState", saveState());

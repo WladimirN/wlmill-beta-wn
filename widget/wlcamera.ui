@@ -14,7 +14,39 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="1">
+    <widget class="QComboBox" name="cbCamera"/>
+   </item>
+   <item row="2" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item row="0" column="2">
+    <widget class="QComboBox" name="cbResolution"/>
+   </item>
+   <item row="1" column="4">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="3" colspan="2">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -27,29 +59,23 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="0" colspan="3">
-    <widget class="QCameraViewfinder" name="viewCamera" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>50</width>
-       <height>50</height>
-      </size>
+   <item row="0" column="0">
+    <widget class="QPushButton" name="pbRefresh">
+     <property name="text">
+      <string>Refresh</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QComboBox" name="cbResolution"/>
-   </item>
-   <item row="0" column="0">
-    <widget class="QComboBox" name="cbCamera"/>
+   <item row="1" column="0" colspan="4">
+    <widget class="WLCameraView" name="viewCamera" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QCameraViewfinder</class>
+   <class>WLCameraView</class>
    <extends>QWidget</extends>
-   <header>qcameraviewfinder.h</header>
+   <header>wlcameraview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

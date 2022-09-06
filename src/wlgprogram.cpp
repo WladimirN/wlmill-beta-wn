@@ -366,8 +366,11 @@ bool ok=true;;
 //qDebug()<<dataStr;
 
 int iLastSC=GCode->getActivSC();
+int iLastToolOfst=GCode->getOfstTool();
 
 QList <int> MList;
+
+int lastT=GCode->getT();
 
 MList=GCode->loadStr(data);
 
@@ -396,6 +399,20 @@ ElementTraj.str+=dataStr;
 
 ElementTraj.setF(GCode->getValue('F'));
 ElementTraj.setS(GCode->getValue('S'));
+
+if(!data.contains("G"))
+{
+#ifdef GCODE_TURN
+if(lastT!=GCode->getT())
+  ElementTraj.setScript(GCode->getPointActivSC(GCode->data()->curGPoint),QString("changeTool(%1,%2)").arg(GCode->getT()).arg(lastT));
+break;
+#endif
+
+if(GCode->isValidValue('P'))
+   GCode->setOffsetTool(GCode->getValue('P'));
+}
+
+
 
 if(GCode->isGCode(64)) //устанавливаем тип перемещения
    {
@@ -508,8 +525,8 @@ GCode->data()->lastGPoint=GCode->data()->curGPoint;
 
 if(ok){
  foreach(int MCode,MList){ 
- ElementTraj.setMCode(GCode->getPointActivSC(GCode->data()->curGPoint),MCode);
- curListTraj+=ElementTraj;
+ ElementTraj.setScript(GCode->getPointActivSC(GCode->data()->curGPoint),QString("M%1()").arg(MCode));
+ curListTraj.append(ElementTraj);
  }
 }
 
@@ -737,7 +754,6 @@ loadFile(clearFile.fileName(),true);
 
 template<class T>
 T SQ(T a) { return a*a; }
-
 
 bool WLGProgram::convertLine(WLElementTraj ElementTraj,QList <WLElementTraj> &curListTraj,WLGCode *GCode)
 {
@@ -1064,8 +1080,12 @@ if ((py == opy) && (px == opx)) {     /* no XY motion */
                           GCode->getPointActivSC(endGPoint));
 
             curListTraj+=ETraj;
-            }
-            else {
+
+            //GCode->data()->endPoint.y=mid_y;//update last point
+            //GCode->data()->endPoint.x=mid_x;
+            //CHP(move_endpoint_and_flush(settings, mid_x, mid_y));
+
+        } else {
             // arc->line
             // beware: the arc we saved is the compensated one.
             WLElementCirc prev = curListTraj.back().data.arc;
@@ -1149,6 +1169,12 @@ if ((py == opy) && (px == opx)) {     /* no XY motion */
         GCode->data()->endPoint.y=cx;
         GCode->data()->endPoint.x=cy;
     }
+//    (move == G_0? enqueue_STRAIGHT_TRAVERSE : enqueue_STRAIGHT_FEED)
+//        (settings, block->line_number,
+//         px - opx, py - opy, pz - opz,
+//         end_x, end_y, pz,
+//         AA_end, BB_end, CC_end,
+//         u_end, v_end, w_end);
 
     WLGPoint startGPoint;
     startGPoint  =GCode->data()->lastGPoint;
@@ -1170,6 +1196,15 @@ GCode->data()->curPoint.x=end_x;
 GCode->data()->curPoint.y=end_y;
 GCode->data()->curPoint.z=pz;
 
+//comp_set_current(settings, end_x, end_y, pz);
+//settings->AA_current = AA_end;
+//settings->BB_current = BB_end;
+//settings->CC_current = CC_end;
+//settings->u_current = u_end;
+//settings->v_current = v_end;
+//settings->w_current = w_end;
+//comp_set_programmed(settings, px, py, pz);
+//return INTERP_OK;
 return true;
 }
 

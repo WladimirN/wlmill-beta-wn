@@ -5,6 +5,7 @@
 TEMPLATE = app
 TARGET = wlmill
 QT += core widgets serialport gui network opengl script
+QT += qml quick quickwidgets
 
 
 QMAKE_LFLAGS = -no-pie
@@ -13,8 +14,27 @@ QMAKE_LFLAGS = -no-pie
 #           QT_NO_INFO_OUTPUT\
 #           QT_NO_WARNING_OUTPUT\
 
+#DEFINES  += DEF_QML
+#DEFINES  += DEF_CAMERA
+DEFINES  += GCODE_MILL
+DEFINES  += DEF_HMAP
 
-DEFINES += DEF_HMAP
+contains(DEFINES, DEF_CAMERA) {
+QT += multimedia multimediawidgets
+SOURCES +=widget/wlcamera.cpp \
+          widget/wlcameraview.cpp
+HEADERS +=widget/wlcamera.h \
+          widget/wlcameraview.h
+FORMS   +=widget/wlcamera.ui
+TARGET = wlmill_cam
+}
+
+contains(DEFINES, DEF_QML) {
+QT += qml quick quickwidgets
+SOURCES +=src/wlfile.cpp
+HEADERS +=src/wlfile.h
+}
+
 
 VERSION = 21.06.18.1
 
@@ -66,6 +86,7 @@ HEADERS += \
     widget/wlgaxislabel.h \
     widget/wleditpoint.h \
     widget/wlgdrivewidget.h \
+    widget/wlcameraview.h \
     src/wl3dpoint.h \
     src/wlcalc.h \
     src/wldrive.h \
@@ -88,7 +109,7 @@ HEADERS += \
     src/wldoublespinbox.h \
     src/wljoysticks.h \
     src/wlheightmap.h \
-    src/wlgmachine.h \
+    src/wlgmachine.h \    
     model/wlheightmaptablemodel.h \
     model/wlgtoolstablemodel.h \
     wlmill.h \

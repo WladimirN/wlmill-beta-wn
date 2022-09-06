@@ -11,23 +11,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QElapsedTimer>
-/*
-class WLValueScript: public QObject
-{
-Q_OBJECT
 
-public:
-    WLValueScript(QString file):values(file, QSettings::IniFormat) {}
-   ~WLValueScript() {}
-
-Q_INVOKABLE void     set(QString name,QVariant value)     {values.setValue(name,value);}
-Q_INVOKABLE QVariant get(QString name,QVariant defvalue) {return values.value(name,defvalue);}
-
-private:
-
-QSettings values;
-};
-*/
 
 struct SLoadCode
 {
@@ -115,6 +99,8 @@ public:
 
 Q_INVOKABLE bool runFunction(QString _func,bool _detectError=true);
 Q_INVOKABLE bool runScript(QString _script,bool _detectError=true);
+Q_INVOKABLE QVariant getValue(QString name,QVariant def = QVariant());
+Q_INVOKABLE bool setValue(QString name,QVariant);
 
     bool setProperty(QString name,QScriptValue value);
     bool addObject(QObject *obj,QString name);
@@ -122,20 +108,21 @@ Q_INVOKABLE bool runScript(QString _script,bool _detectError=true);
     bool isEnable() {return m_enable;}
     bool isReady() {return ready;}
 
+ QString getBeforeInitScript() {return m_beforeInitScript;}
+    void addBeforeInitScript(QString script) {m_beforeInitScript+=script;}
     void setBeforeInitScript(QString script) {m_beforeInitScript=script;}
     void setAfterInitScript(QString script)  {m_afterInitScript=script;}
+
 private:
     QList <WLObjectScript> m_objList;
     QList <WLValueScript>  m_valList;
 
 public slots:
-
     void reset();
     void includeFile(QString nameFile);
     void setEnable(bool enable=true);
 
 public:
-
 Q_INVOKABLE int setTimeout(QString func,long ms);
 Q_INVOKABLE int setInterval(QString func,long ms);
 

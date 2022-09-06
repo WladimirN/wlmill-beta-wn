@@ -9,6 +9,7 @@ win32* {
     DEFINES += SDL_MAIN_HANDLED
 }
 
+
 win32-g++* {
     LIBS += -L$$PWD/bin/windows/mingw/x86/ -lSDL2
 }

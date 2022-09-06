@@ -45,6 +45,13 @@
 #include "wlcamera.h"
 #endif
 
+#ifdef DEF_QML
+#include <QQuickWidget>
+#include <QQmlEngine>
+#include <QQmlContext>
+#include "wlfile.h"
+#endif
+
 #define FileState       QCoreApplication::applicationDirPath()+"//state.dat"
 #define configWLMill    QCoreApplication::applicationDirPath()+"//wlmillconfig//config.xml"
 #define iniconfigWLMill QCoreApplication::applicationDirPath()+"//wlmillconfig//config.ini"
@@ -114,6 +121,23 @@
 #define VERSION_BCD_SEC   (16U * VERSION_SEC0 + VERSION_SEC1)
 
 #define defDockStateS "\x00\x00\x00\xFF\x00\x00\x00\x00\xFD\x00\x00\x00\x02\x00\x00\x00\x00\x00\x00\x01X\x00\x00\x03\xAB\xFC\x02\x00\x00\x00\x01\xFB\x00\x00\x00\x18\x00""D\x00M\x00i\x00l\x00l\x00""C\x00o\x00n\x00t\x00r\x00o\x00l\x01\x00\x00\x00O\x00\x00\x03\xAB\x00\x00\x01\x92\x00\x00'%\x00\x00\x00\x01\x00\x00\x01m\x00\x00\x03\xAB\xFC\x02\x00\x00\x00\x01\xFC\x00\x00\x00O\x00\x00\x03\xAB\x00\x00\x01\x83\x00\x01\x86\xB5\xFA\x00\x00\x00\x02\x01\x00\x00\x00\x04\xFB\x00\x00\x00\x12\x00""D\x00P\x00o\x00s\x00i\x00t\x00i\x00o\x00n\x01\x00\x00\x00\x00\xFF\xFF\xFF\xFF\x00\x00\x01&\x00\x00\x03\xE7\xFB\x00\x00\x00\f\x00""D\x00I\x00O\x00P\x00u\x00t\x01\x00\x00\x00\x00\xFF\xFF\xFF\xFF\x00\x00\x00\x7F\x00\xFF\xFF\xFF\xFB\x00\x00\x00\x10\x00""D\x00P\x00r\x00o\x00g\x00r\x00""a\x00m\x01\x00\x00\x00\x00\xFF\xFF\xFF\xFF\x00\x00\x01""1\x00\xFF\xFF\xFF\xFB\x00\x00\x00\x10\x00""D\x00P\x00r\x00o\x00g\x00r\x00""a\x00m\x01\x00\x00\x00\x00\xFF\xFF\xFF\xFF\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\xB3\x00\x00\x03\xAB\x00\x00\x00\x04\x00\x00\x00\x04\x00\x00\x00\b\x00\x00\x00\b\xFC\x00\x00\x00\x01\x00\x00\x00\x02\x00\x00\x00\x02\x00\x00\x00\x0E\x00t\x00""b\x00M\x00""C\x00o\x00""d\x00""e\x01\x00\x00\x00\x00\xFF\xFF\xFF\xFF\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x12\x00t\x00""b\x00M\x00""e\x00s\x00s\x00""a\x00g\x00""e\x01\x00\x00\x02i\x00\x00\x05\x17\x00\x00\x00\x00\x00\x00\x00\x00"
+
+#define   configGMPath QCoreApplication::applicationDirPath()+"//wlmillconfig//"
+#define   configGMFile QCoreApplication::applicationDirPath()+"//wlmillconfig//mmconfig.xml"
+#define   configGKFile QCoreApplication::applicationDirPath()+"//wlmillconfig//mkconfig.xml"
+#define        pamFile QCoreApplication::applicationDirPath()+"//wlmillconfig//pam.dat"
+#define      toolsFile QCoreApplication::applicationDirPath()+"//wlmillconfig//tools.csv"
+
+#define    iconsGMPath QCoreApplication::applicationDirPath()+"//icons//"
+#define   _iconsGMPath QCoreApplication::applicationDirPath()+"//wlmillconfig//icons//"
+
+#define    mScriptFile QCoreApplication::applicationDirPath()+"//wlmillconfig//mscript.js"
+#define    lScriptFile QCoreApplication::applicationDirPath()+"//wlmillconfig//lscript.js"
+
+#define   _mScriptFile QCoreApplication::applicationDirPath()+"//wlmillconfig//script//mscript.js"
+#define   _lScriptFile QCoreApplication::applicationDirPath()+"//wlmillconfig//script//lscript.js"
+#define    _scriptPath QCoreApplication::applicationDirPath()+"//wlmillconfig//script//"
+#define       _qmlPath QCoreApplication::applicationDirPath()+"//wlmillconfig//qml//"
 
 class WLMill : public QMainWindow
 {
@@ -246,20 +270,31 @@ public:
         void setLifeM(unsigned int M) {m_lifeM=M;  emit changedLife();}
 unsigned int getLifeM() {return m_lifeM;}
 
+private:
+
+#ifdef DEF_QML
+QQuickWidget *createQuickWidget(QString file);
+#endif
+
+public slots:
+void runQML(QString file);
+void addTabQML(QString file);
+
+void runQMLFile(QString file);
+void addTabQMLFile(QString file);
 private: 
 	
  void autoSaveChekers();
 
+ void createTabTools();
+
  void createDockPosition();
-
-
  void createDockConsoleMScript();
  void createDockConsoleLScript();
  void createDockMPG();
  void createDockProgram();
  void createDockManual();
  void createDockSpindle();
- void createDockTools();
  void createDockIOPut();
  void createDockHeightMap();
 

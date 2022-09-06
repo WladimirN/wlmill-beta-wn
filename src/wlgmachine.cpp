@@ -1,9 +1,8 @@
-#include "wlmillmachine.h"
-
 #include <QTimer>
 #include <QFile>
 #include <QCoreApplication>
 #include <QXmlStreamWriter>
+#include "wlmill.h"
 
 double SGProbe::FProbe1=50;
 double SGProbe::FProbe2=0;
@@ -11,6 +10,7 @@ double SGProbe::backDist=3;
 double SGProbe::headDiam=2;
 bool SGProbe::enDoubleProbe=false;
 typeActionInput SGProbe::typeStop=INPUT_actSdStop;
+
 
 double WLGMachine::getDistG1StartAt() const
 {
@@ -45,7 +45,7 @@ m_LScript=_LScript;
 motDevice=nullptr;
 
 QDir().mkdir(_scriptPath);
-QDir().mkdir(_iconsMMPath);
+QDir().mkdir(_iconsGMPath);
 
 setContinueMov(true);
 setBLNextMov(true);
@@ -454,8 +454,8 @@ void WLGMachine::init(void)
 {
 qDebug()<<"Init GMachine"<<thread();
 
-if(!QDir(configMMPath).exists())
-    QDir().mkdir(configMMPath);
+if(!QDir(configGMPath).exists())
+    QDir().mkdir(configGMPath);
 
 motDevice=new WLMotion;
 
@@ -520,11 +520,26 @@ else
     return true;
 }
 
+float WLGMachine::getCurSpeed()
+{
+float sum=0;
+
+foreach(WLDrive *drive,getDrives())
+  {
+  if(drive->getName()=="X"
+   ||drive->getName()=="Y"
+   ||drive->getName()=="Z")  sum+=pow(drive->getVnow(),2);
+
+  }
+
+return sqrt(sum);
+}
+
 
 bool WLGMachine::isProbe()
 {
-if(getMotionDevice()->getModulePlanner()){
-           return getMotionDevice()->getModulePlanner()->isProbe2()
+    if(getMotionDevice()->getModulePlanner()){
+        return getMotionDevice()->getModulePlanner()->isProbe2()
                 ||getMotionDevice()->getModulePlanner()->isProbe3();
     }
     else {
@@ -546,18 +561,17 @@ return 0;
 
 void WLGMachine::updateMainDimXYZ()
 {
-    double minDim;
+double minDim;
 
-    double pos[3];
-    QList <WLDrive*> drivesXYZ;
+QList <WLDrive*> drivesXYZ;
 
-    if(WLDrive::getDrive("X")) drivesXYZ+=WLDrive::getDrive("X");
-    if(WLDrive::getDrive("Y")) drivesXYZ+=WLDrive::getDrive("Y");
-    if(WLDrive::getDrive("Z")) drivesXYZ+=WLDrive::getDrive("Z");
+if(WLDrive::getDrive("X")) drivesXYZ+=WLDrive::getDrive("X");
+if(WLDrive::getDrive("Y")) drivesXYZ+=WLDrive::getDrive("Y");
+if(WLDrive::getDrive("Z")) drivesXYZ+=WLDrive::getDrive("Z");
 
-    if(drivesXYZ.isEmpty()) return;
+if(drivesXYZ.isEmpty()) return;
 
-    if(drivesXYZ.size()==1)
+if(drivesXYZ.size()==1)
 {
 m_mainDim=drivesXYZ.first()->getDriveDim().valueReal;
 }
@@ -565,12 +579,12 @@ else
 {
 minDim=drivesXYZ.first()->getDriveDim().valueReal;
 
-for(int i=1;i<3;i++)
+for(int i=1;i<drivesXYZ.size();i++)
     if(drivesXYZ[i]->getDriveDim().valueReal<minDim)	minDim=drivesXYZ[i]->getDriveDim().valueReal;
 
 m_mainDim=minDim;
 
-for(int i=0;i<3;i++)
+for(int i=0;i<drivesXYZ.size();i++)
     {
     drivesXYZ[i]->setKGear(m_mainDim/(drivesXYZ[i]->getDriveDim().valueReal));
     }
@@ -595,9 +609,6 @@ else
 void WLGMachine::initMScript()
 {
 qDebug()<<"WLGMachine::initMScript()";
-
-m_MScript->setBeforeInitScript("TOOLBAR1.removeButtons();\
-                                TOOLBAR2.removeButtons()");
 
 m_MScript->addObject(this,"MACHINE");
 m_MScript->addObject(getGCode(),"GCODE");
@@ -918,7 +929,7 @@ void WLGMachine::saveConfig()
 {
 QMutexLocker locker(&MutexSaveConfig);
 
-QFile FileXML(configMMFile);
+QFile FileXML(configGMFile);
 
 QByteArray Data;
 
@@ -1015,7 +1026,7 @@ FileXML.write(Data.constData());
 FileXML.close();
 }
 
-motDevice->writeToFile(configMMPath+motDevice->getNameDevice()+".xml");
+motDevice->writeToFile(configGMPath+motDevice->getNameDevice()+".xml");
 
 getGCode()->getTools()->writeToFile(toolsFile);
 }
@@ -1091,7 +1102,7 @@ WLMachine::removeDrive(millDrive);
 bool WLGMachine::loadConfig()
 {
 QMutexLocker locker(&MutexSaveConfig);
-QFile FileXML(configMMFile);
+QFile FileXML(configGMFile);
 QXmlStreamReader stream;
 QStringList List;
 int i=0;
@@ -1214,7 +1225,7 @@ if(FileXML.isOpen())
 
        if(!stream.attributes().value("WLMotion").isEmpty())
             {
-            QString initFile=configMMPath+stream.attributes().value("WLMotion").toString()+".xml";
+            QString initFile=configGMPath+stream.attributes().value("WLMotion").toString()+".xml";
 
             WLMotion WLMDev;
 
@@ -1299,10 +1310,10 @@ if(FileXML.isOpen())
             if(stream.name()=="WLMillDrive"
              ||stream.name()=="WLGDrive")
              {
-             WLGDrive *millDrive = new WLGDrive("",motDevice->getModuleAxis());
+             WLGDrive *GDrive = new WLGDrive("",motDevice->getModuleAxis());
 
-             millDrive->readXMLData(stream);
-             addDrive(millDrive);
+             GDrive->readXMLData(stream);
+             addDrive(GDrive);
              }
 
             }
@@ -1868,7 +1879,7 @@ int iSC=m_GCode.getActivSC(&SCG);
 //qDebug()<<"curPos"<<curPos.toString();
 //newPos.fromM(getGCode()->getSC(getGCode()->getActivSC()).to6D().toM().inverted()*curPos.to6D().toM());
 
-if(nameCoord=="X") newPos.x=pos;
+if(nameCoord=="X") newPos.x=pos / (getGCode()->isXDiam() ? 2.0:1.0);
 else
 if(nameCoord=="Y") newPos.y=pos;
 else
@@ -1916,6 +1927,51 @@ newSCG.y=newOffsetSC.y;
 newSCG.z=newOffsetSC.z;
 
 m_GCode.setOffsetSC(iSC,newSCG);
+}
+
+void WLGMachine::setCurPositionSCT(QString nameCoord,double pos)
+{
+WLGPoint curPosSC=getCurrentPositionActivSC();
+WLGPoint SCG;
+
+int iSC=m_GCode.getActivSC(&SCG);
+
+if(nameCoord=="X") getGCode()->setDataCurTool("Xg",curPosSC.x-pos/(getGCode()->isXDiam()? 2.0:1.0)
+                  +getGCode()->getDataCurToolNum("Xg",0));
+else
+if(nameCoord=="Y") getGCode()->setDataCurTool("Yg",curPosSC.y-pos+getGCode()->getDataCurToolNum("Yg",0));
+else
+if(nameCoord=="Z") getGCode()->setDataCurTool("Zg",curPosSC.z-pos+getGCode()->getDataCurToolNum("Zg",0)+getGCode()->getHToolOfst());
+
+}
+
+double WLGMachine::getCurPositionSCT(QString name)
+{
+WLGPoint GP=getCurrentPositionActivSC();
+
+name=name.toUpper();
+
+if(name=="X") return GP.x-getGCode()->getDataCurToolNum("x",0);
+else
+if(name=="Y") return GP.y-getGCode()->getDataCurToolNum("y",0);
+else
+if(name=="Z") return GP.z-getGCode()->getDataCurToolNum("z",0)
+                         -getGCode()->getHToolOfst();
+else
+if(name=="A") return GP.a;
+else
+if(name=="B") return GP.b;
+else
+if(name=="C") return GP.c;
+else
+if(name=="U") return GP.u;
+else
+if(name=="V") return GP.v;
+else
+if(name=="W") return GP.w;
+
+
+return 0;
 }
 
 double WLGMachine::getCurPositionSC(QString name)
@@ -2522,7 +2578,7 @@ foreach(WLGDrive *MDrive,getGDrives())
   }
 
 QList <WLElementTraj> curTraj;
-QList <QPair <int,QStringList>> detectMList;
+QList <QPair <QString,QStringList>> detectMList;
 QString txt;
 
 
@@ -2557,9 +2613,6 @@ if(MillTraj.isEmpty())
    getGCode()->loadStr(getGCode()->getStrRunProgram());
    }
 
-double firstPlaneZ=getGCode()->getCurPoint().z;
-bool   detFirstPlane=true;
-
 WLGPoint curGPoint=getGCode()->getPointActivSC(getGCode()->getCurPoint(),true);
 
 if(getGCode()->isGCode(90))
@@ -2583,17 +2636,12 @@ if(istart>0)
 
      if(getGCode()->isGCode(90))
          curGPoint.z-=getGCode()->getHToolOfst();
-
-     if(detFirstPlane){
-       detFirstPlane=false;
-       firstPlaneZ=getGCode()->getCurPoint().z;
-       }
      }
 
    foreach(WLElementTraj et,curTraj){
-     if(et.isMCode())
+     if(et.isScript())
        {
-       QPair <int,QStringList> MPair(et.data.mcode.MCode,QStringList()<<m_GCode.getContextGCodeList());
+       QPair <QString,QStringList> MPair(et.escript.script,QStringList()<<m_GCode.getContextGCodeList());
 
        for(int i=0;i<detectMList.size();i++){ //ищем чтобы был всегда один
            if(detectMList[i].first==MPair.first)  {
@@ -2605,38 +2653,17 @@ if(istart>0)
        detectMList.append(MPair);
 
        for (int i=0;i<detectMList.size();i++) {
-        switch(MPair.first)
-        {
-        case 3: if(detectMList.at(i).first==4
-                 ||detectMList.at(i).first==5)
-                   detectMList.removeAt(i--); break;
-
-        case 4: if(detectMList.at(i).first==3
-                 ||detectMList.at(i).first==5)
-                   detectMList.removeAt(i--); break;
-
-        case 5: if(detectMList.at(i).first==3
-                 ||detectMList.at(i).first==4)
-                   detectMList.removeAt(i--); break;
-
-        case 7: if(detectMList.at(i).first==8
-                 ||detectMList.at(i).first==9)
-                   detectMList.removeAt(i--); break;
-
-        case 8: if(detectMList.at(i).first==7
-                 ||detectMList.at(i).first==9)
-                   detectMList.removeAt(i--); break;
-
-        case 9: if(detectMList.at(i).first==7
-                 ||detectMList.at(i).first==8)
-                   detectMList.removeAt(i--); break;
+             if(MPair.first=="M3()")  {if(detectMList.at(i).first=="M4()"||detectMList.at(i).first=="M5()") detectMList.removeAt(i--);}
+        else if(MPair.first=="M4()")  {if(detectMList.at(i).first=="M3()"||detectMList.at(i).first=="M5()") detectMList.removeAt(i--);}
+        else if(MPair.first=="M5()")  {if(detectMList.at(i).first=="M3()"||detectMList.at(i).first=="M4()") detectMList.removeAt(i--);}
+        else if(MPair.first=="M7()")  {if(detectMList.at(i).first=="M8()"||detectMList.at(i).first=="M9()") detectMList.removeAt(i--);}
+        else if(MPair.first=="M8()")  {if(detectMList.at(i).first=="M7()"||detectMList.at(i).first=="M9()") detectMList.removeAt(i--);}
+        else if(MPair.first=="M9()")  {if(detectMList.at(i).first=="M7()"||detectMList.at(i).first=="M8()") detectMList.removeAt(i--);}
         }
        }
+      }
 
-       }
-     }
-
-   if(!curTraj.isEmpty())  //оставляем один элемент для последующего
+   if(!curTraj.isEmpty())
      {
      WLElementTraj lastElement = curTraj.last();
      curTraj.clear();
@@ -2687,11 +2714,10 @@ if(getCurrentPosition().z<getGCode()->getG28Position().z)
 preRunProgramList+=QString("G53 G0 X%1 Y%2").arg(endPoint.x).arg(endPoint.y);
 preRunProgramList+=QString("G53 G0 A%1 B%2 C%3").arg(endPoint.a).arg(endPoint.b).arg(endPoint.c);
 
-
 if(getGCode()->isGCode(0)||getDistG1StartAt()==0.0){
    preRunProgramList+=QString("G0 Z%1").arg(curGPoint.z);
    }
-   else{    
+   else{
    preRunProgramList+=QString("G0 Z%1").arg(curGPoint.z+getDistG1StartAt());
 
    double F = getFeedG1StartAt() > 0 ? getFeedG1StartAt() : getGCode()->getValue('F');
@@ -2810,6 +2836,7 @@ QString txt;
 QList<WLElementTraj> simpliTraj;
 QList<WLElementTraj> curTraj;
 WLElementTraj lastEG4142;
+
 WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 //WLElementTraj ETraj;
 
@@ -2825,17 +2852,17 @@ qDebug()<<"WLGMachine::updateMovProgram() m_iProgram"<<m_iProgram
 if(isRunGProgram()
 &&!isRunMScript())
  {
- while(MillTraj.size()<50
+ while(MillTraj.size()<100
      &&(!baseTraj.isEmpty()||m_iProgram<m_Program->getElementCount())
-     &&(MillTraj.isEmpty()||(!MillTraj.last().isMCode())))
+     &&(MillTraj.isEmpty()||(!MillTraj.last().isScript())))
    {
+
    if(!baseTraj.isEmpty()
-     &&baseTraj.first().isMCode()) //если первый элемент M то отправляем его на исполнение
+     &&baseTraj.first().isScript()) //если первый элемент Script то отправляем его на исполнение
      {
      addElementTraj(QList<WLElementTraj>()<<baseTraj.takeFirst());
      continue;
      }
-
 
    if(m_iProgram<m_Program->getElementCount()) //читаем программу
     {
@@ -2876,15 +2903,15 @@ if(isRunGProgram()
    if((isimpli+1)<baseTraj.size()) //если сгладили и дошли до точки, но не до конца
     {
     addElementTraj(simpliTraj);
-    baseTraj=baseTraj.mid(isimpli+1); //оставляем один элемент на будущее, может и М
-    }
-    else if(m_iProgram==(m_Program->getElementCount())
-          ||WLElementTraj::detectMCode(baseTraj)) //до конца
+    baseTraj=baseTraj.mid(isimpli+1); //оставляем один элемент на будущее, может и Script
+    }   
+    else if(m_iProgram==(m_Program->getElementCount())      //до конца
+          ||WLElementTraj::detectScript(baseTraj)) //до конца
           {
-          while(!baseTraj.isEmpty())  //перемещаем всё + одна M
+          while(!baseTraj.isEmpty())  //перемещаем всё + один Script
            {
            addElementTraj(QList<WLElementTraj>()<<baseTraj.first());
-           if(baseTraj.takeFirst().isMCode())
+           if(baseTraj.takeFirst().isScript())
                break;
            }
           }
@@ -2950,6 +2977,190 @@ for(int i=0;i<Traj.size();i++)
 return true;
 }
 
+void WLGMachine::addHeightMap(QList<WLElementTraj> &Traj)
+{
+QList<WLElementTraj> newTraj;
+
+if(!m_HeightMap.isValid()
+ ||!m_HeightMap.isEnable()) return;
+
+while(!Traj.isEmpty())
+{
+WLElementTraj ET=Traj.takeFirst();
+
+switch(ET.type)
+{
+case WLElementTraj::line: {
+                          double interpolationStepX = m_HeightMap.getInterpStepX();
+                          double interpolationStepY = m_HeightMap.getInterpStepY();
+
+                          QVector3D stXY(ET.data.line.startPoint.x
+                                        ,ET.data.line.startPoint.y
+                                        ,ET.data.line.startPoint.z);
+
+                          QVector3D enXY(ET.data.line.endPoint.x
+                                        ,ET.data.line.endPoint.y
+                                        ,ET.data.line.endPoint.z);
+
+                          QVector3D vec=enXY-stXY;
+                          double length;
+
+                          if(qIsNaN(vec.length()))
+                             {
+                             ET.data.line.startPoint.z+=m_HeightMap.getValue(ET.data.line.startPoint.x
+                                                                            ,ET.data.line.startPoint.y);
+
+                             ET.data.line.endPoint.z+=m_HeightMap.getValue(ET.data.line.endPoint.x
+                                                                           ,ET.data.line.endPoint.y);
+                             newTraj+=ET;
+                             break;
+                             }
+                             else {
+                             if (fabs(vec.x()) / fabs(vec.y()) < interpolationStepX / interpolationStepY)
+                                 length = interpolationStepY / (vec.y() / vec.length());
+                             else
+                                 length = interpolationStepX / (vec.x() / vec.length());
+
+                             length = fabs(length);
+
+                             QVector3D seg = vec.normalized() * length;
+                             int count = trunc(vec.length() / length);
+                             seg = vec / count;
+
+                             if (count == 0)
+                                {
+                                ET.data.line.startPoint.z+=m_HeightMap.getValue(ET.data.line.startPoint.x
+                                                                               ,ET.data.line.startPoint.y);
+
+                                ET.data.line.endPoint.z+=m_HeightMap.getValue(ET.data.line.endPoint.x
+                                                                              ,ET.data.line.endPoint.y);
+                                newTraj+=ET;
+                                break;
+                                }
+
+                             for (int i = 0; i < count; i++) {
+
+                                 WLElementTraj segLine=ET;
+
+                                 segLine.data.line.startPoint.x+=seg.x()*i;
+                                 segLine.data.line.startPoint.y+=seg.y()*i;
+                                 segLine.data.line.startPoint.z+=seg.z()*i;
+
+                                 segLine.data.line.endPoint=segLine.data.line.startPoint;
+
+                                 segLine.data.line.startPoint.z+=m_HeightMap.getValue(segLine.data.line.startPoint.x
+                                                                                     ,segLine.data.line.startPoint.y);
+
+                                 if(i==count-1)
+                                 {
+                                 segLine.data.line.endPoint.x=ET.data.line.endPoint.x;
+                                 segLine.data.line.endPoint.y=ET.data.line.endPoint.y;
+                                 segLine.data.line.endPoint.z=ET.data.line.endPoint.z;
+                                 }
+                                 else{
+                                 segLine.data.line.endPoint.x+=seg.x();
+                                 segLine.data.line.endPoint.y+=seg.y();
+                                 segLine.data.line.endPoint.z+=seg.z();
+                                 }
+
+                                 segLine.data.line.endPoint.z+=m_HeightMap.getValue(segLine.data.line.endPoint.x
+                                                                                   ,segLine.data.line.endPoint.y);
+
+
+                                 newTraj+=segLine;
+                                 }
+                             }
+
+                          }
+                          break;
+
+
+case WLElementTraj::arc:
+                        {
+                        double interpolationStep = 5;//qMin(m_HeightMap.getInterpStepX(),m_HeightMap.getInterpStepY());
+
+                        if(ET.data.arc.R/2.0<interpolationStep
+                         ||ET.data.arc.plane!=17)
+                          {
+                          ET.data.arc.startPoint.z+=m_HeightMap.getValue(ET.data.arc.startPoint.x
+                                                                        ,ET.data.arc.startPoint.y);
+
+                          ET.data.arc.endPoint.z+=m_HeightMap.getValue(ET.data.arc.endPoint.x
+                                                                      ,ET.data.arc.endPoint.y);
+                          newTraj+=ET;
+                          }
+                          else {
+                           WLElementTraj segArc=ET;
+
+                           double A_st=ET.data.arc.startPoint.to3D().getAxy(ET.data.arc.centerPoint.to3D());
+                           double A_en=ET.data.arc.endPoint.to3D().getAxy(ET.data.arc.centerPoint.to3D());
+
+                           if((ET.data.arc.CCW)&&(A_en<=A_st))  A_en+=2.0*M_PI;
+                           if((!ET.data.arc.CCW)&&(A_en>=A_st)) A_en-=2.0*M_PI;
+
+                           double lenght=qAbs((A_en-A_st)*ET.data.arc.R);
+
+                           int count=trunc(lenght/interpolationStep)+1;
+
+                           double dA=(A_en-A_st)/count;
+                           double A=A_st;
+
+                           for (int i = 0;i<count; i++) {
+
+                               if(i!=0){
+                               segArc.data.arc.startPoint.x=segArc.data.arc.endPoint.x;
+                               segArc.data.arc.startPoint.y=segArc.data.arc.endPoint.y;
+                               segArc.data.arc.startPoint.z=segArc.data.arc.endPoint.z;
+                               }
+                               else{
+                               segArc.data.arc.startPoint.z+=m_HeightMap.getValue(segArc.data.arc.startPoint.x
+                                                                                 ,segArc.data.arc.startPoint.y);
+                               }
+
+                               A+=dA;
+
+                               if(i==count-1)
+                                {
+                                A=A_en;
+
+                                segArc.data.arc.endPoint.x=ET.data.arc.endPoint.x;
+                                segArc.data.arc.endPoint.y=ET.data.arc.endPoint.y;
+                                }
+                                else{
+                                segArc.data.arc.endPoint.x=segArc.data.arc.centerPoint.x;
+                                segArc.data.arc.endPoint.y=segArc.data.arc.centerPoint.y;
+
+                                segArc.data.arc.endPoint.x+=segArc.data.arc.R*cos(A);
+                                segArc.data.arc.endPoint.y+=segArc.data.arc.R*sin(A);
+                                }
+
+                               segArc.data.arc.endPoint.z=ET.data.arc.endPoint.z;
+                               segArc.data.arc.endPoint.z+=m_HeightMap.getValue(segArc.data.arc.endPoint.x
+                                                                               ,segArc.data.arc.endPoint.y);
+
+                               newTraj+=segArc;
+
+                               if((ET.data.arc.CCW&&A>=A_en)
+                               ||(!ET.data.arc.CCW&&A<=A_en)) break;
+                               }
+
+                          }
+                         }
+                        break;
+case WLElementTraj::delay:
+                            ET.data.delay.point.z+=m_HeightMap.getValue(ET.data.delay.point.x
+                                                                       ,ET.data.delay.point.y);
+                            newTraj+=ET;
+                            break;
+
+default: newTraj+=ET;
+}
+
+}
+
+
+Traj=newTraj;
+}
 
 #define useULine
 void WLGMachine::addSmooth(QList<WLElementTraj> &addTraj)
@@ -2987,7 +3198,7 @@ dt=1.0f/20;
 
 for(int i=1;i<addTraj.size();i++)
   {
- // qDebug()<<"addTraj.smooth"<<addTraj[i].getG64P();
+  //qDebug()<<"addTraj.smooth"<<addTraj[i].getG64P();
   if(!addTraj[i-1].isLine()
    ||!addTraj[i].isLine()   
    ||addTraj[i-1].isFast()
@@ -3007,7 +3218,7 @@ for(int i=1;i<addTraj.size();i++)
   V1=addTraj[i].data.line.endPoint
     -addTraj[i].data.line.startPoint;
 
-  B=calcAngleGrd(V0.to3D(),V1.to3D())/2.0;
+  B=calcAngleGrd(V0.to3D().normalize(),V1.to3D().normalize())/2.0;
 
   if(B>0.1)
 //  if(qAbs(B) <(90-smoothAng)
@@ -3350,7 +3561,7 @@ while((ModulePlanner->getFree()>0)
    &&(!MillTraj.isEmpty())
    &&(!isRunGProgram()
      ||MillTraj.size()>1
-     ||MillTraj.first().isMCode()
+     ||MillTraj.first().isScript()
      ||m_iProgram==(m_Program->getElementCount()))
    &&m_runList
    &&ok) //если можно отправлять
@@ -3359,9 +3570,13 @@ WLElementTraj ME=MillTraj.takeFirst();
 qDebug()<<"take"<<ME.type<<ME.str<<" MillTraj.size()="<<MillTraj.size();
 switch(ME.type)
 {
-case WLElementTraj::mcode: if(!isActiv()  //стоит
-                           ||(!isRunMScript()&&ME.index==ModulePlanner->getCurIdElement())){ //или порождён текущим элементом
-                               runMCode(ME.data.mcode.MCode);
+case WLElementTraj::script: qDebug()<<"Script"<<isActiv()<<isRunMScript()<<(ME.index==ModulePlanner->getCurIdElement())<<ME.escript.singleRun;
+
+                            if(!isActiv()  //стоит
+                           ||(!isRunMScript()
+                             &&ME.index==ModulePlanner->getCurIdElement())  //или порождён текущим элементом
+                             &&!ME.escript.singleRun){                      //и возможен запуск паралельный
+                               runMScript(ME.escript.script);
                                ok=true;
                                }
                                else{
@@ -3483,15 +3698,13 @@ case WLElementTraj::uline:   {
                            break;
 
 case WLElementTraj::arc: {
-                          if(!getDrive("X")||!getDrive("Y"))
-                             {
-                             setMessage("Machine",tr("error set circle"),-1);
-                             break;
-                             }
+                          QVector <quint8>  indexs;
+                          QVector <qint32>  ePos;
+                          QVector <qint32>  cPos;
 
-                          QVector <quint8> indexs;
-                          QVector <qint32> ePos;
-                          QVector <qint32> cPos;
+                          quint8 Ib=255;
+                          quint8 Jb=255;
+                          quint8 Kb=255;
 
                           quint8 i=0;
 
@@ -3500,43 +3713,48 @@ case WLElementTraj::arc: {
                            ePos+=round(ME.data.arc.endPoint.get(mD->getName())/mD->dimension());
                            cPos+=round(ME.data.arc.centerPoint.get(mD->getName())/mD->dimension());
                            indexs+=i;
+
+                           if(mD->getName()=="X") Ib=i;
+                           else if(mD->getName()=="Y") Jb=i;
+                           else if(mD->getName()=="Z") Kb=i;
+
                            i++;
                            }
 
                           qint32 ePosIJK[3];
                           qint32 cPosIJ[2];
-                          
-                          quint8 Ib=0;
-                          quint8 Jb=1;
-                          quint8 Kb= getDrive("Z") ? 2 :0;
 
                           quint8 I,J,K;
 
                           switch(ME.data.arc.plane)
-                          {                           
+                          {
                           case 18: I=Kb;J=Ib;K=Jb; break;
                           case 19: I=Jb;J=Kb;K=Ib; break;
                           default: I=Ib;J=Jb;K=Kb; break;
-                          }                          
-                          
+                          }
+
+                          if(I==255||J==255)
+                            {
+                            sendMessage("WLGMachine",QString("error set arcmotion iI=%1 iJ%2").arg(I).arg(J),-1);
+                            return 0;
+                            }
+
 
                           cPosIJ[0]=cPos[I];
                           cPosIJ[1]=cPos[J];
 
                           ePosIJK[0]=ePos[I];
                           ePosIJK[1]=ePos[J];
-                          ePosIJK[2]=ePos[K];
 
                           ePos[0]=ePosIJK[0];
                           ePos[1]=ePosIJK[1];
-
 
                           indexs[0]=I;
                           indexs[1]=J;
 
 
-                          if(getDrive("Z"))
-                           {
+                          if(K!=255){
+                           ePosIJK[2]=ePos[K];
                            ePos[2]=ePosIJK[2];
                            indexs[2]=K;
                            }
@@ -3544,7 +3762,7 @@ case WLElementTraj::arc: {
                          ok=ModulePlanner->addCirc(MASK_abs
                                                  |(ME.data.arc.CCW  ? MASK_ccw:0)
                                                  |(ME.isFast()      ? MASK_fline:0)
-                                                 |(getDrive("Z")    ? MASK_circxyz:0)
+                                                 |(K!=255           ? MASK_circxyz:0)
                                                  |(ME.isSmooth()    ? MASK_ensmooth:0)
                                                  ,indexs.size()
                                                  ,indexs.data()
@@ -3554,7 +3772,7 @@ case WLElementTraj::arc: {
                                                  ,ME.isFast() ? -1 : (ME.F/60)/m_mainDim
                                                  ,ME.index);
                           }
-						  break;
+                          break;
 }
 
 if(!ok){
@@ -3855,9 +4073,9 @@ void WLGMachine::runMCode(int iM)
 
 void WLGMachine::runMScript(QString txt)
 {
-    if(m_MScript)
+if(m_MScript)
     {
-        qDebug()<<"WLGMachine::runMScript"<<txt<<isActiv();
+    qDebug()<<"WLGMachine::runMScript"<<txt<<isActiv();
 
         //detect MCode
     bool ok;
