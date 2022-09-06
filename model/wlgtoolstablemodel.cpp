@@ -112,6 +112,13 @@ if (role == Qt::BackgroundRole
    return QColor(250,100,100);
    }
 
+if (role == Qt::BackgroundRole
+  && (headers[index.column()]=="Xg"
+    ||headers[index.column()]=="Yg"
+    ||headers[index.column()]=="Zg")
+  &&GCode->getOfstTool()==GCode->getTools()->getValueAt(index.row(),"index","-1").toInt()){
+   return QColor(100,200,100);
+   }
 
 if (role == Qt::TextAlignmentRole) {
     return Qt::AlignCenter;

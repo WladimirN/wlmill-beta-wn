@@ -344,10 +344,8 @@ struct WLGCodeData
  WL3DPoint curPoint;//G41/42
  WL3DPoint endPoint;//G41/42
 
- int iToolOfst=0;
+ int iOfstTool=0;
  int iSC=0;
-
- bool Xdiam=false;//turnmode
 
   double drillPlane=0;
  quint32 drillPms=0;
@@ -523,7 +521,6 @@ public:
     double getDToolOfst();
     double getCompToolRadius() {return qAbs(getDToolOfst()/2.0);}
 
-    int getToolOfst() {return data()->iToolOfst;}
     WLGPoint getGToolOfst(int ikey=-1);
 
     void verifyG51();
@@ -565,8 +562,12 @@ public:
     static bool detectMCode(QString gstr);
 public:
 
-    Q_INVOKABLE void setXDiam(bool en=true) {data()->Xdiam=en;}
-    Q_INVOKABLE bool isXDiam() {return data()->Xdiam;}
+    Q_INVOKABLE void setOffsetTool(int index=0) {data()->iOfstTool=index;
+                                                emit changedTool(index);}
+    Q_INVOKABLE int getOfstTool();
+
+    Q_INVOKABLE void setXDiam(bool en=true) {setGCode(en ? 7 : 8);}
+    Q_INVOKABLE bool isXDiam()              {return isGCode(8);}
 
     Q_INVOKABLE void removeTool(int ikey);
     Q_INVOKABLE void setDataTool(int ikey,QString key,QVariant value,bool send=true);

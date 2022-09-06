@@ -364,7 +364,7 @@ bool ok=true;;
 //qDebug()<<dataStr;
 
 int iLastSC=GCode->getActivSC();
-int iLastToolOfst=GCode->getToolOfst();
+int iLastToolOfst=GCode->getOfstTool();
 
 QList <int> MList;
 
@@ -398,13 +398,19 @@ ElementTraj.str+=dataStr;
 ElementTraj.setF(GCode->getValue('F'));
 ElementTraj.setS(GCode->getValue('S'));
 
-if(lastT!=GCode->getT())
-{
 if(!data.contains("G"))
-  {
+{
+#ifdef GCODE_TURN
+if(lastT!=GCode->getT())
   ElementTraj.setScript(GCode->getPointActivSC(GCode->data()->curGPoint),QString("changeTool(%1,%2)").arg(GCode->getT()).arg(lastT));
-  }
+break;
+#endif
+
+if(GCode->isValidValue('P'))
+   GCode->setOffsetTool(GCode->getValue('P'));
 }
+
+
 
 if(GCode->isGCode(64)) //устанавливаем тип перемещения
    {

@@ -1113,7 +1113,7 @@ QPalette blckPalette,redPalette;
 blckPalette.setColor(QPalette::WindowText, Qt::black);
  redPalette.setColor(QPalette::WindowText, Qt::red);
 
-gALabelX->setGPos(GP.x);
+gALabelX->setGPos(MillMachine->getGCode()->isXDiam() ? GP.x*2.0 : GP.x);
 gALabelY->setGPos(GP.y);
 gALabelZ->setGPos(GP.z-MillMachine->getGCode()->getHToolOfst());
 gALabelA->setGPos(GP.a);

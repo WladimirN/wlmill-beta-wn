@@ -15,8 +15,7 @@ setGCode(17);
 setGCode(01);
 setGCode(54);
 setGCode(61);
-
-//setGCode(7); //radius Turn Mode
+setGCode(7);  //radius Turn Mode
 
 push();
 }
@@ -127,11 +126,11 @@ case 'T': str>>buf;
           }
           else if(buf.length()==3){
           setValue(a,buf.mid(0,1).toInt());
-          data()->iToolOfst=buf.mid(1).toInt();
+          setOffsetTool(buf.mid(1).toInt());
           }
           else if(buf.length()==4){
           setValue(a,buf.mid(0,2).toInt());
-          data()->iToolOfst=buf.mid(2).toInt();
+          setOffsetTool(buf.mid(2).toInt());
           }
           break;
 #endif
@@ -318,14 +317,16 @@ if(D!=0){
 return ret;
 }
 
+int WLGCode::getOfstTool() {return data()->iOfstTool;}
+
 WLGPoint WLGCode::getGToolOfst(int ikey)
 {
-WLGPoint ret;
+    WLGPoint ret;
 
 if(ikey==-1)
-    ikey=data()->iToolOfst;
+    ikey=data()->iOfstTool;
 
-if(data()->iToolOfst!=0)
+if(data()->iOfstTool!=0)
  {
  ret.x=getDataToolNum(ikey,"Xg",0)
       +getDataToolNum(ikey,"Xw",0);
@@ -539,6 +540,14 @@ switch(code)
            m_data.GCode[1]=0;
            m_data.GCode[2]=0;
            m_data.GCode[3]=1;
+           break;
+
+   case 7: m_data.GCode[7]=1;//"X Diam";
+           m_data.GCode[8]=0;
+           break;
+
+   case 8: m_data.GCode[7]=0;
+           m_data.GCode[8]=1;//"X Radius";
            break;
 
   case 102:
@@ -967,7 +976,7 @@ return lastGPoint;
 
 WLGPoint WLGCode::movPointToActivToolOfst(int iLastTOfst, WLGPoint &lastGPoint)
 {
-if(iLastTOfst!=m_data.iToolOfst){
+if(iLastTOfst!=m_data.iOfstTool){
  lastGPoint=lastGPoint+getGToolOfst(iLastTOfst)-getGToolOfst();
  }
 
@@ -1205,8 +1214,6 @@ G51Scale.y=1;
 G51Scale.z=1;
 
 absIJK=false;
-
-iToolOfst=1;
 
 gF.value=200;
 gS.value=0;
