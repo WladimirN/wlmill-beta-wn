@@ -123,7 +123,7 @@ WLAxisWidget::WLAxisWidget(WLAxis *_axis,bool _slave,double _offset, QWidget *pa
      WLModuleEncoder *ModuleEncoder=static_cast<WLModuleEncoder*>(m_axis->getModule()->getDevice()->getModule(typeMEncoder));
 
      if(ModuleEncoder)  {
-       ui->cbTypeMotor->addItems(QString("noMotor,stepMotor,encoderStepMotor").split(","));
+       ui->cbTypeMotor->addItems(QString("noMotor,stepMotor,encoderStepMotor,errEncoderStepMotor").split(","));
 
        ui->encoder->setModule(ModuleEncoder);
        ui->encoder->setValue(m_axis->getEncoder());
@@ -162,7 +162,8 @@ m_axis->setTypePulse((typePulseAxis)ui->cbTypePulse->currentIndex()
                     |(ui->cbInvDir->isChecked() ?MAF_invDir:0));
 
 
-if((typeMotorAxis)ui->cbTypeMotor->currentIndex()==AXIS_encoderStepMotor){
+if((typeMotorAxis)ui->cbTypeMotor->currentIndex()==AXIS_encoderStepMotor
+ ||(typeMotorAxis)ui->cbTypeMotor->currentIndex()==AXIS_errEncoderStepMotor){
   m_axis->setEncoder(ui->encoder->value());
   }
   else {
@@ -384,6 +385,14 @@ case AXIS_encoderStepMotor:
                      ui->gbEncoder->setVisible(true);
                          ui->gbPID->setVisible(true);
                     ui->gbMParPlus->setVisible(true);
+                   //ui->gbMParMinus->setVisible(true);
+                    ui->gbErrorPos->setVisible(true);
+
+case AXIS_errEncoderStepMotor:
+                   ui->gbTypePulse->setVisible(true);
+                     ui->gbEncoder->setVisible(true);
+                         ui->gbPID->setVisible(true);
+                    ui->gbMParPlus->setVisible(false);
                    //ui->gbMParMinus->setVisible(true);
                     ui->gbErrorPos->setVisible(true);
                    break;
