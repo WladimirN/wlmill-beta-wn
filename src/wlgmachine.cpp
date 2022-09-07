@@ -2433,6 +2433,23 @@ if(getDrive("W")) GP.w=getDrive("W")->position();
 return GP;
 }
 
+WLGPoint WLGMachine::getAxisErrorPosition()
+{
+WLGPoint GP;
+
+if(getDrive("X")) GP.x=getDrive("X")->errPosition();
+if(getDrive("Y")) GP.y=getDrive("Y")->errPosition();
+if(getDrive("Z")) GP.z=getDrive("Z")->errPosition();
+if(getDrive("A")) GP.a=getDrive("A")->errPosition();
+if(getDrive("B")) GP.b=getDrive("B")->errPosition();
+if(getDrive("C")) GP.c=getDrive("C")->errPosition();
+if(getDrive("U")) GP.u=getDrive("U")->errPosition();
+if(getDrive("V")) GP.v=getDrive("V")->errPosition();
+if(getDrive("W")) GP.w=getDrive("W")->errPosition();
+
+return GP;
+}
+
 WLGPoint WLGMachine::getCurrentPosition(bool real)
 {
 WLGPoint GP;

@@ -12,6 +12,8 @@ nowPosition=0;
 maxPosition=std::numeric_limits<qint32>::max();
 minPosition=std::numeric_limits<qint32>::min();
 homePosition=0;
+errPosition=0;
+
 
 status=AXIS_stop;
 mode=AXIS_alone;
@@ -787,13 +789,16 @@ switch((typeDataAxis)type)
                        emit changedPosition(nowPosition);
                        break;
 
+ case dataAxis_posError:data>>errPosition;
+                       emit changedErrPosition(errPosition);
+                       break;
+
  case dataAxis_F:      data>>Freq;
                        emit changedFreq(Freq);
                        break;
 
  case dataAxis_latch2: data>>m_latchPos2;
-
-    m_validLatch2=true;
+                       m_validLatch2=true;
                        emit changedLatch2(m_latchPos2);
                        break;
 
@@ -801,6 +806,7 @@ switch((typeDataAxis)type)
                        m_validLatch3=true;
                        emit changedLatch3(m_latchPos3);
                        break;
+
 }
 }
 

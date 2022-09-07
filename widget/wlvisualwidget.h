@@ -52,6 +52,7 @@ private:
     WLGMachine *m_MillMachine;
 
     bool m_viewProgramF;
+    bool m_viewErrPosition;
     bool m_viewMillF;
     bool m_viewLimits;
     bool m_viewRotPointF;
@@ -209,6 +210,7 @@ public slots:
     void setToolDiametr(float d);	
 	void setToolHeight(float h);	
 
+    void setViewErrPosition() {m_viewErrPosition=!m_viewErrPosition;  update();}
     void setViewProgram() {m_viewProgramF=!m_viewProgramF;  update();}
     void setViewMill()    {m_viewMillF=!m_viewMillF;        update();}
     void setViewRotPoint(){m_viewRotPointF=!m_viewRotPointF;update();}

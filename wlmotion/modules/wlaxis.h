@@ -112,13 +112,17 @@ const QString errorAxis("0,no error\
 #define sendAxis_signal 200
 
 enum typeDataAxis{
-     dataAxis_pos
-    ,dataAxis_F
-    ,dataAxis_latch2
-    ,dataAxis_latch3
+   dataAxis_pos
+  ,dataAxis_F
+  ,dataAxis_latch2
+  ,dataAxis_latch3
+  ,dataAxis_modeStatus
+  ,dataAxis_posReal
+  ,dataAxis_posTarget
+  ,dataAxis_posMin
+  ,dataAxis_posMax
+  ,dataAxis_posError
   };
-
-
 
 #define sendAxis_data          202 //send data Axis
 
@@ -357,6 +361,8 @@ private:
  qint32 maxPosition;
  qint32 minPosition;
 
+ qint32 errPosition;
+
 statusAxis status;
   modeAxis mode;
    WLFlags Flags;
@@ -435,6 +441,8 @@ enum statusAxis getStatus() {return status;}
  long getLatch2() {return m_latchPos2;}
  long getLatch3() {return m_latchPos3;}
 
+ long getErrPosition() {return errPosition;}
+
  void setError(quint8 err)  {emit changedError(error=err);}
 
  int getTypePulse(){return typePulse;}
@@ -476,6 +484,7 @@ signals:
  void changedLatch3(qint32);
  void changedError(quint8);
  void changedPosition(qint32);
+ void changedErrPosition(qint32);
  void changedStatus(statusAxis);
  void changedMode(modeAxis);
  void changedFreq(float);

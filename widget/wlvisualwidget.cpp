@@ -49,6 +49,7 @@ connect(m_MillMachine,SIGNAL(changedReadyRunList(bool)),this,SLOT(setEnRotTool(b
 GLMillElemnts=0;
 GLlastMillElemnts=0;
 
+m_viewErrPosition=false;
 m_viewProgramF=true;
 m_viewMillF=true;
 m_viewBacklash=false;
@@ -119,6 +120,10 @@ Action->setChecked(true);
 Action=menuViewShow->addAction(tr("Limits"),    this,SLOT(setViewLimits()));
 Action->setCheckable(true);
 Action->setChecked(true);
+
+Action=menuViewShow->addAction(tr("Error Pos"),this,SLOT(setViewErrPosition()));
+Action->setCheckable(true);
+Action->setChecked(false);
 
 Action=menuViewShow->addAction(tr("Rot"),this,SLOT(setViewRotPoint()));
 Action->setCheckable(true);
@@ -385,7 +390,12 @@ void WLVisualWidget::paintGL()
     if(m_typeView==XYZ)
      {
      showHome(m_MillMachine->getGCode()->getG28Position().to3D());
-     showTool(m_MillMachine->getCurrentPosition().to3D(),true,10,QVector3D(0,1,0));
+
+     if(m_viewErrPosition)
+        showTool((m_MillMachine->getCurrentPosition()-m_MillMachine->getAxisErrorPosition()).to3D(),true,10,QVector3D(0,1,0));
+     else
+        showTool((m_MillMachine->getCurrentPosition()).to3D(),true,10,QVector3D(0,1,0));
+
 
      if(m_viewRotPointF) showRotPoint();
 
@@ -1022,10 +1032,16 @@ void WLVisualWidget::showTrackTraj()
 {
 if(trackTraj.size()==defTrackSize) trackTraj.removeFirst();
 
+WLGPoint curPos=m_MillMachine->getCurrentPosition();
+
+if(m_viewErrPosition)
+    curPos=curPos-m_MillMachine->getAxisErrorPosition();
+
 if(m_typeView==XYZ)
-  trackTraj+=m_MillMachine->getCurrentPosition().to6D().to3Df();
-else
-  trackTraj+=m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition()).to6D().to3Df();
+    trackTraj+=(m_MillMachine->getCurrentPosition()).to6D().to3Df();
+  else
+    trackTraj+=m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition()).to6D().to3Df();
+
 
 int vertexLocation;
 QMatrix4x4 matrix;

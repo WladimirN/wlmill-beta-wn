@@ -72,6 +72,7 @@ void WLModuleAxis::callTrackAxis()
 {
 for(int i=0;i<getSizeAxis();i++)
   {
+  Axis[i]->getData(typeDataAxis::dataAxis_posError);
   Axis[i]->getData(typeDataAxis::dataAxis_pos);
   Axis[i]->getData(typeDataAxis::dataAxis_F);
   }

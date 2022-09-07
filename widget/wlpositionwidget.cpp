@@ -274,6 +274,10 @@ pbWL->setSizePolicy(sizePolicy);
 pbWL->setPopupMode(QToolButton::InstantPopup);
 
 QMenu *menuWL = new QMenu();
+
+QAction *act=menuWL->addAction((tr("Show errPos")),[=](){m_showErrorPos=!m_showErrorPos;});
+act->setCheckable(true);
+
 QMenu *menuProgram = new QMenu(tr("Program"));
 
 menuProgram->addAction((tr("Start")),this,[=](){MillMachine->runGProgram();});
@@ -1104,9 +1108,11 @@ void WLPositionWidget::updatePosition()
 WLGPoint GP;
 WLGPoint GP53;
 
-
 GP53=MillMachine->getAxisPosition();
 GP=MillMachine->getCurrentPositionActivSC();
+
+if(m_showErrorPos)
+  GP=GP-MillMachine->getAxisErrorPosition();
 
 QPalette blckPalette,redPalette;
 

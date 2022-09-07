@@ -364,6 +364,7 @@ bool isBLNextMov()      {return m_blnextmov;}
 bool isContinueMov()    {return m_continuemov;}
 
 WLGPoint getAxisPosition();
+WLGPoint getAxisErrorPosition();
 WLGPoint getCurrentPosition(bool real=0);
 WLGPoint getCurrentPositionActivSC();
 

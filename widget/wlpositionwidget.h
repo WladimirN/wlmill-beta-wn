@@ -277,6 +277,8 @@ private:
 
    QSize m_buttonSize;
 
+   bool m_showErrorPos=false;
+
 private:
 
     void initElementControls();

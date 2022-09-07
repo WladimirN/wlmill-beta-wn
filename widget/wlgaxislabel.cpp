@@ -87,9 +87,6 @@ else
 
 if(isChecked()) ofst.prepend("*");
 
-
-
-
 rName.setX(0);
 rName.setY(0);
 rName.setHeight(this->height()-1);
