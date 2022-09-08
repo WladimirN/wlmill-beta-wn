@@ -13,6 +13,7 @@
 #include "modules/wlmodulepwm.h"
 #include "modules/wlmoduleuart.h"
 #include "modules/wlmoduledmodbus.h"
+#include "modules/wlmodulespindle.h"
 
 class WLMotion: public WLDevice
 {
@@ -23,12 +24,9 @@ public:
 	 WLMotion();
 	~WLMotion();
 
-protected:
-virtual WLModule *createModule(QString name);
-virtual WLModule *createModule(typeModule getTypeModule);
-
 public:
 WLModulePlanner* getModulePlanner() {return static_cast<WLModulePlanner*>(getModule(typeMPlanner));}
+WLModuleSpindle* getModuleSpindle() {return static_cast<WLModuleSpindle*>(getModule(typeMSpindle));}
 WLModuleAxis*    getModuleAxis()    {return static_cast<WLModuleAxis*>(getModule(typeMAxis));}
 WLModuleIOPut*   getModuleIOPut()   {return static_cast<WLModuleIOPut*>(getModule(typeMIOPut));}
 WLModuleAIOPut*  getModuleAIOPut()  {return static_cast<WLModuleAIOPut*>(getModule(typeMAIOPut));}
@@ -40,7 +38,10 @@ WLModuleDCan*    getModuleDCan()    {return static_cast<WLModuleDCan*>(getModule
 WLModuleDModbus* getModuleDModbus() {return static_cast<WLModuleDModbus*>(getModule(typeMDModbus));}
 
 public:
+virtual WLModule *createModule(QString name);
+virtual WLModule *createModule(typeModule getTypeModule);
 
+public:
 bool getIn(int index);
 bool getOut(int index);
 void setOut(int index, bool set);

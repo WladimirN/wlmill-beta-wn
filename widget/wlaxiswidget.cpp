@@ -30,7 +30,7 @@ WLAxisWidget::WLAxisWidget(WLAxis *_axis,bool _slave,double _offset, QWidget *pa
     connect(ui->editInPEL,&WLEditIOWidget::toggle,ui->cbActInPEL,&QComboBox::setEnabled);
     connect(ui->editInMEL,&WLEditIOWidget::toggle,ui->cbActInMEL,&QComboBox::setEnabled);
 
-    WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(m_axis->getModule()->getDevice()->getModule(typeMIOPut));
+    WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(m_axis->getModule()->getDevice()->getModule(WLModule::typeMIOPut));
 
     ui->editInALM->setModule(ModuleIOPut);
     ui->editInORG->setModule(ModuleIOPut);
@@ -118,7 +118,7 @@ WLAxisWidget::WLAxisWidget(WLAxis *_axis,bool _slave,double _offset, QWidget *pa
 
      connect(ui->cbTypeMotor,QOverload<int>::of(&QComboBox::currentIndexChanged),this,&WLAxisWidget::updateTypeMotor);
 
-     WLModuleEncoder *ModuleEncoder=static_cast<WLModuleEncoder*>(m_axis->getModule()->getDevice()->getModule(typeMEncoder));
+     WLModuleEncoder *ModuleEncoder=static_cast<WLModuleEncoder*>(m_axis->getModule()->getDevice()->getModule(WLModule::typeMEncoder));
 
      if(ModuleEncoder)  {
        ui->cbTypeMotor->addItems(QString("noMotor,stepMotor,encoderStepMotor").split(","));

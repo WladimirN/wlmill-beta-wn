@@ -178,7 +178,7 @@ void    setVersionProtocol(quint16 _ver);
 
 void clearBuf();
 
-protected:
+public:
 virtual WLModule *createModule(QString name);
 virtual WLModule *createModule(typeModule getTypeModule);
 

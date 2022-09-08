@@ -993,7 +993,7 @@ setCommand(data);
 
 WLModule *WLDevice::createModule(typeModule type)
 {
-WLModule *Module=nullptr;
+WLModule *Module=getModule(type);
 
 if(Module==nullptr)
 {
@@ -1038,19 +1038,10 @@ if(getNameDevice()==stream.name()
  ||getNameDevice().isEmpty())	
 {
 setNameDevice(stream.name().toString());
-/*
-if(!stream.attributes().value("VCP").isEmpty())
-         initSerialPort(stream.attributes().value("VCP").toString());
 
-if(!stream.attributes().value("IP").isEmpty())
-         initUdpSocket(QHostAddress(stream.attributes().value("IP").toString()));
-*/
 if(!stream.attributes().value("UID96").isEmpty())
          setUID96(stream.attributes().value("UID96").toString());
-/*
-if(!stream.attributes().value("UID").isEmpty())
-         setUID(stream.attributes().value("UID").toLong());
-*/
+
 while(!stream.atEnd())
 {
 stream.readNextStartElement();

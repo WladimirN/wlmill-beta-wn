@@ -229,7 +229,6 @@ QList <SCorrectSOut> m_correctSList;
     float m_maxSOut=100;
 
     float tarSOut=0;
-    float curSOut=0;
 
     float m_smoothAng=10;
     long m_iElementProgram=0;
@@ -405,7 +404,7 @@ public:
   bool isRunMScript()   {return   m_MScript->isBusy();}
 
   float getCurSpeed();
-  float getCurSOut() {return curSOut;}
+  float getCurSOut();
 
 public:
 
@@ -519,7 +518,7 @@ private slots:
 
    void updateInput();
 
-   void setDataSOut(float val);
+   void setTarSOut(float val);
 
  public slots: 
 
@@ -619,8 +618,6 @@ signals:
 
     void changedEMG(bool);
     void changedRDY(bool);
-
-    void changedSSpindle(float);
 
     void changedBusy(bool);
 

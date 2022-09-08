@@ -25,7 +25,7 @@
 #define comMPG_setEncoder      11 //set encoder
 #define comMPG_getData         12 //call data
 
-#define sendMPG_data 1
+#define sendMMPG_data 1
 
 #define errorMPG_setdata 1
 #define errorMPG_enable  2

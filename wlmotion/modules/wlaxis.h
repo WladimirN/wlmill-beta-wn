@@ -308,8 +308,8 @@ class WLAxis : public WLElement
     Q_OBJECT
 
 public:	
- WLAxis(WLModuleAxis *_ModuleAxis);
-~WLAxis();
+ explicit WLAxis(WLModuleAxis *_ModuleAxis);
+         ~WLAxis();
 
 private:
  qint32 nowPosition;

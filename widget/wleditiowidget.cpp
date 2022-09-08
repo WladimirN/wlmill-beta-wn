@@ -45,7 +45,7 @@ m_input=_input;
 
 switch(m_Module->getTypeModule())
 {
- case typeMIOPut: {
+ case WLModule::typeMIOPut: {
                   WLModuleIOPut *ModuleIOPut = static_cast<WLModuleIOPut*>(m_Module);
 
                   ui->spinBox->setRange(0,(m_input? ModuleIOPut->getSizeInputs():ModuleIOPut->getSizeOutputs())-1);
@@ -59,7 +59,7 @@ switch(m_Module->getTypeModule())
                   break;;
                   }
 
-case typeMPWM:    {
+case WLModule::typeMPWM:    {
                   WLModulePWM *ModulePWM = static_cast<WLModulePWM*>(m_Module);
 
                   ui->spinBox->setRange(0,(ModulePWM->getSizeOutPWM()-1));
@@ -72,7 +72,7 @@ case typeMPWM:    {
                  break;
                  }
 
-case typeMAIOPut: {
+case WLModule::typeMAIOPut: {
                   WLModuleAIOPut *ModuleAIOPut = static_cast<WLModuleAIOPut*>(m_Module);
 
                   ui->spinBox->setRange(0,(m_input? ModuleAIOPut->getSizeInputs():ModuleAIOPut->getSizeOutputs())-1);
@@ -84,7 +84,7 @@ case typeMAIOPut: {
                   break;
                   }
 
-case typeMEncoder:{
+case WLModule::typeMEncoder:{
                   WLModuleEncoder *ModuleEncoder = static_cast<WLModuleEncoder*>(m_Module);
 
                   ui->spinBox->setRange(-1,ModuleEncoder->getSizeEncoder()-1);
@@ -120,7 +120,7 @@ return ui->spinBox->value();
 
 WLIOPut *WLEditIOWidget::getIOPut()
 {
-if(m_Module->getTypeModule()==typeMIOPut)
+if(m_Module->getTypeModule()==WLModule::typeMIOPut)
     {
         WLModuleIOPut *ModuleIOPut = static_cast<WLModuleIOPut*>(m_Module);
         return  m_input ? ModuleIOPut->getInput(value()): ModuleIOPut->getOutput(value());
@@ -131,7 +131,7 @@ if(m_Module->getTypeModule()==typeMIOPut)
 
 WLEncoder *WLEditIOWidget::getEncoder()
 {
-    if(m_Module->getTypeModule()==typeMEncoder)
+    if(m_Module->getTypeModule()==WLModule::typeMEncoder)
     {
         WLModuleEncoder *ModuleEncoder = static_cast<WLModuleEncoder*>(m_Module);
         return  m_input ? ModuleEncoder->getEncoder(value()): nullptr;
@@ -143,7 +143,7 @@ WLEncoder *WLEditIOWidget::getEncoder()
 
 WLPWM *WLEditIOWidget::getPWM()
 {
-    if(m_Module->getTypeModule()==typeMPWM)
+    if(m_Module->getTypeModule()==WLModule::typeMPWM)
     {
         WLModulePWM *ModulePWM = static_cast<WLModulePWM*>(m_Module);
         return  m_input ? nullptr : ModulePWM->getOutPWM(value());
@@ -171,7 +171,7 @@ void WLEditIOWidget::update()
 {
     if(!m_Module) return;
 
-    if(m_Module->getTypeModule()==typeMIOPut)
+    if(m_Module->getTypeModule()==WLModule::typeMIOPut)
     {
         if(m_enLatchInput)
             ui->spinBox->setStyleSheet("background-color: rgb(20, 255, 205)");
@@ -186,9 +186,9 @@ void WLEditIOWidget::togInvers()
 {
  switch(m_Module->getTypeModule())
  {
- case typeMIOPut:   getIOPut()->togInv();  break;
- case typeMPWM:     getPWM()->togInv();    break;
- case typeMEncoder: getEncoder()->togInv();break;
+ case WLModule::typeMIOPut:   getIOPut()->togInv();  break;
+ case WLModule::typeMPWM:     getPWM()->togInv();    break;
+ case WLModule::typeMEncoder: getEncoder()->togInv();break;
 
  default: break;
  }
@@ -264,7 +264,8 @@ if(!m_Module
 
 switch(m_Module->getTypeModule())
 {
-case typeMIOPut:   {
+case WLModule::typeMIOPut:
+                   {
                    QAction *actTog=menu.addAction(tr("invers"),this,SLOT(onActTogInvers()));
 
                     actTog->setCheckable(true);
@@ -280,7 +281,8 @@ case typeMIOPut:   {
                     }
                   break;
 
-case typeMEncoder: if(m_input)
+case WLModule::typeMEncoder:
+                     if(m_input)
                      {
                      menu.addAction(QString::number(getEncoder()->count()));
                      menu.addAction(">>0",this,SLOT(onActResetEncoder()));
@@ -291,7 +293,8 @@ case typeMEncoder: if(m_input)
                      }
                    break;
 
-case typeMPWM:    {
+case WLModule::typeMPWM:
+                  {
                   QAction *actTog=menu.addAction(tr("invers"),this,SLOT(onActTogInvers()));
 
                   actTog->setCheckable(true);

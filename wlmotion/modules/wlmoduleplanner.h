@@ -12,6 +12,7 @@
 #include "wlmodule.h"
 #include "wlaxis.h"
 #include "wlmoduleioput.h"
+#include "wlmodulespindle.h"
 
 //Spindle
 #define comSpindle_setEnable   1 //
@@ -138,12 +139,7 @@ enum typeInputPlanner{PLANNER_inProbe
                      ,PLANNER_inStop};
 
 
-typedef struct
-{
-float  inValue=0;
-float outValue=0;
 
-}WLSpindleData;
 
 
 class WLModulePlanner : public WLModule
@@ -182,14 +178,9 @@ float m_decSpindle=0;
 float m_KF=1;
 float m_KSOut=1;
 
-WLSpindleData m_curSpindleData;
-
 float m_smoothAng=15;
 
 qint32  m_hPause;
-
-typeElement m_typeSOut;
-     quint8 m_iSout;
 
 WLIOPut *inProbe;
 WLIOPut *inPause;
@@ -208,31 +199,25 @@ QList<qint32> m_posProbe3;
 bool m_validProbe2=false;
 bool m_validProbe3=false;
 
-bool m_fastChangeSOut=false;
-WLIOPut *outENBSpindle;
-
 QVector <quint8> m_indexsAxis;
 
 QTimer *updateTimer;
 
-QList<WLSpindleData> spindleDataList;
+quint8 iSpindle=0;
 
 private:
      bool setInput(typeInputPlanner getTypeModule,quint8 num);
      bool setIgnoreInput(typeInputPlanner getTypeModule,quint8 ignore);
 
-     bool addDataSpindle(WLSpindleData data);
-   //bool setOutput(typeOutputAxis type,quint8 num);
 public:
      WLIOPut*  getInput(typeInputPlanner type);
-
-     QList<WLSpindleData> getSpindleDataList() {return spindleDataList;}
-     void setSpindleDataList(QList<WLSpindleData> dataList);
 
      void clear();
 
      void setModeRun(modeRunPlanner modeRun);
      modeRunPlanner getModeRun(){return m_modeRun;}
+
+     WLSpindle* getSpindle();
 
      void setInProbe(int index);
      void setInPause(int index);
@@ -240,12 +225,6 @@ public:
 
      bool isIgnorePause() {return  m_ignoreInPause;}
      bool isIgnoreStop()  {return  m_ignoreInStop;}
-
-     float getAccSpindle() const;
-     float getDecSpindle() const;
-
-typeElement getTypeSOut() const;
-     quint8 getISOut() const;
 
      int getSizeBuf() {return m_sizeBuf;}
      int getCountBuf() {return m_sizeBuf-m_free;}
@@ -261,12 +240,6 @@ typeElement getTypeSOut() const;
     quint8 getIAxis(uint8_t i) {return m_indexsAxis.indexOf(i);}
 
     bool setHPause(quint8 enable,qint32 hPause);
-
-    bool setAccSpindle(float acc);
-    bool setDecSpindle(float dec);
-
-    bool setElementSpindle(typeElement element,quint8 i);
-    bool resetElementSpindle();
 
     bool clearDataSpindle();    
 
@@ -288,8 +261,6 @@ typeElement getTypeSOut() const;
 	bool setSOut(float s);
 	bool setKSOut(float k);
    float getKSOut(){return m_KSOut;}
-
-   WLSpindleData getCurSpindleDta(){return m_curSpindleData;}
 
 	bool setEnableSOut(quint8 enable);
 		
@@ -324,17 +295,6 @@ statusPlanner getStatus()  const {return m_status;}
    void setData(QDataStream &data);
    void getData(typeDataPlanner getTypeModule);
 
-   bool isFastChangeSOut() {return m_fastChangeSOut;}
-   void setFastChangeSOut(bool enable=true);
-
-   void setOutENBSpindle(int index);
-
-    WLIOPut*  getInputSpindle(typeInputSpindle type);
-    WLIOPut*  getOutputSpindle(typeOutputSpindle type);
-
-private:
-    bool setInputSpindle(typeInputSpindle type,quint8 num);
-    bool setOutputSpindle(typeOutputSpindle type,quint8 num);
 
 private slots:
    void callTrackPlanner();

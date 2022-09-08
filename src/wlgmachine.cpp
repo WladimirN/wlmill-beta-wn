@@ -139,8 +139,8 @@ double WLGMachine::getSSpindle(int index)
 {
 switch(stateSpindle)
 {
-case  CW: return  curSOut;
-case CCW: return -curSOut;
+case  CW: return  getCurSOut();
+case CCW: return -getCurSOut();
 
 default: return 0;
 }
@@ -232,7 +232,7 @@ setSOut(getSTar());
 */
 WLModulePlanner *Planner=getMotionDevice()->getModulePlanner();
 
-QList <WLSpindleData> List=Planner->getSpindleDataList();
+QList <WLSpindleData> List=Planner->getSpindle()->getDataList();
 
 WLSpindleData corrS;
 
@@ -254,7 +254,7 @@ if(gS<List.first().inValue){
   }
 
 corrS.inValue=gS;
-corrS.outValue=Planner->getCurSpindleDta().outValue;
+corrS.outValue=Planner->getSpindle()->getCurData().outValue;
 
 bool edited=false;
 
@@ -270,7 +270,7 @@ if(!edited) {
  List+=corrS;
  }
 
-getMotionDevice()->getModulePlanner()->setSpindleDataList(List);
+getMotionDevice()->getModulePlanner()->getSpindle()->setDataList(List);
 
 setPercentS(100.0);
 setSOut(getSTar());
@@ -281,7 +281,7 @@ void WLGMachine::clearSCorList()
 //m_correctSList.clear();
 WLModulePlanner *Planner=getMotionDevice()->getModulePlanner();
 
-QList<WLSpindleData> list=Planner->getSpindleDataList();
+QList<WLSpindleData> list=Planner->getSpindle()->getDataList();
 QList<WLSpindleData> newList;
 
 if(!list.isEmpty()) {
@@ -289,7 +289,7 @@ if(!list.isEmpty()) {
   newList+=list.last();
   }
 
-getMotionDevice()->getModulePlanner()->setSpindleDataList(newList);
+getMotionDevice()->getModulePlanner()->getSpindle()->setDataList(newList);
 }
 
 
@@ -535,6 +535,11 @@ foreach(WLDrive *drive,getDrives())
 return sqrt(sum);
 }
 
+float WLGMachine::getCurSOut()
+{
+return getMotionDevice()->getModulePlanner()->getSpindle()->getCurData().inValue;
+}
+
 
 bool WLGMachine::isProbe()
 {
@@ -708,19 +713,8 @@ m_MScript->addObject(&m_HeightMap,"HMAP");
 
 void WLGMachine::initValuesScript()
 {
- /*
-m_ValueScript = new WLValueScript(configMMPath+"//script//values.ini");
 
-m_MScript->setObject(m_ValueScript,"VALUES");
-m_LScript->setObject(m_ValueScript,"VALUES");
-*/
 }
-
-void WLGMachine::setDataSOut(float S)
-{
- emit changedSSpindle(curSOut=S);
-}
-
 
 void WLGMachine::stopMov() //полная остановка
 {
@@ -1462,9 +1456,9 @@ if(FileXML.isOpen())
   connect(ModulePlanner,&WLModulePlanner::reset,this,&WLGMachine::reset,Qt::QueuedConnection);
   connect(ModulePlanner,&WLModulePlanner::changedFree,this,&WLGMachine::setFinished,Qt::QueuedConnection);
 
-  connect(motDevice->getModulePlanner(),SIGNAL(changedSOut(float)),SLOT(setDataSOut(float)));
+  connect(motDevice->getModulePlanner(),SIGNAL(changedSOut(float)),SLOT(setTarSOut(float)));
 
-  if(ModulePlanner->getSpindleDataList().isEmpty()){ //переход на новый формат с 18,12,21
+  if(ModulePlanner->getSpindle()->getDataList().isEmpty()){ //переход на новый формат с 18,12,21
     QList <WLSpindleData> spindleDataList;
     WLSpindleData SD;
 
@@ -1475,10 +1469,10 @@ if(FileXML.isOpen())
       spindleDataList+=SD;
       }
 
-    ModulePlanner->setSpindleDataList(spindleDataList);
+    ModulePlanner->getSpindle()->setDataList(spindleDataList);
 
-    ModulePlanner->setAccSpindle((m_maxS-m_minS)/((m_maxSOut-m_minSOut)/100/1000/ModulePlanner->getAccSpindle()));
-    ModulePlanner->setDecSpindle((m_maxS-m_minS)/((m_maxSOut-m_minSOut)/100/1000/ModulePlanner->getDecSpindle()));
+    ModulePlanner->getSpindle()->setAcc((m_maxS-m_minS)/((m_maxSOut-m_minSOut)/100/1000/ModulePlanner->getSpindle()->getAcc()));
+    ModulePlanner->getSpindle()->setDec((m_maxS-m_minS)/((m_maxSOut-m_minSOut)/100/1000/ModulePlanner->getSpindle()->getDec()));
     }
 
   setSOut(m_GCode.getValue('S'));
@@ -2524,8 +2518,7 @@ updatePosible();
 
 void WLGMachine::setSOut(float S)
 {
-tarSOut=S;
-motDevice->getModulePlanner()->setSOut(tarSOut);
+motDevice->getModulePlanner()->setSOut(S);
 }
 
 WLGPoint WLGMachine::getProbeGPoint()
@@ -3876,6 +3869,11 @@ if(ModuleAxis->getInput(MAXIS_inEMGStop)->getCond()==3) //если была отжата
   //saveLog("Machine",("the stop button is pressed"));		
 	}
 
+}
+
+void WLGMachine::setTarSOut(float val)
+{
+tarSOut=val;
 }
 
 QList<WLElementTraj>  WLGMachine::addCirclePoints(WLElementTraj  _ETraj)

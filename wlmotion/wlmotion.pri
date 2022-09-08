@@ -34,6 +34,8 @@ HEADERS += \
       $$PWD/modules/wluart.h \
       $$PWD/modules/wldmodbus.h \
       $$PWD/modules/wlmoduledmodbus.h \
+      $$PWD/modules/wlmodulespindle.h \
+      $$PWD/modules/wlspindle.h \
       $$PWD/wldevice.h \
       $$PWD/wlmotion.h
 
@@ -63,6 +65,8 @@ SOURCES += \
       $$PWD/modules/wluart.cpp \
       $$PWD/modules/wldmodbus.cpp \
       $$PWD/modules/wlmoduledmodbus.cpp \
+      $$PWD/modules/wlmodulespindle.cpp \
+      $$PWD/modules/wlspindle.cpp \
       $$PWD/wldevice.cpp \
       $$PWD/wlmotion.cpp
 

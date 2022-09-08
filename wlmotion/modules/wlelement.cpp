@@ -1,3 +1,4 @@
+#include <QMetaEnum>
 #include "wlelement.h"
 #include "wlmodule.h"
 
@@ -16,6 +17,10 @@ WLElement::~WLElement()
 
 }
 
+QString WLElement::getTypeElementStr()
+{
+return QString::fromUtf8(QMetaEnum::fromType<WLElement::typeElement>().valueToKey(getTypeElement()));
+}
 
 void WLElement::addComment(QString _comment)
 {
