@@ -154,7 +154,7 @@ WLPWM *WLEditIOWidget::getPWM()
 
 bool WLEditIOWidget::isChecked()
 {
-return ui->checkBox->isChecked();
+return ui->checkBox->isChecked()&&isEnable();
 }
 
 bool WLEditIOWidget::isEnable()

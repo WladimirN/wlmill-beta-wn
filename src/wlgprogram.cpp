@@ -412,7 +412,12 @@ if(GCode->isValidValue('P'))
    GCode->setOffsetTool(GCode->getValue('P'));
 }
 
-
+/* добавляет пустой элемент при изменении S
+if(lastS!=(GCode->getValue('S'))){
+ ElementTraj.setDelay(GCode->getPointActivSC(GCode->data()->curGPoint),0);
+ if(ok) curListTraj+=ElementTraj;
+ }
+*/
 
 if(GCode->isGCode(64)) //устанавливаем тип перемещения
    {

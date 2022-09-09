@@ -126,6 +126,23 @@ if(MSpindle){
 return nullptr;
 }
 
+bool WLModulePlanner::setISpindle(quint8 index)
+{
+iSpindle=index;
+
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setISpindle<<index;
+
+emit sendCommand(data);
+
+return true;
+}
+
 void WLModulePlanner::setInProbe(int index)
 {
 inProbe->removeComment("inProbe");
@@ -676,6 +693,11 @@ if(!stream.attributes().value("inPause").isEmpty())
 
 if(!stream.attributes().value("inStop").isEmpty())
     setInStop( stream.attributes().value("inStop").toString().toInt());
+
+if(!stream.attributes().value("iSpindle").isEmpty())
+    setISpindle(stream.attributes().value("iSpindle").toString().toInt());
+  else
+    setISpindle(0);
 
 ///old style 08/09/2022
 if(!getDevice()->getModule(WLDevice::typeMSpindle))

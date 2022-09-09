@@ -36,6 +36,8 @@ QList <QDialog*> dialogList;
 
     bool m_needClose=false;
 
+    QButtonGroup *grOutput=nullptr;
+
 private:
    void initTableCalcSout();
    QList <WLSpindleData> getSpindleDataList();

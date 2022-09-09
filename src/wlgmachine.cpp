@@ -135,13 +135,19 @@ motDevice->deleteLater();
 qDebug()<<"end GMachine";
 }
 
+void WLGMachine::setStateSpindle(int state, int index)
+{
+stateSpindle=(statesSpindle)state;
+
+enableSOut(state!=statesSpindle::Stop);
+}
+
 double WLGMachine::getSSpindle(int index)
 {
 switch(stateSpindle)
 {
 case  CW: return  getCurSOut();
 case CCW: return -getCurSOut();
-
 default: return 0;
 }
 
@@ -3512,14 +3518,14 @@ int WLGMachine::updateMovPlanner()
 {
 WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 
-qDebug()<<"WLGMachine::updateMovBuf() MillTraj.size()="<<MillTraj.size()<<"MPlanner.free()="<<ModulePlanner->getFree();
+qDebug()<<"WLGMachine::updateMovPlanner() MillTraj.size()="<<MillTraj.size()<<"MPlanner.free()="<<ModulePlanner->getFree();
 
 QMutexLocker locker(&MutexMillTraj);
 bool ok=true;
 //qDebug()<<"update Pause";
 if(!ModulePlanner
   ||isPause()) {
-   qDebug()<<"updateMovBuf >> pause";
+   qDebug()<<"updateMovPlanner >> pause";
   return 0;
   }
 
@@ -3540,13 +3546,13 @@ if(m_runGProgram) // if run program
 
 //qDebug()<<"update runList"<<Flag.get(ma_runlist);
 if(!m_runList) {
-    qDebug()<<"noRunList";
+    qDebug()<<">>noRunList";
     return 0;
     }
 
 //qDebug()<<"update Empty";
 if(isEmptyMotion())   {
-    qDebug()<<"Empty Motion";
+    qDebug()<<">>Empty Motion";
     return 1;
     }
 
@@ -3567,8 +3573,8 @@ case WLElementTraj::script: qDebug()<<"Script"<<isActiv()<<isRunMScript()<<(ME.i
 
                             if(!isActiv()  //стоит
                            ||(!isRunMScript()
-                             &&ME.index==ModulePlanner->getCurIdElement())  //или порождён текущим элементом
-                             &&!ME.escript.singleRun){                      //и возможен запуск паралельный
+                            &&ME.index==ModulePlanner->getCurIdElement())  //или порождён текущим элементом
+                           &&!ME.escript.singleRun){                      //и возможен запуск паралельный
                                runMScript(ME.escript.script);
                                ok=true;
                                }
@@ -3578,7 +3584,9 @@ case WLElementTraj::script: qDebug()<<"Script"<<isActiv()<<isRunMScript()<<(ME.i
 
                            break;
 
-case WLElementTraj::delay: ok=ModulePlanner->addDelay(ME.data.delay.time,ME.S,ME.index);
+case WLElementTraj::delay: ok=ModulePlanner->addDelay(ME.data.delay.time
+                                                     ,isSpindleStop() ? 0 : ME.S
+                                                     ,ME.index);
                            break;
 
 case WLElementTraj::line:  {
@@ -3655,7 +3663,7 @@ case WLElementTraj::line:  {
                                                        ,indexs.size()
                                                        ,indexs.data()
                                                        ,ePos.data()
-                                                       ,ME.S
+                                                       ,isSpindleStop() ? 0 : ME.S
                                                        ,ME.isFast() ? -1 :(kF*ME.F/60.0)/m_mainDim
                                                        ,ME.index);
                               }
@@ -3684,7 +3692,7 @@ case WLElementTraj::uline:   {
                                                        ,indexs.data()
                                                        ,ePos.data()
                                                        ,mPos.data()
-                                                       ,ME.S
+                                                       ,isSpindleStop() ? 0 : ME.S
                                                        ,ME.isFast() ? -1 : (ME.F/60)/m_mainDim
                                                        ,ME.index);
                            }
@@ -3761,7 +3769,7 @@ case WLElementTraj::arc: {
                                                  ,indexs.data()
                                                  ,ePos.data()
                                                  ,cPosIJ
-                                                 ,ME.S
+                                                 ,isSpindleStop() ? 0 : ME.S
                                                  ,ME.isFast() ? -1 : (ME.F/60)/m_mainDim
                                                  ,ME.index);
                           }
@@ -4066,7 +4074,7 @@ return ret;
 
 void WLGMachine::runMCode(int iM)
 {
-    runMScript("M"+QString::number(iM)+"()");
+runMScript("M"+QString::number(iM)+"()");
 }
 
 void WLGMachine::runMScript(QString txt)
@@ -4086,6 +4094,7 @@ if(m_MScript)
       M.remove("M");
 
       iM=M.toInt(&ok);
+
       qDebug()<<"detect MCode:"<<iM<<ok;
 
       switch (iM) {

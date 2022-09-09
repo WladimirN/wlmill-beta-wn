@@ -31,20 +31,20 @@
 
 #define sendMSpindle_data 1 //
 
-#define SF_enable  1<<0
-#define SF_useadec 1<<1
-#define SF_fastch  1<<2
+#define SF_enable  (1<<0)
+#define SF_useadec (1<<1)
+#define SF_fastch  (1<<2)
+#define SF_run     (1<<3)
 
 enum typeInputSpindle{SPINDLE_inORG};
-enum typeOutputSpindle{SPINDLE_outENB};
+enum typeOutputSpindle{SPINDLE_outENB,SPINDLE_outRUN};
 
 enum typeDataSpindle{
      dataSpindle_Scur
     ,dataSpindle_Star
     ,dataSpindle_OutCur
-    ,dataSpindle_flag
+    ,dataSpindle_flags
   };
-
 
 typedef struct
 {
@@ -80,6 +80,7 @@ WLSpindleData m_curSpindleData;
 QList<WLSpindleData> spindleDataList;
 
 WLIOPut *outENBSpindle;
+WLIOPut *outRUNSpindle;
 
 private:
 
@@ -97,13 +98,7 @@ public:
    bool addDataSpindle(WLSpindleData data);
 
    void setOutENB(int index);
-signals:
- 
- void changedError(quint8);
- void changedFreq(float);
- void changedValue(float);
- void changed(int);
-
+   void setOutRUN(int index);
 public:
 
  WLIOPut*  getInputSpindle(typeInputSpindle type);
@@ -137,6 +132,7 @@ virtual void backup();
 signals:
    void changedInValue(float);
    void changedOutValue(float);
+   void changedRun(bool);
 
 public:
 

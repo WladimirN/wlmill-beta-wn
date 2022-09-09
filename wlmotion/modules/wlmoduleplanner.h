@@ -40,7 +40,6 @@
 #define comPlanner_setMaxNView     12
 #define comPlanner_clear           13
 #define comPlanner_toSpindle        14//to spindle command
-//#define comPlanner_setSOutFreqOut  14
 #define comPlanner_setKSOut        15 
 #define comPlanner_addULine        16
 #define comPlanner_setISlaveAxis   17
@@ -55,6 +54,7 @@
 
 #define comPlanner_setIgnoreInput 25 //set ignore input
 #define comPlanner_addDelay   26 //add Delay_ms element
+#define comPlanner_setISpindle 27 //set Spindle
 
 #define comPlanner_getDataPlanner    101
 
@@ -97,11 +97,14 @@ enum typeSignalBuf{_sigChgEmptyBuf_ui8
 #define errorLine_df     5
 #define errorLine_count  6
 
-#define PLF_enable    (1<<0)
-#define PLF_empty     (1<<2)
-#define PLF_moving    (1<<3)
-#define PLF_chgdata   (1<<4)
-#define PLF_usehpause (1<<5)
+#define PLF_enable     (1<<0)
+#define PLF_safeprobe  (1<<1)
+#define PLF_empty      (1<<2)
+#define PLF_moving     (1<<3)
+#define PLF_chgdata    (1<<4)
+#define PLF_usehpause  (1<<5)
+
+#define PLF_enableSOut (1<<7)
 
 const QString errorPlanner("0,no error\
 ,1,emg stop\
@@ -203,7 +206,7 @@ QVector <quint8> m_indexsAxis;
 
 QTimer *updateTimer;
 
-quint8 iSpindle=0;
+quint8 iSpindle=255;
 
 private:
      bool setInput(typeInputPlanner getTypeModule,quint8 num);
@@ -218,6 +221,8 @@ public:
      modeRunPlanner getModeRun(){return m_modeRun;}
 
      WLSpindle* getSpindle();
+
+     bool setISpindle(quint8 index);
 
      void setInProbe(int index);
      void setInPause(int index);

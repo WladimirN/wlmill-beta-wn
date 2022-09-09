@@ -127,7 +127,7 @@ private:
 
     QStringList preRunProgramList;
 
-    enum statesSpindle{Stop,CW,CCW};
+    enum statesSpindle{Stop=0,CW=1,CCW=-1};
 
     statesSpindle stateSpindle=Stop;
     statesSpindle pauseStateSpindle=Stop;
@@ -152,9 +152,13 @@ QList<WLElementTraj>  showMillTraj;
  QMutex MutexSaveConfig;
  QMutex MutexScript;
 
-Q_INVOKABLE bool   isSpindleStop(int index=0) {return stateSpindle==Stop;}
-Q_INVOKABLE bool   isSpindleCW(int index=0)   {return stateSpindle==CW;}
-Q_INVOKABLE bool   isSpindleCCW(int index=0)  {return stateSpindle==CCW;}
+Q_INVOKABLE bool   isSpindleStop(int index=0)   {return stateSpindle==Stop;}
+Q_INVOKABLE bool   isSpindleCW(int index=0)     {return stateSpindle==CW;}
+Q_INVOKABLE bool   isSpindleCCW(int index=0)    {return stateSpindle==CCW;}
+
+Q_INVOKABLE int    getStateSpindle(int index=0) {return stateSpindle;}
+Q_INVOKABLE void   setStateSpindle(int state,int index=0);
+
 Q_INVOKABLE double getSSpindle(int index=0);
 
 Q_INVOKABLE bool isIngnoreInPause() {return motDevice->getModulePlanner()->isIgnoreInPause();}

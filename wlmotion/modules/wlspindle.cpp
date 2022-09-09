@@ -13,6 +13,7 @@ WLSpindle::WLSpindle(WLModuleSpindle *_ModuleSpindle)
 setTypeElement(typeESpindle);
 
 outENBSpindle=&WLIOPut::Out;
+outRUNSpindle=&WLIOPut::Out;
 }
 
 
@@ -97,10 +98,25 @@ outENBSpindle->addComment("outENBSpindle"+QString::number(getIndex()));
 setOutputSpindle(SPINDLE_outENB,index);
 }
 
+void WLSpindle::setOutRUN(int index)
+{
+outRUNSpindle->removeComment("outRUNSpindle"+QString::number(getIndex()));
+
+WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(WLDevice::typeMIOPut));
+
+if(index>=ModuleIOPut->getSizeOutputs()) index=0;
+
+outRUNSpindle=ModuleIOPut->getOutput(index);
+outRUNSpindle->addComment("outRUNSpindle"+QString::number(getIndex()));
+
+setOutputSpindle(SPINDLE_outRUN,index);
+}
+
 bool WLSpindle::setElementSOut(typeElement telement,quint8 i)
 {
 if(telement==typeElement::typeEOutPWM
- ||telement==typeElement::typeEAOutput)
+ ||telement==typeElement::typeEAOutput
+ ||telement==typeElement::typeEOutput)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -153,12 +169,25 @@ switch((typeDataSpindle)type)
                        }
                        break;
 
-case dataSpindle_OutCur:
-                      {
-                      data>>m_curSpindleData.outValue;
-                      emit changedOutValue(m_curSpindleData.outValue);
-                      }
-                      break;
+ case dataSpindle_OutCur:
+                       {
+                       data>>m_curSpindleData.outValue;
+                       emit changedOutValue(m_curSpindleData.outValue);
+                       }
+                       break;
+
+ case dataSpindle_flags:
+                       {
+                       quint8 nflags;
+                       data>>nflags;
+
+                       if((Flags.m_Data&SF_run)!=(nflags&SF_run)){
+                         emit changedRun(nflags&SF_run);
+                         }
+
+                       Flags.m_Data=nflags;
+                       }
+                       break;
 default: break;
 }
 
@@ -191,6 +220,8 @@ return true;
 void WLSpindle::update()
 {
 sendGetData();
+
+sendGetData(dataSpindle_flags);
 }
 
 void WLSpindle::backup()
@@ -212,6 +243,7 @@ WLIOPut *WLSpindle::getOutput(typeOutputSpindle type)
 switch(type)
 {
 case SPINDLE_outENB:  return outENBSpindle;
+case SPINDLE_outRUN:  return outRUNSpindle;
 }
 
 return nullptr;
@@ -295,7 +327,8 @@ stream.writeAttribute("decSOut",QString::number(getDec()));
 
 stream.writeAttribute("fastChangeSOut",QString::number(isFastChangeSOut()));
 
-stream.writeAttribute("outENBSpindle",QString::number(getOutput(SPINDLE_outENB)->getIndex()));
+stream.writeAttribute("outENB",QString::number(getOutput(SPINDLE_outENB)->getIndex()));
+stream.writeAttribute("outRUN",QString::number(getOutput(SPINDLE_outRUN)->getIndex()));
 
 quint8 i=0;
 
@@ -329,6 +362,8 @@ if(!stream.attributes().value("fastChangeSOut").isEmpty())
 if(!stream.attributes().value("outENB").isEmpty())
     setOutENB(stream.attributes().value("outENB").toString().toInt());
 
+if(!stream.attributes().value("outRUN").isEmpty())
+    setOutRUN(stream.attributes().value("outRUN").toString().toInt());
 
 if(!stream.attributes().value("SOut").isEmpty())
    {
