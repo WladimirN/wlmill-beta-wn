@@ -1,7 +1,10 @@
 #include "wleditiowidget.h"
+#include "ui_wleditiowidget.h"
+
 #include <QMenu>
 #include <QContextMenuEvent>
-#include "ui_wleditiowidget.h"
+
+#include "wlaxiswidget.h"
 
 WLEditIOWidget::WLEditIOWidget(QWidget *parent) :
     QWidget(parent),
@@ -45,6 +48,20 @@ m_input=_input;
 
 switch(m_Module->getTypeModule())
 {
+ case WLModule::typeMAxis:{
+                  WLModuleAxis *ModuleAxis = static_cast<WLModuleAxis*>(m_Module);
+
+                  m_input=false;
+
+                  ui->spinBox->setRange(0, ModuleAxis->getSizeAxis()-1);
+
+                  ui->spinBox->setVisible(true);
+                  ui->label->setVisible(true);
+
+                  setLabel("axis");
+                  break;
+                  }
+
  case WLModule::typeMIOPut: {
                   WLModuleIOPut *ModuleIOPut = static_cast<WLModuleIOPut*>(m_Module);
 
@@ -56,7 +73,7 @@ switch(m_Module->getTypeModule())
                   connect(ModuleIOPut,&WLModuleIOPut::changedInput,this,&WLEditIOWidget::setLatchInput);
 
                   setLabel(m_input ? ("input"):("output"));
-                  break;;
+                  break;
                   }
 
 case WLModule::typeMPWM:    {
@@ -152,6 +169,17 @@ WLPWM *WLEditIOWidget::getPWM()
         return nullptr;
 }
 
+WLAxis *WLEditIOWidget::getAxis()
+{
+    if(m_Module->getTypeModule()==WLModule::typeMAxis)
+    {
+        WLModuleAxis *ModuleAxis = static_cast<WLModuleAxis*>(m_Module);
+        return  ModuleAxis->getAxis(value());
+    }
+    else
+        return nullptr;
+}
+
 bool WLEditIOWidget::isChecked()
 {
 return ui->checkBox->isChecked()&&isEnable();
@@ -174,9 +202,9 @@ void WLEditIOWidget::update()
     if(m_Module->getTypeModule()==WLModule::typeMIOPut)
     {
         if(m_enLatchInput)
-            ui->spinBox->setStyleSheet("background-color: rgb(20, 255, 205)");
+            ui->spinBox->setStyleSheet("background-color: rgb(20 ,255,205)");
         else  if (getIOPut()->getNow())
-            ui->spinBox->setStyleSheet("background-color: rgb(255, 120, 120)");
+            ui->spinBox->setStyleSheet("background-color: rgb(255,120,120)");
         else
             ui->spinBox->setStyleSheet("background-color: rgb(255,250,250)");
     }
@@ -192,6 +220,17 @@ void WLEditIOWidget::togInvers()
 
  default: break;
  }
+}
+
+void WLEditIOWidget::onActEditAxis()
+{
+WLAxisWidget AW(getAxis(),0,0,this);
+
+AW.setShowButtonDialog(true);
+AW.setEditSpindle(true);
+AW.setModal(true);
+AW.show();
+AW.exec();
 }
 
 
@@ -264,6 +303,12 @@ if(!m_Module
 
 switch(m_Module->getTypeModule())
 {
+case WLModule::typeMAxis:
+                   {
+                   QAction *actEdit=menu.addAction(tr("edit"),this,SLOT(onActEditAxis()));
+                   }
+                  break;
+
 case WLModule::typeMIOPut:
                    {
                    QAction *actTog=menu.addAction(tr("invers"),this,SLOT(onActTogInvers()));

@@ -116,7 +116,8 @@ bool WLSpindle::setElementSOut(typeElement telement,quint8 i)
 {
 if(telement==typeElement::typeEOutPWM
  ||telement==typeElement::typeEAOutput
- ||telement==typeElement::typeEOutput)
+ ||telement==typeElement::typeEOutput
+ ||telement==typeElement::typeEAxis)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);

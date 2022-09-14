@@ -142,17 +142,6 @@ stateSpindle=(statesSpindle)state;
 enableSOut(state!=statesSpindle::Stop);
 }
 
-double WLGMachine::getSSpindle(int index)
-{
-switch(stateSpindle)
-{
-case  CW: return  getCurSOut();
-case CCW: return -getCurSOut();
-default: return 0;
-}
-
-}
-
 void WLGMachine::plusPercentManual()
 {
 int index=m_percentManualList.indexOf(getPercentManual());
@@ -526,7 +515,7 @@ else
     return true;
 }
 
-float WLGMachine::getCurSpeed()
+float WLGMachine::getCurFxyz()
 {
 float sum=0;
 

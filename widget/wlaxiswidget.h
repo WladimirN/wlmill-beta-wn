@@ -13,8 +13,10 @@ class WLAxisWidget : public QDialog
     Q_OBJECT
 
 public:
-    explicit WLAxisWidget(WLAxis *_axis,bool main,double _offset,QWidget *parent = nullptr);
+    explicit WLAxisWidget(WLAxis *_axis,bool _slave,double _offset,QWidget *parent = nullptr);
     ~WLAxisWidget();
+
+    void setShowButtonDialog(bool en);
 
 public:
     void saveDataAxis();
@@ -36,8 +38,11 @@ public:
     quint8 getIndexOutRALM();
 
     typeActionInput getActInPEL();
-    typeActionInput getActInMEL();
+    typeActionInput getActInMEL();        
     typeActionInput getActInALM();
+
+    void setEditSpindle(bool en);
+
 private:
     Ui::WLAxisWidget *ui;
 
@@ -46,7 +51,7 @@ private:
     double m_stepsize=1.0;
 
 public slots:
-    void accept() {saveDataAxis();}
+    void accept();
     void setUnit(QString);
 
     void setStepSize(double stepsize);

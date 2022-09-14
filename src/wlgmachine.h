@@ -159,7 +159,7 @@ Q_INVOKABLE bool   isSpindleCCW(int index=0)    {return stateSpindle==CCW;}
 Q_INVOKABLE int    getStateSpindle(int index=0) {return stateSpindle;}
 Q_INVOKABLE void   setStateSpindle(int state,int index=0);
 
-Q_INVOKABLE double getSSpindle(int index=0);
+Q_INVOKABLE double getSSpindle(int index=0) {return getCurSOut();}
 
 Q_INVOKABLE bool isIngnoreInPause() {return motDevice->getModulePlanner()->isIgnoreInPause();}
 Q_INVOKABLE bool isIngnoreInStop()  {return motDevice->getModulePlanner()->isIgnoreInStop();}
@@ -407,10 +407,10 @@ public:
 
   bool isRunMScript()   {return   m_MScript->isBusy();}
 
-  float getCurSpeed();
-  float getCurSOut();
-
 public:
+
+Q_INVOKABLE float getCurFxyz();
+Q_INVOKABLE float getCurSOut();
 
 Q_INVOKABLE bool getInProbe()      {return motDevice->getModulePlanner()->getInput(PLANNER_inProbe)->getNow();}
 Q_INVOKABLE bool getInSDStop()     {return motDevice->getModuleAxis()->getInput(MAXIS_inSDStop)->getNow();}

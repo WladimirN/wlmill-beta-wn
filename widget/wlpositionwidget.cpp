@@ -1054,7 +1054,7 @@ if(press)
 
 void WLPositionWidget::updateFSLabel()
 {
-labelF->setData(MillMachine->getCurSpeed()*60);
+labelF->setData(MillMachine->getCurFxyz()*60);
 labelS->setData(MillMachine->getCurSOut());
 }
 

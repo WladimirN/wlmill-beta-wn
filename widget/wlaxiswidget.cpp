@@ -118,26 +118,21 @@ WLAxisWidget::WLAxisWidget(WLAxis *_axis,bool _slave,double _offset, QWidget *pa
 
      connect(ui->cbTypeMotor,QOverload<int>::of(&QComboBox::currentIndexChanged),this,&WLAxisWidget::updateTypeMotor);
 
-     WLModuleEncoder *ModuleEncoder=static_cast<WLModuleEncoder*>(m_axis->getModule()->getDevice()->getModule(WLModule::typeMEncoder));
-
-     if(ModuleEncoder)  {
-       ui->cbTypeMotor->addItems(QString("noMotor,stepMotor,encoderStepMotor").split(","));
-
-       ui->encoder->setModule(ModuleEncoder);
-       ui->encoder->setValue(m_axis->getEncoder());
-       }
-       else {
-       ui->cbTypeMotor->addItems(QString("noMotor,stepMotor").split(","));
-       }
-
-     ui->cbTypeMotor->setCurrentIndex(m_axis->getTypeMotor());
      ui->sbErrMax->setValue(m_axis->getErrPidMax()/m_stepsize);
 
+     ui->buttonBox->setVisible(false);
+
+     setEditSpindle(false);
 }
 
 WLAxisWidget::~WLAxisWidget()
 {
     delete ui;
+}
+
+void WLAxisWidget::setShowButtonDialog(bool en)
+{
+ui->buttonBox->setVisible(en);
 }
 
 void WLAxisWidget::saveDataAxis()
@@ -161,20 +156,19 @@ m_axis->setTypePulse((typePulseAxis)ui->cbTypePulse->currentIndex()
                     |(ui->cbInvDir->isChecked() ?MAF_invDir:0));
 
 
-if((typeMotorAxis)ui->cbTypeMotor->currentIndex()==AXIS_encoderStepMotor){
+if(ui->cbTypeMotor->currentData()==WLAxis::AXIS_encoderStepMotor
+ ||ui->cbTypeMotor->currentData()==WLAxis::AXIS_spindleStepMotor){
   m_axis->setErrPid(ui->sbErrMax->value()/m_stepsize);
   }
 
-if((typeMotorAxis)ui->cbTypeMotor->currentIndex()==AXIS_encoderStepMotor){
+if(ui->cbTypeMotor->currentData()==WLAxis::AXIS_encoderStepMotor){
   m_axis->setEncoder(ui->encoder->value());
   }
   else {
   m_axis->setEncoder(-1);
   }
 
-m_axis->setTypeMotor((typeMotorAxis)ui->cbTypeMotor->currentIndex());
-
-
+m_axis->setTypeMotor(ui->cbTypeMotor->currentData().value<WLAxis::typeMotorAxis>());
 }
 
 double WLAxisWidget::getOffset()
@@ -269,7 +263,45 @@ return static_cast<typeActionInput>(ui->cbActInMEL->currentIndex());
 
 typeActionInput WLAxisWidget::getActInALM()
 {
-return static_cast<typeActionInput>(ui->cbActInALM->currentIndex());
+    return static_cast<typeActionInput>(ui->cbActInALM->currentIndex());
+}
+
+void WLAxisWidget::setEditSpindle(bool en)
+{
+ ui->cbTypeMotor->clear();
+
+ ui->cbTypeMotor->addItem("noMotor",(WLAxis::AXIS_noMotor));
+
+ if(en){
+ ui->cbTypeMotor->addItem("spindleStepMotor",(WLAxis::AXIS_spindleStepMotor));
+ }
+ else{
+ ui->cbTypeMotor->addItem("stepMotor",(WLAxis::AXIS_stepMotor));
+
+ WLModuleEncoder *ModuleEncoder=static_cast<WLModuleEncoder*>(m_axis->getModule()->getDevice()->getModule(WLModule::typeMEncoder));
+
+ if(ModuleEncoder)  {
+   ui->cbTypeMotor->addItem("encoderStepMotor",(WLAxis::AXIS_encoderStepMotor));
+
+   ui->encoder->setModule(ModuleEncoder);
+   ui->encoder->setValue(m_axis->getEncoder());
+   }
+ }
+
+for(int i=0;i<ui->cbTypeMotor->count();i++) {
+    if(ui->cbTypeMotor->itemData(i).value<WLAxis::typeMotorAxis>()==m_axis->getTypeMotor())   {
+    ui->cbTypeMotor->setCurrentIndex(i);
+    break;
+    }
+ }
+}
+
+void WLAxisWidget::accept()
+{
+saveDataAxis();
+
+if(sender()==ui->buttonBox)
+            close();
 }
 
 void WLAxisWidget::setUnit(QString txt)
@@ -346,34 +378,51 @@ if(PW.exec()) {
 
 void WLAxisWidget::updateTypeMotor(int index)
 {
-typeMotorAxis type=(typeMotorAxis)index;
+WLAxis::typeMotorAxis type=static_cast<WLAxis::typeMotorAxis>(ui->cbTypeMotor->currentData().toInt());
 
 switch(type){
-case AXIS_noMotor:
+case WLAxis::AXIS_noMotor:
                    ui->gbTypePulse->setVisible(false);
                      ui->gbEncoder->setVisible(false);
                          ui->gbPID->setVisible(false);
-                    ui->gbMParPlus->setVisible(false);
-                  //ui->gbMParMinus->setVisible(false);
+                    ui->gbMParPlus->setVisible(false);                   
                     ui->gbErrorPos->setVisible(false);
+                       ui->gbInput->setVisible(false);
+                      ui->gbOutput->setVisible(false);
+                      ui->gbDynamic->setVisible(false);
                    break;
 
-case AXIS_stepMotor:
+case WLAxis::AXIS_stepMotor:
                    ui->gbTypePulse->setVisible(true);
                      ui->gbEncoder->setVisible(false);
                          ui->gbPID->setVisible(false);
                     ui->gbMParPlus->setVisible(false);
-                   //ui->gbMParMinus->setVisible(false);
                     ui->gbErrorPos->setVisible(false);
+                       ui->gbInput->setVisible(true);
+                      ui->gbOutput->setVisible(true);
+                     ui->gbDynamic->setVisible(true);
                    break;
 
-case AXIS_encoderStepMotor:
+case WLAxis::AXIS_encoderStepMotor:
                    ui->gbTypePulse->setVisible(true);
                      ui->gbEncoder->setVisible(true);
                          ui->gbPID->setVisible(true);
                     ui->gbMParPlus->setVisible(true);
-                   //ui->gbMParMinus->setVisible(true);
                     ui->gbErrorPos->setVisible(true);
+                       ui->gbInput->setVisible(true);
+                      ui->gbOutput->setVisible(true);
+                     ui->gbDynamic->setVisible(true);
+                    break;
+
+case WLAxis::AXIS_spindleStepMotor:
+                   ui->gbTypePulse->setVisible(true);
+                     ui->gbEncoder->setVisible(false);
+                         ui->gbPID->setVisible(false);
+                    ui->gbMParPlus->setVisible(false);
+                    ui->gbErrorPos->setVisible(false);
+                       ui->gbInput->setVisible(false);
+                      ui->gbOutput->setVisible(false);
+                     ui->gbDynamic->setVisible(false);
                    break;
 }
 

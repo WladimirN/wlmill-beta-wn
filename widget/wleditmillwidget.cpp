@@ -1,6 +1,7 @@
+#include <QButtonGroup>
 #include "wleditmillwidget.h"
 
-WLEditMillWidget::WLEditMillWidget(WLGMachine *_MillMachine,QDialog *parent)
+WLEditMillWidget::WLEditMillWidget(WLGMachine *_MillMachine,QWidget *parent)
 	: QDialog(parent)
 {
 	ui.setupUi(this);
@@ -9,51 +10,6 @@ WLEditMillWidget::WLEditMillWidget(WLGMachine *_MillMachine,QDialog *parent)
 
     WLModuleAxis *ModuleAxis=MillMachine->getMotionDevice()->getModuleAxis();
     WLModulePlanner *ModulePlanner=MillMachine->getMotionDevice()->getModulePlanner();
-
-    ui.editOutSPWM ->setModule(MillMachine->getMotionDevice()->getModulePWM(),false);
-    ui.editOutSAOUT->setModule(MillMachine->getMotionDevice()->getModuleAIOPut(),false);
-    ui.editOutSOUT ->setModule(MillMachine->getMotionDevice()->getModuleIOPut(),false);
-
-    grOutput=new QButtonGroup(this);
-
-    if(ui.editOutSPWM->isEnable())
-        grOutput->addButton(ui.editOutSPWM->getButton());
-
-    if(ui.editOutSAOUT->isEnable())
-        grOutput->addButton(ui.editOutSAOUT->getButton());
-
-    if(ui.editOutSOUT->isEnable())
-        grOutput->addButton(ui.editOutSOUT->getButton());
-
-    grOutput->setExclusive(true);
-
-    ui.editOutSPWM  ->setCheckable(true);
-    ui.editOutSAOUT ->setCheckable(true);
-    ui.editOutSOUT  ->setCheckable(true);
-
-    WLSpindle *Spindle=MillMachine->getMotionDevice()->getModulePlanner()->getSpindle();
-
-    switch(Spindle->getTypeSOut())
-    {
-    case WLModule::typeEOutPWM:
-                        ui.editOutSPWM->setChecked(true);
-                        ui.editOutSPWM->setValue(Spindle->getISOut());
-                        break;
-
-    case WLModule::typeEAOutput:
-                        ui.editOutSAOUT->setChecked(true);
-                        ui.editOutSAOUT->setValue(Spindle->getISOut());
-                        break;
-
-    case WLModule::typeEOutput:
-                        ui.editOutSOUT->setChecked(true);
-                        ui.editOutSOUT->setValue(Spindle->getISOut());
-                        break;
-
-    default: ui.gbSOut->setChecked(false);
-             ui.editOutSPWM->setChecked(true);
-             break;
-    }
 
     ui.cbActSafeProbe->addItems(QString("no,SDstop,EMGStop").split(","));
     ui.cbActSafeProbe->setCurrentIndex(MillMachine->getActSafeProbe());
@@ -104,8 +60,6 @@ WLEditMillWidget::WLEditMillWidget(WLGMachine *_MillMachine,QDialog *parent)
 
 	ui.sbFbls->setValue(MillMachine->VBacklash());
 
-    ui.gbPWMOut->setChecked(MillMachine->getMotionDevice()->getModulePlanner()->getSpindle()->getTypeSOut()!=WLDevice::typeEEmpty);
-
     ui.cbAutoStart->setChecked(MillMachine->isAutoStartGCode());
     ui.cbAutoSetSafeProbe->setChecked(MillMachine->isAutoSetSafeProbe());
 
@@ -117,35 +71,14 @@ WLEditMillWidget::WLEditMillWidget(WLGMachine *_MillMachine,QDialog *parent)
 
    // ui.sbOffsetHToolProbe->setValue(MillMachine->getOffsetHTool());
 
-    initTableCalcSout();
-
-	connect(ui.pbVerError,SIGNAL(clicked()),SLOT(onVerifyError()));
-
-    ui.sbAccSOut->setValue( MillMachine->getMotionDevice()->getModulePlanner()->getSpindle()->getAcc());
-    ui.sbDecSOut->setValue(-MillMachine->getMotionDevice()->getModulePlanner()->getSpindle()->getDec());
+    connect(ui.pbVerError,SIGNAL(clicked()),SLOT(onVerifyError()));
 
     ui.lePercentManual->setText(MillMachine->getPercentManualStr());
 
     ui.sbFeedZG1->setValue(MillMachine->getFeedG1StartAt());
     ui.sbDistZG1->setValue(MillMachine->getDistG1StartAt());
 
-    ui.cbFastChangeSOut->setChecked(MillMachine->getMotionDevice()->getModulePlanner()->getSpindle()->isFastChangeSOut());
-
-    ui.editOutENBSpindle->setModule(MillMachine->getMotionDevice()->getModuleIOPut(),false);
-    ui.editOutENBSpindle->setValue(MillMachine->getMotionDevice()->getModulePlanner()->getSpindle()->getOutput(SPINDLE_outENB)->getIndex());
-
-    ui.editOutENBSpindle->setCheckable(true);
-    ui.editOutENBSpindle->setChecked(ui.editOutENBSpindle->value()!=0);
-    ui.editOutENBSpindle->setLabel("outENB");
-
-    ui.editOutRUNSpindle->setModule(MillMachine->getMotionDevice()->getModuleIOPut(),false);
-    ui.editOutRUNSpindle->setValue(MillMachine->getMotionDevice()->getModulePlanner()->getSpindle()->getOutput(SPINDLE_outRUN)->getIndex());
-
-    ui.editOutRUNSpindle->setCheckable(true);
-    ui.editOutRUNSpindle->setChecked(ui.editOutRUNSpindle->value()!=0);
-    ui.editOutRUNSpindle->setLabel("outRUN");
-
-	setModal(true);
+    setModal(true);
 
 }
 
@@ -194,47 +127,6 @@ QDialog::accept();
 }
 
 
-QList <WLSpindleData> WLEditMillWidget::getSpindleDataList()
-{
-QList <WLSpindleData> retList;
-
-for(int i=0;i<ui.twCalcSout->rowCount();i++)
- {
- WLSpindleData sdata;
-
- if(ui.twCalcSout->item(i,0)!=nullptr
-  &&ui.twCalcSout->item(i,1)!=nullptr
-  &&!ui.twCalcSout->item(i,0)->data(0).toString().isEmpty()
-  &&!ui.twCalcSout->item(i,1)->data(0).toString().isEmpty())
-  {
-  sdata.inValue =ui.twCalcSout->item(i,0)->data(0).toString().replace(",",".").toDouble();
-  sdata.outValue=ui.twCalcSout->item(i,1)->data(0).toString().replace(",",".").toDouble();;
-
-  qDebug()<<"spindleData"<<sdata.inValue<<sdata.outValue;
-
-  retList+=sdata;
-  }
- }
-
-return retList;
-}
-
-void WLEditMillWidget::initTableCalcSout()
-{
-QList <WLSpindleData> sList=MillMachine->getMotionDevice()->getModulePlanner()->getSpindle()->getDataList();
-
-ui.twCalcSout->setColumnCount(2);
-ui.twCalcSout->setRowCount(10);
-
-ui.twCalcSout->setHorizontalHeaderLabels (QString(tr("S,out(0.0-1.0)")).split(","));
-
-for(int i=0;i<ui.twCalcSout->rowCount()&&i<sList.size();i++)
- {
- ui.twCalcSout->setItem (i,0,new QTableWidgetItem(QString::number(sList[i].inValue)));
- ui.twCalcSout->setItem (i,1,new QTableWidgetItem(QString::number(sList[i].outValue)));
- }
-}
-
 bool WLEditMillWidget::saveDataMill()
 {
 bool ret=false;
@@ -267,34 +159,12 @@ MillMachine->setEnableHPause(ui.cbHPause->isChecked());
 MillMachine->setHPause(ui.sbHPause->value());
 MillMachine->setUseMPG(ui.cbUseMPG->isChecked());
 
-ModulePlanner->getSpindle()->setDataList(getSpindleDataList());
-
-float deltaS=0;
-
-WLSpindle *Spindle=MillMachine->getMotionDevice()->getModulePlanner()->getSpindle();
-
-Spindle->setAcc( ui.sbAccSOut->value());
-Spindle->setDec(-ui.sbDecSOut->value());
-
 MillMachine->setStrFindDrivePos(ui.leStrFindDrivePos->text());
 
 MillMachine->setAutoStartGCode(ui.cbAutoStart->isChecked());
 MillMachine->setAutoSetSafeProbe(ui.cbAutoSetSafeProbe->isChecked());
 
 MillMachine->getMotionDevice()->getModulePlanner()->setKFpause(ui.sbPerFpause->value()/100.0f);
-
-if(!ui.gbSOut->isChecked()) {
-Spindle->resetElementSpindle();
-}
-else if(ui.editOutSPWM->isChecked()){
-Spindle->setElementSOut(WLDevice::typeEOutPWM,ui.editOutSPWM->value());
-}
-else if(ui.editOutSAOUT->isChecked()){
-Spindle->setElementSOut(WLDevice::typeEAOutput,ui.editOutSAOUT->value());
-}
-else if(ui.editOutSOUT->isChecked()){
-Spindle->setElementSOut(WLDevice::typeEOutput,ui.editOutSOUT->value());
-}
 
 if(ui.cbUseDriveA->isChecked())
 {
@@ -336,12 +206,9 @@ MillMachine->setPercentManualStr(ui.lePercentManual->text());
 MillMachine->setFeedG1StartAt(ui.sbFeedZG1->value());
 MillMachine->setDistG1StartAt(ui.sbDistZG1->value());
 
-Spindle->setFastSOut(ui.cbFastChangeSOut->isChecked());
-Spindle->setOutENB(ui.editOutENBSpindle->isChecked() ? ui.editOutENBSpindle->value():0);
-Spindle->setOutRUN(ui.editOutRUNSpindle->isChecked() ? ui.editOutRUNSpindle->value():0);
+
 return ret;
 }
-
 
 void WLEditMillWidget::keyPressEvent(QKeyEvent *event)
 {
