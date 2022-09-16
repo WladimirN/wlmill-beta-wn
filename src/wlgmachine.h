@@ -127,7 +127,7 @@ private:
 
     QStringList preRunProgramList;
 
-    enum statesSpindle{Stop=0,CW=1,CCW=-1};
+    enum statesSpindle{Stop=0,FW=1,RE=-1};
 
     statesSpindle stateSpindle=Stop;
     statesSpindle pauseStateSpindle=Stop;
@@ -153,8 +153,8 @@ QList<WLElementTraj>  showMillTraj;
  QMutex MutexScript;
 
 Q_INVOKABLE bool   isSpindleStop(int index=0)   {return stateSpindle==Stop;}
-Q_INVOKABLE bool   isSpindleCW(int index=0)     {return stateSpindle==CW;}
-Q_INVOKABLE bool   isSpindleCCW(int index=0)    {return stateSpindle==CCW;}
+Q_INVOKABLE bool   isSpindleCW(int index=0)     {return stateSpindle==FW;}
+Q_INVOKABLE bool   isSpindleCCW(int index=0)    {return stateSpindle==RE;}
 
 Q_INVOKABLE int    getStateSpindle(int index=0) {return stateSpindle;}
 Q_INVOKABLE void   setStateSpindle(int state,int index=0);
@@ -450,10 +450,7 @@ Q_INVOKABLE double getProbeSC(QString name) {if(getMotionDevice()->getModulePlan
 
 
 Q_INVOKABLE  void setSOut(float S);
-Q_INVOKABLE  void enableSOut(bool enable) {
-                                          setSOut(m_GCode.getValue('S'));
-                                          motDevice->getModulePlanner()->setEnableSOut(enable);
-                                          } 
+Q_INVOKABLE  void enableSOut(int state) {setStateSpindle(state);}
 
 
    WLGPoint getProbeGPoint();

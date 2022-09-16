@@ -139,7 +139,9 @@ void WLGMachine::setStateSpindle(int state, int index)
 {
 stateSpindle=(statesSpindle)state;
 
-enableSOut(state!=statesSpindle::Stop);
+motDevice->getModulePlanner()->setEnableSOut(state!=statesSpindle::Stop);
+
+setSOut(getGCode()->getValue('S') * getStateSpindle());
 }
 
 void WLGMachine::plusPercentManual()
@@ -2316,10 +2318,10 @@ if(pause)
             case Stop: m_waitMScript=true;
                        runMCode(5);
                        break;
-            case CW:   m_waitMScript=true;
+            case FW:   m_waitMScript=true;
                        runMCode(3);
                        break;
-            case CCW:  m_waitMScript=true;
+            case RE:  m_waitMScript=true;
                        runMCode(4);
                        break;
             }
@@ -3574,7 +3576,7 @@ case WLElementTraj::script: qDebug()<<"Script"<<isActiv()<<isRunMScript()<<(ME.i
                            break;
 
 case WLElementTraj::delay: ok=ModulePlanner->addDelay(ME.data.delay.time
-                                                     ,isSpindleStop() ? 0 : ME.S
+                                                     ,ME.S * getStateSpindle()
                                                      ,ME.index);
                            break;
 
@@ -3652,7 +3654,7 @@ case WLElementTraj::line:  {
                                                        ,indexs.size()
                                                        ,indexs.data()
                                                        ,ePos.data()
-                                                       ,isSpindleStop() ? 0 : ME.S
+                                                       ,ME.S * getStateSpindle()
                                                        ,ME.isFast() ? -1 :(kF*ME.F/60.0)/m_mainDim
                                                        ,ME.index);
                               }
@@ -3681,7 +3683,7 @@ case WLElementTraj::uline:   {
                                                        ,indexs.data()
                                                        ,ePos.data()
                                                        ,mPos.data()
-                                                       ,isSpindleStop() ? 0 : ME.S
+                                                       ,ME.S * getStateSpindle()
                                                        ,ME.isFast() ? -1 : (ME.F/60)/m_mainDim
                                                        ,ME.index);
                            }
@@ -3758,7 +3760,7 @@ case WLElementTraj::arc: {
                                                  ,indexs.data()
                                                  ,ePos.data()
                                                  ,cPosIJ
-                                                 ,isSpindleStop() ? 0 : ME.S
+                                                 ,ME.S * getStateSpindle()
                                                  ,ME.isFast() ? -1 : (ME.F/60)/m_mainDim
                                                  ,ME.index);
                           }
@@ -4087,8 +4089,8 @@ if(m_MScript)
       qDebug()<<"detect MCode:"<<iM<<ok;
 
       switch (iM) {
-          case 3: stateSpindle=CW;   break;
-          case 4: stateSpindle=CCW;  break;
+          case 3: stateSpindle=FW;   break;
+          case 4: stateSpindle=RE;  break;
           case 5: stateSpindle=Stop; break;
           }
       }

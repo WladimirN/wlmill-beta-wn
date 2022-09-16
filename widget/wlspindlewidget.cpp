@@ -21,6 +21,8 @@ WLSpindleWidget::WLSpindleWidget(WLSpindle *_Spindle,QWidget *parent) :
 
     QButtonGroup *grOutput=new QButtonGroup(this);
 
+    connect(grOutput,QOverload<int>::of(&QButtonGroup::buttonClicked),this,&WLSpindleWidget::updateTypeOutS);
+
     if(ui->editOutSPWM->isEnable())
         grOutput->addButton(ui->editOutSPWM->getButton());
 
@@ -40,11 +42,16 @@ WLSpindleWidget::WLSpindleWidget(WLSpindle *_Spindle,QWidget *parent) :
     ui->editOutSOUT  ->setCheckable(true);
     ui->editOutSAxis ->setCheckable(true);
 
+    ui->editOutSAxis->setLabel("Axis");
+    ui->editOutSPWM->setLabel("PWM");
+    ui->editOutSAOUT->setLabel("Analog");
+    ui->editOutSOUT->setLabel("DOUT");
+
     switch(Spindle->getTypeSOut())
     {
     case WLModule::typeEAxis:
                         ui->editOutSAxis->setChecked(true);
-                        ui->editOutSAxis->setValue(Spindle->getISOut());
+                        ui->editOutSAxis->setValue(Spindle->getISOut());    
                         break;
 
     case WLModule::typeEOutPWM:
@@ -72,22 +79,36 @@ WLSpindleWidget::WLSpindleWidget(WLSpindle *_Spindle,QWidget *parent) :
 
     ui->cbFastChangeSOut->setChecked(Spindle->isFastChangeSOut());
 
-    ui->editOutENBSpindle->setModule(MDevice->getModuleIOPut(),false);
-    ui->editOutENBSpindle->setValue(Spindle->getOutput(SPINDLE_outENB)->getIndex());
+    ui->editOutENB->setModule(MDevice->getModuleIOPut(),false);
+    ui->editOutENB->setValue(Spindle->getOutput(SPINDLE_outENB)->getIndex());
 
-    ui->editOutENBSpindle->setCheckable(true);
-    ui->editOutENBSpindle->setChecked(ui->editOutENBSpindle->value()!=0);
-    ui->editOutENBSpindle->setLabel("outENB");
+    ui->editOutENB->setCheckable(true);
+    ui->editOutENB->setChecked(ui->editOutENB->value()!=0);
+    ui->editOutENB->setLabel("Enable");
 
-    ui->editOutRUNSpindle->setModule(MDevice->getModuleIOPut(),false);
-    ui->editOutRUNSpindle->setValue(Spindle->getOutput(SPINDLE_outRUN)->getIndex());
+    ui->editOutRUN->setModule(MDevice->getModuleIOPut(),false);
+    ui->editOutRUN->setValue(Spindle->getOutput(SPINDLE_outRUN)->getIndex());
 
-    ui->editOutRUNSpindle->setCheckable(true);
-    ui->editOutRUNSpindle->setChecked(ui->editOutRUNSpindle->value()!=0);
-    ui->editOutRUNSpindle->setLabel("outRUN");
+    ui->editOutRUN->setCheckable(true);
+    ui->editOutRUN->setChecked(ui->editOutRUN->value()!=0);
+    ui->editOutRUN->setLabel("Run");
+
+    ui->editOutFW->setModule(MDevice->getModuleIOPut(),false);
+    ui->editOutFW->setValue(Spindle->getOutput(SPINDLE_outFW)->getIndex());
+
+    ui->editOutFW->setCheckable(true);
+    ui->editOutFW->setChecked(ui->editOutFW->value()!=0);
+    ui->editOutFW->setLabel("Forward");
+
+    ui->editOutRE->setModule(MDevice->getModuleIOPut(),false);
+    ui->editOutRE->setValue(Spindle->getOutput(SPINDLE_outRE)->getIndex());
+
+    ui->editOutRE->setCheckable(true);
+    ui->editOutRE->setChecked(ui->editOutRE->value()!=0);
+    ui->editOutRE->setLabel("Reverse");
 
     initTableCalcSout();
-
+    updateTypeOutS(0);
 }
 
 WLSpindleWidget::~WLSpindleWidget()
@@ -120,6 +141,18 @@ for(int i=0;i<ui->twCalcSout->rowCount();i++)
 return retList;
 }
 
+void WLSpindleWidget::updateTypeOutS(int index)
+{
+Q_UNUSED(index)
+
+ui->cbFastChangeSOut->setVisible(ui->editOutSPWM->isChecked());
+
+if(ui->editOutSAxis->isChecked())
+   ui->twCalcSout->setHorizontalHeaderLabels (QString(tr("S,Hz")).split(","));
+else
+   ui->twCalcSout->setHorizontalHeaderLabels (QString(tr("S,outValue")).split(","));
+}
+
 void WLSpindleWidget::accept()
 {
 Spindle->setDataList(getSpindleDataList());
@@ -145,9 +178,11 @@ Spindle->setElementSOut(WLDevice::typeEAxis,ui->editOutSAxis->value());
 }
 
 Spindle->setFastSOut(ui->cbFastChangeSOut->isChecked());
-Spindle->setOutENB(ui->editOutENBSpindle->isChecked() ? ui->editOutENBSpindle->value():0);
-Spindle->setOutRUN(ui->editOutRUNSpindle->isChecked() ? ui->editOutRUNSpindle->value():0);
 
+Spindle->setOutENB(ui->editOutENB->isChecked() ? ui->editOutENB->value():0);
+Spindle->setOutRUN(ui->editOutRUN->isChecked() ? ui->editOutRUN->value():0);
+Spindle->setOutFW(ui->editOutFW->isChecked() ? ui->editOutFW->value():0);
+Spindle->setOutRE(ui->editOutRE->isChecked() ? ui->editOutRE->value():0);
 }
 
 void WLSpindleWidget::initTableCalcSout()
@@ -156,8 +191,6 @@ QList <WLSpindleData> sList=Spindle->getDataList();
 
 ui->twCalcSout->setColumnCount(2);
 ui->twCalcSout->setRowCount(10);
-
-ui->twCalcSout->setHorizontalHeaderLabels (QString(tr("S,outValue")).split(","));
 
 for(int i=0;i<ui->twCalcSout->rowCount()&&i<sList.size();i++)
  {

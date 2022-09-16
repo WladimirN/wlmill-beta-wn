@@ -27,6 +27,8 @@ private:
    void initTableCalcSout();
    QList <WLSpindleData> getSpindleDataList();
 
+private slots:
+   void updateTypeOutS(int index);
    // QDialog interface
 public slots:
    void accept();

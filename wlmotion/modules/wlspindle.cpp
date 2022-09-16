@@ -12,8 +12,10 @@ WLSpindle::WLSpindle(WLModuleSpindle *_ModuleSpindle)
 {
 setTypeElement(typeESpindle);
 
-outENBSpindle=&WLIOPut::Out;
-outRUNSpindle=&WLIOPut::Out;
+outENB=&WLIOPut::Out;
+outRUN=&WLIOPut::Out;
+outFW=&WLIOPut::Out;
+outRE=&WLIOPut::Out;
 }
 
 
@@ -86,30 +88,58 @@ foreach(WLSpindleData sdata,dataList){
 
 void WLSpindle::setOutENB(int index)
 {
-outENBSpindle->removeComment("outENBSpindle"+QString::number(getIndex()));
+outENB->removeComment("outENBSpindle"+QString::number(getIndex()));
 
 WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(WLDevice::typeMIOPut));
 
 if(index>=ModuleIOPut->getSizeOutputs()) index=0;
 
-outENBSpindle=ModuleIOPut->getOutput(index);
-outENBSpindle->addComment("outENBSpindle"+QString::number(getIndex()));
+outENB=ModuleIOPut->getOutput(index);
+outENB->addComment("outENBSpindle"+QString::number(getIndex()));
 
-setOutputSpindle(SPINDLE_outENB,index);
+setOutput(SPINDLE_outENB,index);
 }
 
 void WLSpindle::setOutRUN(int index)
 {
-outRUNSpindle->removeComment("outRUNSpindle"+QString::number(getIndex()));
+outRUN->removeComment("outRUNSpindle"+QString::number(getIndex()));
 
 WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(WLDevice::typeMIOPut));
 
 if(index>=ModuleIOPut->getSizeOutputs()) index=0;
 
-outRUNSpindle=ModuleIOPut->getOutput(index);
-outRUNSpindle->addComment("outRUNSpindle"+QString::number(getIndex()));
+outRUN=ModuleIOPut->getOutput(index);
+outRUN->addComment("outRUNSpindle"+QString::number(getIndex()));
 
-setOutputSpindle(SPINDLE_outRUN,index);
+setOutput(SPINDLE_outRUN,index);
+}
+
+void WLSpindle::setOutFW(int index)
+{
+outRUN->removeComment("outFWSpindle"+QString::number(getIndex()));
+
+WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(WLDevice::typeMIOPut));
+
+if(index>=ModuleIOPut->getSizeOutputs()) index=0;
+
+outFW=ModuleIOPut->getOutput(index);
+outFW->addComment("outFWSpindle"+QString::number(getIndex()));
+
+setOutput(SPINDLE_outFW,index);
+}
+
+void WLSpindle::setOutRE(int index)
+{
+outRUN->removeComment("outRESpindle"+QString::number(getIndex()));
+
+WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(WLDevice::typeMIOPut));
+
+if(index>=ModuleIOPut->getSizeOutputs()) index=0;
+
+outRE=ModuleIOPut->getOutput(index);
+outRE->addComment("outRESpindle"+QString::number(getIndex()));
+
+setOutput(SPINDLE_outRE,index);
 }
 
 bool WLSpindle::setElementSOut(typeElement telement,quint8 i)
@@ -243,8 +273,10 @@ WLIOPut *WLSpindle::getOutput(typeOutputSpindle type)
 {
 switch(type)
 {
-case SPINDLE_outENB:  return outENBSpindle;
-case SPINDLE_outRUN:  return outRUNSpindle;
+case SPINDLE_outENB:  return outENB;
+case SPINDLE_outRUN:  return outRUN;
+case SPINDLE_outFW:   return outFW;
+case SPINDLE_outRE:   return outRE;
 }
 
 return nullptr;
@@ -264,7 +296,7 @@ emit sendCommand(data);
 return true;
 }
 
-bool WLSpindle::setOutputSpindle(typeOutputSpindle type,quint8 num)
+bool WLSpindle::setOutput(typeOutputSpindle type,quint8 num)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -330,6 +362,8 @@ stream.writeAttribute("fastChangeSOut",QString::number(isFastChangeSOut()));
 
 stream.writeAttribute("outENB",QString::number(getOutput(SPINDLE_outENB)->getIndex()));
 stream.writeAttribute("outRUN",QString::number(getOutput(SPINDLE_outRUN)->getIndex()));
+stream.writeAttribute("outFW",QString::number(getOutput(SPINDLE_outFW)->getIndex()));
+stream.writeAttribute("outRE",QString::number(getOutput(SPINDLE_outRE)->getIndex()));
 
 quint8 i=0;
 
@@ -365,6 +399,13 @@ if(!stream.attributes().value("outENB").isEmpty())
 
 if(!stream.attributes().value("outRUN").isEmpty())
     setOutRUN(stream.attributes().value("outRUN").toString().toInt());
+
+if(!stream.attributes().value("outFW").isEmpty())
+    setOutFW(stream.attributes().value("outFW").toString().toInt());
+
+if(!stream.attributes().value("outRE").isEmpty())
+    setOutRE(stream.attributes().value("outRE").toString().toInt());
+
 
 if(!stream.attributes().value("SOut").isEmpty())
    {

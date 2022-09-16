@@ -37,7 +37,7 @@
 #define SF_run     (1<<3)
 
 enum typeInputSpindle{SPINDLE_inORG};
-enum typeOutputSpindle{SPINDLE_outENB,SPINDLE_outRUN};
+enum typeOutputSpindle{SPINDLE_outENB,SPINDLE_outRUN,SPINDLE_outFW,SPINDLE_outRE};
 
 enum typeDataSpindle{
      dataSpindle_Scur
@@ -74,18 +74,20 @@ float m_dec=0;
 
 typeElement m_typeSOut;
      quint8 m_iOut;
-       bool m_fastSOut=false;
+       bool m_fastSOut=true;
 
 WLSpindleData m_curSpindleData;
 QList<WLSpindleData> spindleDataList;
 
-WLIOPut *outENBSpindle;
-WLIOPut *outRUNSpindle;
+WLIOPut *outENB;
+WLIOPut *outRUN;
+WLIOPut *outFW;
+WLIOPut *outRE;
 
 private:
 
    bool setInputSpindle(typeInputSpindle type,quint8 num);
-   bool setOutputSpindle(typeOutputSpindle type,quint8 num);
+   bool setOutput(typeOutputSpindle type,quint8 num);
 
 public:
 
@@ -99,6 +101,8 @@ public:
 
    void setOutENB(int index);
    void setOutRUN(int index);
+   void setOutFW(int index);
+   void setOutRE(int index);
 public:
 
  WLIOPut*  getInputSpindle(typeInputSpindle type);
