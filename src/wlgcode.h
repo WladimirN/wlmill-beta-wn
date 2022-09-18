@@ -48,6 +48,18 @@ double w;
 WLGPoint() {x=y=z=a=b=c=u=v=w=0;}
 WLGPoint(WL6DPoint point) {u=v=w=0; from6D(point); }
 
+double getR()
+{
+return sqrt(x*x
+           +y*y
+           +z*z
+           +a*a
+           +b*b
+           +c*c
+           +u*u
+           +w*w);
+}
+
 bool isNull()
 {
 return x==0.0

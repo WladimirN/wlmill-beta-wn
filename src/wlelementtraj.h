@@ -142,7 +142,7 @@ inline bool isULine() {return type==uline;}
 inline bool isMCode() {return type==mcode;}
 inline bool isEmpty() {return type==empty;}
 
-float movDistance;
+float movDistanceXYZ;
 
 float movDistanceIJ;
 float movDistanceK;

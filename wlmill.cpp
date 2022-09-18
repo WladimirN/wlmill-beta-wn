@@ -753,7 +753,8 @@ LScript->wait();
 MScript->quit();
 MScript->wait();
 
-saveConfigINI();
+if(MillMachine->isReady())
+          saveConfigINI();
 
 delete VisualWidget;
 delete Program;
@@ -1290,6 +1291,7 @@ ToolsWidget->setHeadersTable(setting.value("Tools/showColumn","").toString().spl
 
 return true;
 }
+
 void WLMill::saveConfigINI()
 {
 QSettings setting(iniconfigWLMill,QSettings::IniFormat);
