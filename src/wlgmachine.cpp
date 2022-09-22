@@ -2607,10 +2607,8 @@ foreach(WLGDrive *MDrive,getGDrives())
   }
 
 QList <WLElementTraj> curTraj;
-QList <QPair <QString,QStringList>> detectMList;
+QList <QPair <int,QStringList>> detectMList;
 QString txt;
-
-
 
 MillTraj.clear();
 baseTraj.clear();
@@ -2669,8 +2667,12 @@ if(istart>0)
 
    foreach(WLElementTraj et,curTraj){
      if(et.isScript())
-       {
-       QPair <QString,QStringList> MPair(et.escript.script,QStringList()<<m_GCode.getContextGCodeList());
+       {                
+       int Mcode=et.escript.script.remove(QRegExp("[M()]")).toInt();
+
+       if(Mcode<0) continue;
+
+       QPair <int,QStringList> MPair(Mcode,QStringList()<<m_GCode.getContextGCodeList());
 
        for(int i=0;i<detectMList.size();i++){ //ищем чтобы был всегда один
            if(detectMList[i].first==MPair.first)  {
@@ -2682,12 +2684,12 @@ if(istart>0)
        detectMList.append(MPair);
 
        for (int i=0;i<detectMList.size();i++) {
-             if(MPair.first=="M3()")  {if(detectMList.at(i).first=="M4()"||detectMList.at(i).first=="M5()") detectMList.removeAt(i--);}
-        else if(MPair.first=="M4()")  {if(detectMList.at(i).first=="M3()"||detectMList.at(i).first=="M5()") detectMList.removeAt(i--);}
-        else if(MPair.first=="M5()")  {if(detectMList.at(i).first=="M3()"||detectMList.at(i).first=="M4()") detectMList.removeAt(i--);}
-        else if(MPair.first=="M7()")  {if(detectMList.at(i).first=="M8()"||detectMList.at(i).first=="M9()") detectMList.removeAt(i--);}
-        else if(MPair.first=="M8()")  {if(detectMList.at(i).first=="M7()"||detectMList.at(i).first=="M9()") detectMList.removeAt(i--);}
-        else if(MPair.first=="M9()")  {if(detectMList.at(i).first=="M7()"||detectMList.at(i).first=="M8()") detectMList.removeAt(i--);}
+             if(MPair.first==3)  {if(detectMList.at(i).first==4||detectMList.at(i).first==5) detectMList.removeAt(i--);}
+        else if(MPair.first==4)  {if(detectMList.at(i).first==3||detectMList.at(i).first==5) detectMList.removeAt(i--);}
+        else if(MPair.first==5)  {if(detectMList.at(i).first==3||detectMList.at(i).first==4) detectMList.removeAt(i--);}
+        else if(MPair.first==7)  {if(detectMList.at(i).first==8||detectMList.at(i).first==9) detectMList.removeAt(i--);}
+        else if(MPair.first==8)  {if(detectMList.at(i).first==7||detectMList.at(i).first==9) detectMList.removeAt(i--);}
+        else if(MPair.first==9)  {if(detectMList.at(i).first==7||detectMList.at(i).first==8) detectMList.removeAt(i--);}
         }
        }
       }
@@ -2722,12 +2724,10 @@ for(int i=0;i<detectMList.size();i++)
   for(int j=0;j<filtertMList.size();j++)
         if(detectMList.at(i).first==filtertMList.at(j)){
 
-           qDebug()<<"detect MCode"<<filtertMList.at(i);
-
-           QString last=detectMList[i].second.takeLast();
+           qDebug()<<"detect MCode M"<<filtertMList.at(i)<<detectMList.at(i).second.join(" ");
 
            preRunProgramList+=detectMList.at(i).second;
-           preRunProgramList+=QString("M%1 %2").arg(detectMList.at(i).first).arg(last);
+           preRunProgramList+=QString("M%1").arg(detectMList.at(i).first);
            }
 
 WLGPoint endPoint=getGCode()->getCurPoint();
