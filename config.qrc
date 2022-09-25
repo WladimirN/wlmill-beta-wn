@@ -2,8 +2,8 @@
     <qresource prefix="/">
         <file>data/wlmillconfig/config.xml</file>
         <file>data/wlmillconfig/mmconfig.xml</file>
-        <file>data/wlmillconfig/mscript.js</file>
         <file>data/wlmillconfig/WLM35A.xml</file>
-        <file>data/wlmillconfig/lscript.js</file>
+        <file>data/wlmillconfig/script/lscript.js</file>
+        <file>data/wlmillconfig/script/mscript.js</file>
     </qresource>
 </RCC>

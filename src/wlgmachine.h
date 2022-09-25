@@ -22,13 +22,6 @@
 #include "wljoysticks.h"
 #include "wlheightmap.h"
 
-//#define XDrive 0
-//#define YDrive 1
-//#define ZDrive 2
-//#define ADrive 3
-//#define M_PI_4 M_PI/4
-
-
 #define   configMMPath QCoreApplication::applicationDirPath()+"//wlmillconfig//"
 #define   configMMFile QCoreApplication::applicationDirPath()+"//wlmillconfig//mmconfig.xml"
 #define   configMKFile QCoreApplication::applicationDirPath()+"//wlmillconfig//mkconfig.xml"

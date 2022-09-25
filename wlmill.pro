@@ -89,14 +89,12 @@ HEADERS += \
     src/wljoysticks.h \
     src/wlheightmap.h \
     src/wlgmachine.h \
+    src/wlmill.h \
+    src/wlgdrive.h \
     model/wlheightmaptablemodel.h \
-    model/wlgtoolstablemodel.h \
-    wlmill.h \
-    wlgdrive.h \
-    wlmillmachine.h
+    model/wlgtoolstablemodel.h
 
-
-SOURCES += \
+ SOURCES += \
     widget/wldevicewidget.cpp \
     widget/wldrivewidget.cpp \
     widget/wleditiowidget.cpp \
@@ -145,12 +143,11 @@ SOURCES += \
     src/wlgtool.cpp \
     src/wlgpoint.cpp \
     src/wlgmachine.cpp \
+    src/wlmill.cpp \
+    src/wlgdrive.cpp \
     model/wlheightmaptablemodel.cpp \
     model/wlgtoolstablemodel.cpp \
-    main.cpp \    
-    wlmill.cpp \
-    wlmillmachine.cpp \
-    wlgdrive.cpp
+    main.cpp
 
 
 FORMS += \

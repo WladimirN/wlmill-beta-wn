@@ -5,7 +5,7 @@
 #include <QSerialPortInfo>
 #include <QButtonGroup>
 
-#include "wlmillmachine.h"
+#include "wlgmachine.h"
 #include "ui_wleditmillwidget.h"
 
 
