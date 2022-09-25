@@ -105,15 +105,9 @@
        </property>
        <layout class="QGridLayout" name="gridLayout_13">
         <item row="0" column="0">
-         <widget class="QDoubleSpinBox" name="sbErrMax">
-          <property name="prefix">
-           <string notr="true">max:</string>
-          </property>
-          <property name="decimals">
-           <number>20</number>
-          </property>
-          <property name="maximum">
-           <double>10000000.000000000000000</double>
+         <widget class="QPushButton" name="pbEditErrorPid">
+          <property name="text">
+           <string>Edit</string>
           </property>
          </widget>
         </item>

@@ -38,23 +38,27 @@ public:
     typeActionInput getActInPEL();
     typeActionInput getActInMEL();
     typeActionInput getActInALM();
+
 private:
     Ui::WLAxisWidget *ui;
 
     WLAxis *m_axis;
     bool m_slave=false;
+    bool m_Fminutess=false;
     double m_stepsize=1.0;
+    QString m_unit="1;";
 
 public slots:
     void accept() {saveDataAxis();}
     void setUnit(QString);
 
     void setStepSize(double stepsize);
-private slots:
+    void setFminutes(bool);
 
+private slots:
     void onEditParSMPlus();
     void onEditPid();
-
+    void onEditErrorPid();
     void updateTypeMotor(int);
 
 };

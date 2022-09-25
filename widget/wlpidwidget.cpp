@@ -28,7 +28,7 @@ WLPidWidget::WLPidWidget(QString name,WLPidData data,QWidget *parent) :
     connect(ui->sbD,QOverload<double>::of(&QDoubleSpinBox::valueChanged),[=](){ui->pbApply->setEnabled(true);});
 
     connect(ui->pbApply,&QPushButton::clicked,[=](){ui->pbApply->setDisabled(true);
-                                                    emit pidChanged(getPidData());});
+                                                    emit changedPidData(getPidData());});
 
 }
 

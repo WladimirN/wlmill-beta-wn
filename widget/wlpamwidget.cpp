@@ -64,16 +64,16 @@ void WLPamWidget::setUnit(QString unit)
 {
 m_unit=unit;
 
-ui.labelVst->setText("Vst("+m_unit+"/"+(ui.cbFMinutes->isChecked() ? tr("m)"):tr("s)")));
-ui.labelVma->setText("Vma("+m_unit+"/"+(ui.cbFMinutes->isChecked() ? tr("m)"):tr("s)")));
+ui.labelVst->setText("Vst("+m_unit+"/"+(ui.cbFMinutes->isChecked() ? tr("min)"):tr("sec)")));
+ui.labelVma->setText("Vma("+m_unit+"/"+(ui.cbFMinutes->isChecked() ? tr("min)"):tr("sec)")));
 
 if(ui.cbATime->isChecked()){
- ui.labelAac->setText("Aac(s)");
- ui.labelAde->setText("Ade(s)");
+ ui.labelAac->setText("Aac(sec)");
+ ui.labelAde->setText("Ade(sec)");
  }
  else {
- ui.labelAac->setText("Aac("+m_unit+"/"+tr("s^2)"));
- ui.labelAde->setText("Ade("+m_unit+"/"+tr("s^2)"));
+ ui.labelAac->setText("Aac("+m_unit+"/"+tr("sec^2)"));
+ ui.labelAde->setText("Ade("+m_unit+"/"+tr("sec^2)"));
  }
 }
 

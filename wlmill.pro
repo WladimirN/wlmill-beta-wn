@@ -86,6 +86,7 @@ HEADERS += \
     widget/wlgdrivewidget.h \
     widget/wlcameraview.h \
     widget/wleditgcode.h \
+    widget/wlerrorpidwidget.h
     src/wl3dpoint.h \
     src/wlcalc.h \
     src/wldrive.h \
@@ -112,6 +113,7 @@ HEADERS += \
     src/wlgdrive.h \
     model/wlheightmaptablemodel.h \
     model/wlgtoolstablemodel.h
+
 
 SOURCES += \
     widget/wldevicewidget.cpp \
@@ -141,6 +143,7 @@ SOURCES += \
     widget/wlpositionwidget.cpp \
     widget/wlgdrivewidget.cpp \
     widget/wleditgcode.cpp \
+    widget/wlerrorpidwidget.cpp \
     src/wl3dpoint.cpp \
     src/wlcalc.cpp \
     src/wldrive.cpp \
@@ -168,6 +171,7 @@ SOURCES += \
     model/wlgtoolstablemodel.cpp \
     main.cpp
 
+
 FORMS += \
     widget/wldevicewidget.ui \
     widget/wldrivewidget.ui \
@@ -193,7 +197,8 @@ FORMS += \
     widget/wlpositionwidget.ui \
     widget/wleditpoint.ui \
     widget/wltoolswidget.ui \
-    widget/wlgdrivewidget.ui
+    widget/wlgdrivewidget.ui \
+    widget/wlerrorpidwidget.ui
 
 
 RESOURCES += \

@@ -358,6 +358,7 @@ inline double distance()    {return  nextPosition()-position();}
 //inline double getDistanceL() {return  getNextPositionL()-getPositionL();}
 
 //quint8 indexMAxis(){return getAxis()->getIndex();}
+inline double errPosition(quint8 i=0)  {return i<m_AxisList.size() ? m_AxisList[i]->getErrPosition()*dimension() : 0;}
 
 inline double position()     {return positionDrive().get(dim);}
 inline double nextPosition() {return nextPositionDrive().get(dim);}

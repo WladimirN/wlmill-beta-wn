@@ -2,6 +2,7 @@
 #include "ui_wlaxiswidget.h"
 #include "wlpamwidget.h"
 #include "wlpidwidget.h"
+#include "wlerrorpidwidget.h"
 #include "wldevice.h"
 
 WLAxisWidget::WLAxisWidget(WLAxis *_axis,bool _slave,double _offset, QWidget *parent) :
@@ -84,6 +85,7 @@ WLAxisWidget::WLAxisWidget(WLAxis *_axis,bool _slave,double _offset, QWidget *pa
 
    connect(ui->pbEditParSMPlus,&QPushButton::clicked,this,&WLAxisWidget::onEditParSMPlus);
    connect(ui->pbEditPid,&QPushButton::clicked,this,&WLAxisWidget::onEditPid);
+   connect(ui->pbEditErrorPid,&QPushButton::clicked,this,&WLAxisWidget::onEditErrorPid);
 
     //ui->gbMParMinus->setChecked(m_axis->getStepMotorMParPlus()!=m_axis->getStepMotorMParMinus());
 
@@ -121,7 +123,7 @@ WLAxisWidget::WLAxisWidget(WLAxis *_axis,bool _slave,double _offset, QWidget *pa
      WLModuleEncoder *ModuleEncoder=static_cast<WLModuleEncoder*>(m_axis->getModule()->getDevice()->getModule(typeMEncoder));
 
      if(ModuleEncoder)  {
-       ui->cbTypeMotor->addItems(QString("noMotor,stepMotor,encoderStepMotor").split(","));
+       ui->cbTypeMotor->addItems(QString("noMotor,stepMotor,encoderStepMotor,errEncoderStepMotor").split(","));
 
        ui->encoder->setModule(ModuleEncoder);
        ui->encoder->setValue(m_axis->getEncoder());
@@ -131,7 +133,6 @@ WLAxisWidget::WLAxisWidget(WLAxis *_axis,bool _slave,double _offset, QWidget *pa
        }
 
      ui->cbTypeMotor->setCurrentIndex(m_axis->getTypeMotor());
-     ui->sbErrMax->setValue(m_axis->getErrPidMax()/m_stepsize);
 
 }
 
@@ -161,11 +162,8 @@ m_axis->setTypePulse((typePulseAxis)ui->cbTypePulse->currentIndex()
                     |(ui->cbInvDir->isChecked() ?MAF_invDir:0));
 
 
-if((typeMotorAxis)ui->cbTypeMotor->currentIndex()==AXIS_encoderStepMotor){
-  m_axis->setErrPid(ui->sbErrMax->value()/m_stepsize);
-  }
-
-if((typeMotorAxis)ui->cbTypeMotor->currentIndex()==AXIS_encoderStepMotor){
+if((typeMotorAxis)ui->cbTypeMotor->currentIndex()==AXIS_encoderStepMotor
+ ||(typeMotorAxis)ui->cbTypeMotor->currentIndex()==AXIS_errEncoderStepMotor){
   m_axis->setEncoder(ui->encoder->value());
   }
   else {
@@ -274,7 +272,9 @@ return static_cast<typeActionInput>(ui->cbActInALM->currentIndex());
 
 void WLAxisWidget::setUnit(QString txt)
 {
-    ui->sbOffset->setSuffix(txt);
+m_unit=txt;
+
+ui->sbOffset->setSuffix(txt);
 }
 
 void WLAxisWidget::setStepSize(double stepsize)
@@ -282,8 +282,6 @@ void WLAxisWidget::setStepSize(double stepsize)
 if(stepsize>0){
 
 double k=stepsize/m_stepsize;
-
-ui->sbErrMax->setValue(ui->sbErrMax->value()*k);
 
 m_stepsize=stepsize;
 }
@@ -344,6 +342,21 @@ if(PW.exec()) {
   }
 }
 
+void WLAxisWidget::onEditErrorPid()
+{
+WLErrorPidWidget EPW(QString("Axis %1").arg(m_axis->getIndex()),m_axis->getErrorPidData(),m_stepsize,this);
+
+EPW.setUnit(m_unit);
+EPW.setFminutes(m_Fminutess);
+
+EPW.setModal(true);
+EPW.show();
+
+if(EPW.exec()) {
+  m_axis->setErrorPidData(EPW.getErrorPidData());
+  }
+}
+
 void WLAxisWidget::updateTypeMotor(int index)
 {
 typeMotorAxis type=(typeMotorAxis)index;
@@ -374,9 +387,22 @@ case AXIS_encoderStepMotor:
                     ui->gbMParPlus->setVisible(true);
                    //ui->gbMParMinus->setVisible(true);
                     ui->gbErrorPos->setVisible(true);
+
+case AXIS_errEncoderStepMotor:
+                   ui->gbTypePulse->setVisible(true);
+                     ui->gbEncoder->setVisible(true);
+                         ui->gbPID->setVisible(true);
+                    ui->gbMParPlus->setVisible(false);
+                   //ui->gbMParMinus->setVisible(true);
+                    ui->gbErrorPos->setVisible(true);
                    break;
 }
 
+}
+
+void WLAxisWidget::setFminutes(bool fmin)
+{
+m_Fminutess=fmin;
 }
 
 

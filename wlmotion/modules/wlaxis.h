@@ -112,13 +112,17 @@ const QString errorAxis("0,no error\
 #define sendAxis_signal 200
 
 enum typeDataAxis{
-     dataAxis_pos
-    ,dataAxis_F
-    ,dataAxis_latch2
-    ,dataAxis_latch3
+   dataAxis_pos
+  ,dataAxis_F
+  ,dataAxis_latch2
+  ,dataAxis_latch3
+  ,dataAxis_modeStatus
+  ,dataAxis_posReal
+  ,dataAxis_posTarget
+  ,dataAxis_posMin
+  ,dataAxis_posMax
+  ,dataAxis_posError
   };
-
-
 
 #define sendAxis_data          202 //send data Axis
 
@@ -166,7 +170,7 @@ enum  statusAxis{AXIS_stop,AXIS_acc,AXIS_fconst,AXIS_dec,AXIS_wait};
 enum   stateAxis{AXIS_standby,AXIS_pos,AXIS_vel} ;
 enum    modeAxis{AXIS_alone,AXIS_slave,AXIS_sub,AXIS_track};
 
-enum   typeMotorAxis{AXIS_noMotor,AXIS_stepMotor,AXIS_encoderStepMotor};
+enum   typeMotorAxis{AXIS_noMotor,AXIS_stepMotor,AXIS_encoderStepMotor,AXIS_errEncoderStepMotor};
 
 enum   typeMParAxis{AXIS_MParAll
                    ,AXIS_MParPlus
@@ -278,6 +282,8 @@ QString toString(){
                                  .arg(ffd,0,'f',5);
  }
 
+
+
 bool fromString(QString str)
  {
  QStringList list=str.split(",");
@@ -301,6 +307,45 @@ bool fromString(QString str)
  }
 };
 
+struct WLErrorPidData
+{
+float Fmin=0;
+float Emin=0;
+
+float Fmax=0;
+float Emax=1;
+
+bool isValid(){
+  return   Fmin>=0
+         &&Fmax>=0
+         &&Emin>=0
+         &&Emax>=Emin;
+  }
+
+QString toString(){
+ return QString("%1,%2,%3,%4,%5").arg(Fmin,0,'f',5)
+                                 .arg(Fmax,0,'f',5)
+                                 .arg(Emin,0,'f',5)
+                                 .arg(Emax,0,'f',5);
+ }
+
+
+
+bool fromString(QString str)
+ {
+ QStringList list=str.split(",");
+
+ if(list.size()<4) return false;
+
+ Fmin=list.at(0).toFloat();
+ Fmax=list.at(1).toFloat();
+ Emin=list.at(2).toFloat();
+ Emax=list.at(3).toFloat();
+ return true;
+ }
+
+};
+
 class WLModuleAxis;
 
 class WLAxis : public WLElement
@@ -315,6 +360,8 @@ private:
  qint32 nowPosition;
  qint32 maxPosition;
  qint32 minPosition;
+
+ qint32 errPosition;
 
 statusAxis status;
   modeAxis mode;
@@ -356,12 +403,11 @@ bool m_validLatch3;
 
 typeMotorAxis typeMotor=AXIS_stepMotor;
 
-WLPidData m_pidData;
+WLPidData      m_pidData;
+WLErrorPidData m_errorPidData;
 
 WLMParAxis stepMotorMParPlus;
 WLMParAxis stepMotorMParMinus;
-
-quint16 m_errPidMax=100;
 
 private:
 QMutex mutex;
@@ -395,6 +441,8 @@ enum statusAxis getStatus() {return status;}
  long getLatch2() {return m_latchPos2;}
  long getLatch3() {return m_latchPos3;}
 
+ long getErrPosition() {return errPosition;}
+
  void setError(quint8 err)  {emit changedError(error=err);}
 
  int getTypePulse(){return typePulse;}
@@ -427,9 +475,8 @@ void getData(typeDataAxis type);
 WLMParAxis getStepMotorMParPlus()  {return stepMotorMParPlus;}
 WLMParAxis getStepMotorMParMinus() {return stepMotorMParMinus;}
 
-WLPidData getPidData() {return m_pidData;}
-
-quint16 getErrPidMax() {return m_errPidMax;}
+WLPidData      getPidData() {return m_pidData;}
+WLErrorPidData getErrorPidData() {return m_errorPidData;}
 
 signals:
 
@@ -437,6 +484,7 @@ signals:
  void changedLatch3(qint32);
  void changedError(quint8);
  void changedPosition(qint32);
+ void changedErrPosition(qint32);
  void changedStatus(statusAxis);
  void changedMode(modeAxis);
  void changedFreq(float);
@@ -479,7 +527,7 @@ public:
     bool setEncoder(quint8 _iEncoder);
     bool setPidData(WLPidData _pidData);
     bool setTypeMotor(typeMotorAxis _typeMotor);
-    bool setErrPid(quint16 err);
+    bool setErrorPidData(WLErrorPidData _errPidData);
 
 public:
 //static qint32 calcI32Pos(double pos);

@@ -178,6 +178,11 @@ if(m_Fminutes!=Fminutes) {
     }
 
 m_PamTab->setFminutes(Fminutes);
+
+foreach(WLAxisWidget *AW,axisWidgetList){
+  AW->setFminutes(Fminutes);
+  }
+
 }
 
 ui.sbVfind1->setSuffix(m_unit+"/"+(m_Fminutes? tr("m"):tr("s")));
@@ -375,10 +380,9 @@ emit changedUnit(m_unit);
 
 void WLDriveWidget::updateTabAxis()
 {
-foreach(WLAxisWidget *tw,axisWidgetList)
-{
-ui.tabWidget->removeTab(ui.tabWidget->indexOf(tw));
-}
+foreach(WLAxisWidget *tw,axisWidgetList) {
+ ui.tabWidget->removeTab(ui.tabWidget->indexOf(tw));
+ }
 
 axisWidgetList.clear();
 
@@ -395,6 +399,8 @@ for(uint8_t i=0;i<m_Drive->getAxisList().size();i++)
 WLAxisWidget *AW=new WLAxisWidget(m_Drive->getAxisList().at(i),i!=0,m_Drive->getOffsetAxis(i),this);
 
 AW->setStepSize(dim.value);
+AW->setUnit(m_unit);
+AW->setFminutes(m_Fminutes);
 
 insertTabWidget(1+i,AW,("Axis-")+QString::number(m_Drive->getAxisList().at(i)->getIndex()));
 
