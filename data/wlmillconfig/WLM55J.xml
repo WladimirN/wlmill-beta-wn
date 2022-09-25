@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<WLDevice>
+    <WLM55J UID96="490065000b51393332363639">
+        <Modules>
+            <WLModuleIOPut>
+                <inputs size="17" inv=""/>
+                <outputs size="14" inv="1,2,4"/>
+            </WLModuleIOPut>
+            <WLModuleEncoder size="4">
+                <Encoder index="0" inv="0"/>
+                <Encoder index="1" inv="0"/>
+                <Encoder index="2" inv="0"/>
+                <Encoder index="3" inv="0"/>
+            </WLModuleEncoder>
+            <WLModuleAxis size="4" inEMGStop="0" inSDStop="0" Fmax="0">
+                <Axis index="0" kSTCurve="0" delaySCurve="0" typeMotor="1" typePulse="0" outSDinv="0" inORG="0" inPEL="0" actInPEL="0" inMEL="0" actInMEL="0" inALM="0" actInALM="0" outRALM="0" outENB="0" encoder="255" pid="1.00000,0.00000,0.00000,0.00000,0.00000" errPid="100" stepMotorMParPlus="1.00000,-1.00000,0.00000,1.00000" stepMotorMParMinus="1.00000,-1.00000,0.00000,1.00000"/>
+                <Axis index="1" kSTCurve="0" delaySCurve="0" typeMotor="1" typePulse="0" outSDinv="0" inORG="0" inPEL="0" actInPEL="0" inMEL="0" actInMEL="0" inALM="0" actInALM="0" outRALM="0" outENB="0" encoder="255" pid="1.00000,0.00000,0.00000,0.00000,0.00000" errPid="100" stepMotorMParPlus="1.00000,-1.00000,0.00000,1.00000" stepMotorMParMinus="1.00000,-1.00000,0.00000,1.00000"/>
+                <Axis index="2" kSTCurve="0" delaySCurve="0" typeMotor="1" typePulse="0" outSDinv="0" inORG="0" inPEL="0" actInPEL="0" inMEL="0" actInMEL="0" inALM="0" actInALM="0" outRALM="0" outENB="0" encoder="255" pid="1.00000,0.00000,0.00000,0.00000,0.00000" errPid="100" stepMotorMParPlus="1.00000,-1.00000,0.00000,1.00000" stepMotorMParMinus="1.00000,-1.00000,0.00000,1.00000"/>
+                <Axis index="3" kSTCurve="0" delaySCurve="0" typeMotor="1" typePulse="0" outSDinv="0" inORG="0" inPEL="0" actInPEL="0" inMEL="0" actInMEL="0" inALM="0" actInALM="0" outRALM="0" outENB="0" encoder="255" pid="1.00000,0.00000,0.00000,0.00000,0.00000" errPid="100" stepMotorMParPlus="1.00000,-1.00000,0.00000,1.00000" stepMotorMParMinus="1.00000,-1.00000,0.00000,1.00000"/>
+            </WLModuleAxis>
+            <WLModulePWM>
+                <outputs size="3">
+                    <PWM index="0" Freq="8000" inv="1"/>
+                    <PWM index="1" Freq="2000" inv="0"/>
+                    <PWM index="2" Freq="2000" inv="0"/>
+                </outputs>
+            </WLModulePWM>
+            <WLModuleMPG size="1">
+                <MPG index="0" inAxis="0,0,0,0,0,0,0,0" inX="0,0,0,0" inVmode="0" outENB="0" flag="96" pulses="200" encoder="255"/>
+            </WLModuleMPG>
+            <WLModulePlanner SmoothAngGr="15" KFpause="0.25" SOut="0,0" accSOut="3960" decSOut="-9900" inProbe="0" inPause="0" inStop="0">
+                <spindleData index="0" inValue="200.00000" outValue="0.00000"/>
+                <spindleData index="1" inValue="20000.00000" outValue="1.00000"/>
+            </WLModulePlanner>
+            <WLModuleConnect timeoutConnect_ms="10000" timeHeart_ms="0"/>
+        </Modules>
+    </WLM55J>
+</WLDevice>

@@ -11,7 +11,7 @@
 #include <QToolButton>
 
 #include "wlgprogram.h"
-#include "wlmillmachine.h"
+#include "wlgmachine.h"
 #include "wl3dpoint.h"
 #include "wl6dpoint.h"
 #include "wlopengl.h"

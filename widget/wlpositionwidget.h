@@ -18,7 +18,7 @@
 #include "wllabel.h"
 #include "wl3dpoint.h"
 #include "wleditpoint.h"
-#include "wlmillmachine.h"
+#include "wlgmachine.h"
 #include "wlgprogram.h"
 #include "wlgaxislabel.h"
 #include "wlevscript.h"

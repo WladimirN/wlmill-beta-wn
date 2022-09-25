@@ -85,6 +85,7 @@ HEADERS += \
     widget/wleditpoint.h \
     widget/wlgdrivewidget.h \
     widget/wlcameraview.h \
+    widget/wleditgcode.h \
     src/wl3dpoint.h \
     src/wlcalc.h \
     src/wldrive.h \
@@ -103,17 +104,14 @@ HEADERS += \
     src/wlgtool.h \
     src/wlgpoint.h \
     src/wlmachine.h \
-    src/wleditgcode.h \
     src/wldoublespinbox.h \
     src/wljoysticks.h \
     src/wlheightmap.h \
     src/wlgmachine.h \    
+    src/wlmill.h \
+    src/wlgdrive.h \
     model/wlheightmaptablemodel.h \
-    model/wlgtoolstablemodel.h \
-    wlmill.h \
-    wlgdrive.h \
-    wlmillmachine.h
-
+    model/wlgtoolstablemodel.h
 
 SOURCES += \
     widget/wldevicewidget.cpp \
@@ -142,6 +140,7 @@ SOURCES += \
     widget/wleditpoint.cpp \
     widget/wlpositionwidget.cpp \
     widget/wlgdrivewidget.cpp \
+    widget/wleditgcode.cpp \
     src/wl3dpoint.cpp \
     src/wlcalc.cpp \
     src/wldrive.cpp \
@@ -155,8 +154,7 @@ SOURCES += \
     src/wlmcodesh.cpp \
     src/wlopengl.cpp \
     src/wlpad.cpp \
-    src/wlmachine.cpp \
-    src/wleditgcode.cpp \
+    src/wlmachine.cpp \    
     src/wldoublespinbox.cpp \
     src/wlelementtraj.cpp \
     src/wljoysticks.cpp \
@@ -164,13 +162,11 @@ SOURCES += \
     src/wlgtool.cpp \
     src/wlgpoint.cpp \
     src/wlgmachine.cpp \
+    src/wlmill.cpp \
+    src/wlgdrive.cpp \
     model/wlheightmaptablemodel.cpp \
     model/wlgtoolstablemodel.cpp \
-    main.cpp \    
-    wlmill.cpp \
-    wlmillmachine.cpp \
-    wlgdrive.cpp
-
+    main.cpp
 
 FORMS += \
     widget/wldevicewidget.ui \

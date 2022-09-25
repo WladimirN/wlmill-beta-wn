@@ -60,7 +60,7 @@ if(!FileMJS.open(QIODevice::ReadOnly|QIODevice::Text))  {
     saveF=true;
 
     if(!FileMJS.open(QIODevice::ReadOnly|QIODevice::Text))  {
-       FileMJS.setFileName(":/data/wlmillconfig/mscript.js");
+       FileMJS.setFileName(":/data/wlmillconfig/script/mscript.js");
        FileMJS.open(QIODevice::ReadOnly|QIODevice::Text);
        }
     }
@@ -70,7 +70,7 @@ if(FileMJS.isOpen()){
 
     if(m_CodeMScript.isEmpty()){
       FileMJS.close();
-      FileMJS.setFileName(":/data/wlmillconfig/mscript.js");
+      FileMJS.setFileName(":/data/wlmillconfig/script/mscript.js");
       FileMJS.open(QIODevice::ReadOnly|QIODevice::Text);
       m_CodeMScript=QTextCodec::codecForName("Windows-1251")->toUnicode(FileMJS.readAll());
 
@@ -98,7 +98,7 @@ if(!FileLJS.open(QIODevice::ReadOnly|QIODevice::Text))  {
    saveF=true;
 
    if(!FileLJS.open(QIODevice::ReadOnly|QIODevice::Text))  {
-      FileLJS.setFileName(":/data/wlmillconfig/lscript.js");
+      FileLJS.setFileName(":/data/wlmillconfig/script/lscript.js");
       FileLJS.open(QIODevice::ReadOnly|QIODevice::Text);
     }   
    }
@@ -108,7 +108,7 @@ if(FileLJS.isOpen()){
 
     if(m_CodeLScript.isEmpty()){
       FileLJS.close();
-      FileLJS.setFileName(":/data/wlmillconfig/lscript.js");
+      FileLJS.setFileName(":/data/wlmillconfig/script/lscript.js");
       FileLJS.open(QIODevice::ReadOnly|QIODevice::Text);
 
       m_CodeLScript=QTextCodec::codecForName("Windows-1251")->toUnicode(FileLJS.readAll());
