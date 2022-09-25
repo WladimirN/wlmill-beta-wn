@@ -1096,8 +1096,9 @@ switch(QMessageBox::question(this, tr("Confirmation:"),
 	   QMessageBox::Yes|QMessageBox::No))
 	    {
 		
-        case QMessageBox::Yes:     qDebug()<<"WLMill close";
-                                   saveDataState();
+        case QMessageBox::Yes:     MillMachine->setEnable(false);
+                                   qDebug()<<"WLMill close";
+                                   saveDataState();                                   
 			                       break;
 
         default:                   event->ignore();
