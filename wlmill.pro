@@ -34,7 +34,7 @@ HEADERS +=src/wlfile.h
 }
 
 
-VERSION = 21.06.18.1
+VERSION = 1.1.1
 
 QMAKE_TARGET_COMPANY = WLDEV
 QMAKE_TARGET_PRODUCT = WLMill
@@ -86,7 +86,8 @@ HEADERS += \
     widget/wlgdrivewidget.h \
     widget/wlcameraview.h \
     widget/wleditgcode.h \
-    widget/wlerrorpidwidget.h
+    widget/wlerrorpidwidget.h \
+    widget/wlspindlewidget.h \
     src/wl3dpoint.h \
     src/wlcalc.h \
     src/wldrive.h \
@@ -113,7 +114,6 @@ HEADERS += \
     src/wlgdrive.h \
     model/wlheightmaptablemodel.h \
     model/wlgtoolstablemodel.h
-
 
 SOURCES += \
     widget/wldevicewidget.cpp \
@@ -144,6 +144,7 @@ SOURCES += \
     widget/wlgdrivewidget.cpp \
     widget/wleditgcode.cpp \
     widget/wlerrorpidwidget.cpp \
+    widget/wlspindlewidget.cpp \
     src/wl3dpoint.cpp \
     src/wlcalc.cpp \
     src/wldrive.cpp \
@@ -171,7 +172,6 @@ SOURCES += \
     model/wlgtoolstablemodel.cpp \
     main.cpp
 
-
 FORMS += \
     widget/wldevicewidget.ui \
     widget/wldrivewidget.ui \
@@ -198,14 +198,13 @@ FORMS += \
     widget/wleditpoint.ui \
     widget/wltoolswidget.ui \
     widget/wlgdrivewidget.ui \
-    widget/wlerrorpidwidget.ui
-
+    widget/wlerrorpidwidget.ui \
+    widget/wlspindlewidget.ui
 
 RESOURCES += \
     image.qrc \
     shaders.qrc \
-    config.qrc \
-    qml.qrc
+    config.qrc
 
 win32:RC_ICONS +=wlmill.ico
 

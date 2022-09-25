@@ -1,10 +1,5 @@
 #include "wlmoduleplanner.h"
-#include "wldevice.h"
-
-bool compareSpindleData(const WLSpindleData &v1, const WLSpindleData &v2)
-{
-return v1.inValue < v2.inValue;
-}
+#include "wlmotion.h"
 
 WLModulePlanner::WLModulePlanner(WLDevice *_Device)
     : WLModule(_Device)
@@ -88,14 +83,7 @@ default: ret=&WLIOPut::In0;
 return ret;
 }
 
-void WLModulePlanner::setSpindleDataList(QList<WLSpindleData> dataList)
-{
-clearDataSpindle();
 
-foreach(WLSpindleData sdata,dataList){
- addDataSpindle(sdata);
- }
-}
 
 void WLModulePlanner::clear()
 {
@@ -125,6 +113,34 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setModeRun<<(quint8)m_modeRun;
 
 emit sendCommand(data);
+}
+
+WLSpindle *WLModulePlanner::getSpindle()
+{
+WLModuleSpindle *MSpindle=static_cast<WLModuleSpindle*>(getDevice()->getModule(typeMSpindle));
+
+if(MSpindle){
+ return MSpindle->getSpindle(iSpindle);
+ }
+
+return nullptr;
+}
+
+bool WLModulePlanner::setISpindle(quint8 index)
+{
+iSpindle=index;
+
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setISpindle<<index;
+
+emit sendCommand(data);
+
+return true;
 }
 
 void WLModulePlanner::setInProbe(int index)
@@ -173,26 +189,6 @@ connect(inStop,&WLIOPut::changed,this,[=](int _index){if(inStop->getIndex()==_in
                                                        &&inStop->getCond()>1) emit changedStop(inStop->getNow());});
 
 setInput(PLANNER_inStop,index);
-}
-
-float WLModulePlanner::getDecSpindle() const
-{
-    return m_decSpindle;
-}
-
-float WLModulePlanner::getAccSpindle() const
-{
-    return m_accSpindle;
-}
-
-quint8 WLModulePlanner::getISOut() const
-{
-    return m_iSout;
-}
-
-typeElement WLModulePlanner::getTypeSOut() const
-{
-    return m_typeSOut;
 }
 
 void WLModulePlanner::setSizeBuf(int value)
@@ -246,18 +242,8 @@ switch((typeDataPlanner)type)
                      //emit changedPosition(nowPosition);
                        break;
 
- case dataPlanner_curSpindleInValue: {
-                       data>>m_curSpindleData.inValue;
-                       emit changedSOut(m_curSpindleData.inValue);
-                       }
-                       break;
-
-case dataPlanner_curSpindleOutValue: {
-                       data>>m_curSpindleData.outValue;
-                       }
-                       break;
-default: break;
-}
+ default: break;
+ }
 
 }
 
@@ -309,13 +295,6 @@ setSmoothAng(getSmoothAng());
 setInProbe(getInput(PLANNER_inProbe)->getIndex());
 setInPause(getInput(PLANNER_inPause)->getIndex());
 
-setElementSpindle(getTypeSOut(),getISOut());
-
-setAccSpindle(m_accSpindle);
-setDecSpindle(m_decSpindle);
-
-setSpindleDataList(getSpindleDataList());
-
 setIAxisSlave(m_indexsAxis.data(),m_indexsAxis.size());
 
 setActSafeProbe(getActSafeProbe());
@@ -358,124 +337,6 @@ Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
 Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_setHPause<<enable<<m_hPause;
-
-emit sendCommand(data);
-
-return true;
-}
-
-bool WLModulePlanner::setElementSpindle(typeElement telement,quint8 i)
-{
-if(telement==typeElement::typeEOutPWM
- ||telement==typeElement::typeEAOutput)
-{
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
-
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_toSpindle<<(quint8)comSpindle_setOutElement<<(quint8)telement<<i;
-
-emit sendCommand(data);
-
-m_typeSOut=telement;
-m_iSout=i;
-
-return true;
-}
-
-return false;
-}
-
-
-bool WLModulePlanner::setAccSpindle(float acc)
-{
-if(acc<0) return false;
-
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
-
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_toSpindle<<(quint8)comSpindle_setAcc<<acc;
-
-emit sendCommand(data);
-
-m_accSpindle=acc;
-
-return true;
-}
-
-bool WLModulePlanner::setDecSpindle(float dec)
-{
-if(dec>0) return false;
-
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
-
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_toSpindle<<(quint8)comSpindle_setDec<<dec;
-
-emit sendCommand(data);
-
-m_decSpindle=dec;
-
-return true;
-}
-
-bool WLModulePlanner::resetElementSpindle()
-{
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
-
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_toSpindle<<(quint8)comSpindle_resetOutElement;
-
-emit sendCommand(data);
-
-m_typeSOut=typeEEmpty;
-m_iSout=0;
-
-return true;
-}
-
-bool WLModulePlanner::clearDataSpindle()
-{
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
-
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_toSpindle<<(quint8)comSpindle_clearData;
-
-spindleDataList.clear();
-
-emit sendCommand(data);
-
-return true;
-}
-
-bool WLModulePlanner::addDataSpindle(WLSpindleData sdata)
-{
-QByteArray data;
-QDataStream Stream(&data,QIODevice::WriteOnly);
-
-Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-Stream.setByteOrder(QDataStream::LittleEndian);
-
-Stream<<(quint8)typeMPlanner<<(quint8)comPlanner_toSpindle<<(quint8)comSpindle_addData
-       <<sdata.inValue<<sdata.outValue;
-
-spindleDataList+=sdata;
-
-qSort(spindleDataList.begin(), spindleDataList.end(), compareSpindleData);
 
 emit sendCommand(data);
 
@@ -808,34 +669,14 @@ void WLModulePlanner::writeXMLData(QXmlStreamWriter &stream)
 {
 stream.writeAttribute("SmoothAngGr",QString::number(getSmoothAng()));
 stream.writeAttribute("KFpause",QString::number(getKFpause()));
-stream.writeAttribute("SOut",QString::number(getTypeSOut())
-                        +","+QString::number(getISOut()));
-
-stream.writeAttribute("accSOut",QString::number(getAccSpindle()));
-stream.writeAttribute("decSOut",QString::number(getDecSpindle()));
 
 stream.writeAttribute("inProbe",QString::number(getInput(PLANNER_inProbe)->getIndex()));
 stream.writeAttribute("inPause",QString::number(getInput(PLANNER_inPause)->getIndex()));
 stream.writeAttribute("inStop",QString::number(getInput(PLANNER_inStop)->getIndex()));
-
-quint8 index=0;
-
-foreach(WLSpindleData sdata,getSpindleDataList())
- {
- stream.writeStartElement("spindleData");
-
- stream.writeAttribute("index",QString::number(index++));
- stream.writeAttribute("inValue",QString::number(sdata.inValue,'f',5));
- stream.writeAttribute("outValue",QString::number(sdata.outValue,'f',5));
-
- stream.writeEndElement();
- }
 }
 
 void WLModulePlanner::readXMLData(QXmlStreamReader &stream)
 {
-clearDataSpindle();
-
 while(!stream.atEnd())
 {
 if(!stream.attributes().value("SmoothAngGr").isEmpty()) 
@@ -853,22 +694,39 @@ if(!stream.attributes().value("inPause").isEmpty())
 if(!stream.attributes().value("inStop").isEmpty())
     setInStop( stream.attributes().value("inStop").toString().toInt());
 
+if(!stream.attributes().value("iSpindle").isEmpty())
+    setISpindle(stream.attributes().value("iSpindle").toString().toInt());
+  else
+    setISpindle(0);
+
+///old style 08/09/2022
+if(!getDevice()->getModule(WLDevice::typeMSpindle))
+   {
+   getDevice()->createModule(WLDevice::typeMSpindle);
+   }
+
 if(!stream.attributes().value("SOut").isEmpty())
    {
    QStringList list=stream.attributes().value("SOut").toString().split(",");
 
    if(list.size()==2)
      {
-     setElementSpindle(static_cast<typeElement>(list.at(0).toUShort())
-                     ,(quint8)list.at(1).toUShort());
+     getSpindle()->setElementSOut(static_cast<typeElement>(list.at(0).toUShort())
+                                                  ,(quint8)list.at(1).toUShort());
      }
    }
 
 if(!stream.attributes().value("accSOut").isEmpty())
-     setAccSpindle(stream.attributes().value("accSOut").toFloat());
+     getSpindle()->setAcc(stream.attributes().value("accSOut").toFloat());
 
 if(!stream.attributes().value("decSOut").isEmpty())
-     setDecSpindle(stream.attributes().value("decSOut").toFloat());
+     getSpindle()->setDec(stream.attributes().value("decSOut").toFloat());
+
+if(!stream.attributes().value("fastChangeSOut").isEmpty())
+     getSpindle()->setFastSOut(stream.attributes().value("fastChangeSOut").toInt());
+
+if(!stream.attributes().value("outENBSpindle").isEmpty())
+    getSpindle()->setOutENB(stream.attributes().value("outENBSpindle").toString().toInt());
 
 stream.readNextStartElement();
 
@@ -882,8 +740,10 @@ if(stream.name()=="spindleData")
        sdata.inValue=stream.attributes().value("inValue").toString().toFloat();
        sdata.outValue=stream.attributes().value("outValue").toString().toFloat();
 
-       addDataSpindle(sdata);
+       getSpindle()->addDataSpindle(sdata);
        }
+
+//------------
 }
 
 }
@@ -920,7 +780,7 @@ switch(ui1)
                          Stream>>f1;//k element complete
                          Stream>>f2;//Star
 
-                         //emit changedSOut(f2);
+                         emit changedSOut(f2);
 
                          qDebug()<<"WLModulePlanner sendPlanner_data (cur/new) empty="<<((Flags.m_Data&PLF_empty)!=0)<<"/"<<((ui4&PLF_empty)!=0)
                                                   <<" lastIndex(256)="<<m_indexRingElementBuf<<"/"<<ui2

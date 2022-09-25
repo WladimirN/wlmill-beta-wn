@@ -127,7 +127,7 @@ private:
 
     QStringList preRunProgramList;
 
-    enum statesSpindle{Stop,CW,CCW};
+    enum statesSpindle{Stop=0,FW=1,RE=-1};
 
     statesSpindle stateSpindle=Stop;
     statesSpindle pauseStateSpindle=Stop;
@@ -152,9 +152,14 @@ QList<WLElementTraj>  showMillTraj;
  QMutex MutexSaveConfig;
  QMutex MutexScript;
 
-Q_INVOKABLE bool isSpindleStop() {return stateSpindle==Stop;}
-Q_INVOKABLE bool isSpindleCW()   {return stateSpindle==CW;}
-Q_INVOKABLE bool isSpindleCCW()  {return stateSpindle==CCW;}
+Q_INVOKABLE bool   isSpindleStop(int index=0)   {return stateSpindle==Stop;}
+Q_INVOKABLE bool   isSpindleCW(int index=0)     {return stateSpindle==FW;}
+Q_INVOKABLE bool   isSpindleCCW(int index=0)    {return stateSpindle==RE;}
+
+Q_INVOKABLE int    getStateSpindle(int index=0) {return stateSpindle;}
+Q_INVOKABLE void   setStateSpindle(int state,int index=0);
+
+Q_INVOKABLE double getSSpindle(int index=0) {return getCurSOut();}
 
 Q_INVOKABLE bool isIngnoreInPause() {return motDevice->getModulePlanner()->isIgnoreInPause();}
 Q_INVOKABLE bool isIngnoreInStop()  {return motDevice->getModulePlanner()->isIgnoreInStop();}
@@ -228,7 +233,6 @@ QList <SCorrectSOut> m_correctSList;
     float m_maxSOut=100;
 
     float tarSOut=0;
-    float curSOut=0;
 
     float m_smoothAng=10;
     long m_iElementProgram=0;
@@ -404,10 +408,10 @@ public:
 
   bool isRunMScript()   {return   m_MScript->isBusy();}
 
-  float getCurSpeed();
-  float getCurSOut() {return curSOut;}
-
 public:
+
+Q_INVOKABLE float getCurFxyz();
+Q_INVOKABLE float getCurSOut();
 
 Q_INVOKABLE bool getInProbe()      {return motDevice->getModulePlanner()->getInput(PLANNER_inProbe)->getNow();}
 Q_INVOKABLE bool getInSDStop()     {return motDevice->getModuleAxis()->getInput(MAXIS_inSDStop)->getNow();}
@@ -447,10 +451,7 @@ Q_INVOKABLE double getProbeSC(QString name) {if(getMotionDevice()->getModulePlan
 
 
 Q_INVOKABLE  void setSOut(float S);
-Q_INVOKABLE  void enableSOut(bool enable) {
-                                          setSOut(m_GCode.getValue('S'));
-                                          motDevice->getModulePlanner()->setEnableSOut(enable);
-                                          } 
+Q_INVOKABLE  void enableSOut(int state) {setStateSpindle(state);}
 
 
    WLGPoint getProbeGPoint();
@@ -519,7 +520,7 @@ private slots:
 
    void updateInput();
 
-   void setDataSOut(float val);
+   void setTarSOut(float val);
 
  public slots: 
 
@@ -619,8 +620,6 @@ signals:
 
     void changedEMG(bool);
     void changedRDY(bool);
-
-    void changedSValue(int);   
 
     void changedBusy(bool);
 

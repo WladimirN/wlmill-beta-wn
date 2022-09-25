@@ -1,7 +1,10 @@
 #include "wleditiowidget.h"
+#include "ui_wleditiowidget.h"
+
 #include <QMenu>
 #include <QContextMenuEvent>
-#include "ui_wleditiowidget.h"
+
+#include "wlaxiswidget.h"
 
 WLEditIOWidget::WLEditIOWidget(QWidget *parent) :
     QWidget(parent),
@@ -45,7 +48,21 @@ m_input=_input;
 
 switch(m_Module->getTypeModule())
 {
- case typeMIOPut: {
+ case WLModule::typeMAxis:{
+                  WLModuleAxis *ModuleAxis = static_cast<WLModuleAxis*>(m_Module);
+
+                  m_input=false;
+
+                  ui->spinBox->setRange(0, ModuleAxis->getSizeAxis()-1);
+
+                  ui->spinBox->setVisible(true);
+                  ui->label->setVisible(true);
+
+                  setLabel("axis");
+                  break;
+                  }
+
+ case WLModule::typeMIOPut: {
                   WLModuleIOPut *ModuleIOPut = static_cast<WLModuleIOPut*>(m_Module);
 
                   ui->spinBox->setRange(0,(m_input? ModuleIOPut->getSizeInputs():ModuleIOPut->getSizeOutputs())-1);
@@ -56,10 +73,10 @@ switch(m_Module->getTypeModule())
                   connect(ModuleIOPut,&WLModuleIOPut::changedInput,this,&WLEditIOWidget::setLatchInput);
 
                   setLabel(m_input ? ("input"):("output"));
-                  break;;
+                  break;
                   }
 
-case typeMPWM:    {
+case WLModule::typeMPWM:    {
                   WLModulePWM *ModulePWM = static_cast<WLModulePWM*>(m_Module);
 
                   ui->spinBox->setRange(0,(ModulePWM->getSizeOutPWM()-1));
@@ -72,7 +89,7 @@ case typeMPWM:    {
                  break;
                  }
 
-case typeMAIOPut: {
+case WLModule::typeMAIOPut: {
                   WLModuleAIOPut *ModuleAIOPut = static_cast<WLModuleAIOPut*>(m_Module);
 
                   ui->spinBox->setRange(0,(m_input? ModuleAIOPut->getSizeInputs():ModuleAIOPut->getSizeOutputs())-1);
@@ -84,7 +101,7 @@ case typeMAIOPut: {
                   break;
                   }
 
-case typeMEncoder:{
+case WLModule::typeMEncoder:{
                   WLModuleEncoder *ModuleEncoder = static_cast<WLModuleEncoder*>(m_Module);
 
                   ui->spinBox->setRange(-1,ModuleEncoder->getSizeEncoder()-1);
@@ -120,7 +137,7 @@ return ui->spinBox->value();
 
 WLIOPut *WLEditIOWidget::getIOPut()
 {
-if(m_Module->getTypeModule()==typeMIOPut)
+if(m_Module->getTypeModule()==WLModule::typeMIOPut)
     {
         WLModuleIOPut *ModuleIOPut = static_cast<WLModuleIOPut*>(m_Module);
         return  m_input ? ModuleIOPut->getInput(value()): ModuleIOPut->getOutput(value());
@@ -131,7 +148,7 @@ if(m_Module->getTypeModule()==typeMIOPut)
 
 WLEncoder *WLEditIOWidget::getEncoder()
 {
-    if(m_Module->getTypeModule()==typeMEncoder)
+    if(m_Module->getTypeModule()==WLModule::typeMEncoder)
     {
         WLModuleEncoder *ModuleEncoder = static_cast<WLModuleEncoder*>(m_Module);
         return  m_input ? ModuleEncoder->getEncoder(value()): nullptr;
@@ -143,7 +160,7 @@ WLEncoder *WLEditIOWidget::getEncoder()
 
 WLPWM *WLEditIOWidget::getPWM()
 {
-    if(m_Module->getTypeModule()==typeMPWM)
+    if(m_Module->getTypeModule()==WLModule::typeMPWM)
     {
         WLModulePWM *ModulePWM = static_cast<WLModulePWM*>(m_Module);
         return  m_input ? nullptr : ModulePWM->getOutPWM(value());
@@ -152,9 +169,20 @@ WLPWM *WLEditIOWidget::getPWM()
         return nullptr;
 }
 
+WLAxis *WLEditIOWidget::getAxis()
+{
+    if(m_Module->getTypeModule()==WLModule::typeMAxis)
+    {
+        WLModuleAxis *ModuleAxis = static_cast<WLModuleAxis*>(m_Module);
+        return  ModuleAxis->getAxis(value());
+    }
+    else
+        return nullptr;
+}
+
 bool WLEditIOWidget::isChecked()
 {
-return ui->checkBox->isChecked();
+return ui->checkBox->isChecked()&&isEnable();
 }
 
 bool WLEditIOWidget::isEnable()
@@ -171,12 +199,12 @@ void WLEditIOWidget::update()
 {
     if(!m_Module) return;
 
-    if(m_Module->getTypeModule()==typeMIOPut)
+    if(m_Module->getTypeModule()==WLModule::typeMIOPut)
     {
         if(m_enLatchInput)
-            ui->spinBox->setStyleSheet("background-color: rgb(20, 255, 205)");
+            ui->spinBox->setStyleSheet("background-color: rgb(20 ,255,205)");
         else  if (getIOPut()->getNow())
-            ui->spinBox->setStyleSheet("background-color: rgb(255, 120, 120)");
+            ui->spinBox->setStyleSheet("background-color: rgb(255,120,120)");
         else
             ui->spinBox->setStyleSheet("background-color: rgb(255,250,250)");
     }
@@ -186,12 +214,23 @@ void WLEditIOWidget::togInvers()
 {
  switch(m_Module->getTypeModule())
  {
- case typeMIOPut:   getIOPut()->togInv();  break;
- case typeMPWM:     getPWM()->togInv();    break;
- case typeMEncoder: getEncoder()->togInv();break;
+ case WLModule::typeMIOPut:   getIOPut()->togInv();  break;
+ case WLModule::typeMPWM:     getPWM()->togInv();    break;
+ case WLModule::typeMEncoder: getEncoder()->togInv();break;
 
  default: break;
  }
+}
+
+void WLEditIOWidget::onActEditAxis()
+{
+WLAxisWidget AW(getAxis(),0,0,this);
+
+AW.setShowButtonDialog(true);
+AW.setEditSpindle(true);
+AW.setModal(true);
+AW.show();
+AW.exec();
 }
 
 
@@ -264,7 +303,14 @@ if(!m_Module
 
 switch(m_Module->getTypeModule())
 {
-case typeMIOPut:   {
+case WLModule::typeMAxis:
+                   {
+                   QAction *actEdit=menu.addAction(tr("edit"),this,SLOT(onActEditAxis()));
+                   }
+                  break;
+
+case WLModule::typeMIOPut:
+                   {
                    QAction *actTog=menu.addAction(tr("invers"),this,SLOT(onActTogInvers()));
 
                     actTog->setCheckable(true);
@@ -280,7 +326,8 @@ case typeMIOPut:   {
                     }
                   break;
 
-case typeMEncoder: if(m_input)
+case WLModule::typeMEncoder:
+                     if(m_input)
                      {
                      menu.addAction(QString::number(getEncoder()->count()));
                      menu.addAction(">>0",this,SLOT(onActResetEncoder()));
@@ -291,7 +338,8 @@ case typeMEncoder: if(m_input)
                      }
                    break;
 
-case typeMPWM:    {
+case WLModule::typeMPWM:
+                  {
                   QAction *actTog=menu.addAction(tr("invers"),this,SLOT(onActTogInvers()));
 
                   actTog->setCheckable(true);

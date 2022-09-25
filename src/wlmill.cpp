@@ -28,6 +28,7 @@
 #include "wlgmodelwidget.h"
 #include "wlconsolemodbus.h"
 #include "wlconsolescript.h"
+#include "wlspindlewidget.h"
 
 #include <QJoysticks.h>
 
@@ -741,9 +742,12 @@ if(MillMachine->getDrive(nameDrive))
 void WLMill::onEditWLMill()
 {
 WLEditMillWidget EditMill(MillMachine);
+WLSpindleWidget SW(MillMachine->getMotionDevice()->getModuleSpindle()->getSpindle(0));
 WLEditGCode EditGCode(MillMachine->getGCode());
 
+EditMill.addTabWidget(&SW,"Spindle");
 EditMill.addTabWidget(&EditGCode,"GCode");
+
 EditMill.show();
 
 if(EditMill.exec())
@@ -753,7 +757,7 @@ if(EditMill.exec())
     QMessageBox::information(this,tr("Attention"),tr("Please restart WLMill"));
     close();
     }
-   }
+}
 }
 
 

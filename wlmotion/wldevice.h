@@ -54,7 +54,12 @@
 #define ETH_MAXTIMEOUTACK 256
 #define ETH_MAXETHPACK 256-1
 
-#define WLM_PROTOCOL 0x0003
+#define WLM_PROTOCOL 0x0004 //fixSpindle
+/*hist
+0x0001 - start 2020
+0x0002 - add inPause & move inProbe
+0x0003 - add Close Loop
+*/
 
 const QString errorDevice("0,no error\
 ,20,no module");
@@ -178,7 +183,7 @@ void    setVersionProtocol(quint16 _ver);
 
 void clearBuf();
 
-protected:
+public:
 virtual WLModule *createModule(QString name);
 virtual WLModule *createModule(typeModule getTypeModule);
 

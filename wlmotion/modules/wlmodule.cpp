@@ -1,3 +1,4 @@
+#include <QMetaEnum>
 #include "wlmodule.h"
 #include "wldevice.h"
 
@@ -14,6 +15,11 @@ m_Device=_Device;
 WLModule::~WLModule()
 {
 
+}
+
+QString WLModule::getTypeModuleStr()
+{
+return QString::fromUtf8(QMetaEnum::fromType<WLModule::typeModule>().valueToKey(getTypeModule()));
 }
 
 QString WLModule::getErrorStr(QString str,int ierr)

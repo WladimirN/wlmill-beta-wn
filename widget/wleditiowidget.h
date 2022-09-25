@@ -8,6 +8,7 @@
 #include "wlmodulepwm.h"
 #include "wlmoduleencoder.h"
 #include "wlmoduleaioput.h"
+#include "wlmoduleaxis.h"
 #include "wlenternum.h"
 
 namespace Ui {
@@ -32,6 +33,7 @@ public:
     WLIOPut   *getIOPut();
     WLEncoder *getEncoder();
     WLPWM     *getPWM();
+    WLAxis    *getAxis();
 
     bool isChecked();
     bool isEnable();
@@ -51,6 +53,7 @@ private slots:
 
    void togInvers();
 
+   void onActEditAxis();
    void onActTogInvers();
    void onActLatchInput();
    void onActResetEncoder();

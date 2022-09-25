@@ -1,3 +1,4 @@
+#include <QMetaEnum>
 #include "wlmotion.h"
 
 WLMotion::WLMotion()
@@ -27,6 +28,14 @@ if(name=="WLModulePlanner") return createModule(typeMPlanner);
 if(name=="WLModuleAxis")    return createModule(typeMAxis);
 if(name=="WLModulePWM")     return createModule(typeMPWM);
 if(name=="WLModuleUART")    return createModule(typeMUART);
+if(name=="WLModuleSpindle") return createModule(typeMSpindle);
+
+bool ok;
+
+WLDevice::typeModule type=static_cast<WLDevice::typeModule>(QMetaEnum::fromType<WLDevice::typeModule>().keyToValue(name.toUtf8(),&ok));
+
+if(ok)
+  return createModule(type);
 }
 
 return Module;
@@ -49,7 +58,7 @@ case typeMDCan:   Module=new WLModuleDCan(this);
 case typeMIOPut:  Module=new WLModuleIOPut(this);
 	              break;
 
-case typeMAIOPut:  Module=new WLModuleAIOPut(this);
+case typeMAIOPut: Module=new WLModuleAIOPut(this);
                   break;
 
 case typeMMPG:    Module=new WLModuleMPG(this);
@@ -58,20 +67,26 @@ case typeMMPG:    Module=new WLModuleMPG(this);
 case typeMEncoder:Module=new WLModuleEncoder(this);
 	              break;
 
-case typeMPlanner:if(getModuleIOPut()){
-                    Module=new WLModulePlanner(this);
-                    }
+case typeMPlanner:if(createModule(WLDevice::typeMIOPut)
+                   &&createModule(WLDevice::typeMSpindle)){
+                      Module=new WLModulePlanner(this);
+                      }
 	              break;
 
-case typeMAxis:   if(getModuleIOPut()){
-                    Module=new WLModuleAxis((this));
+case typeMSpindle:if(createModule(WLDevice::typeMIOPut)){
+                      Module=new WLModuleSpindle(this);
+                      }
+                  break;
+
+case typeMAxis:   if(createModule(WLDevice::typeMIOPut)){
+                    Module=new WLModuleAxis((this));                    
                     }
 	              break;
 
 case typeMPWM:    Module=new WLModulePWM(this);
 	              break;
 
-case typeMUART:    Module=new WLModuleUART(this);
+case typeMUART:   Module=new WLModuleUART(this);
                   break;
 
 default: break;

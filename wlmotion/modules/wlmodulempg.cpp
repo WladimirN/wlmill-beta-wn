@@ -74,7 +74,7 @@ Stream>>ui1;
 
 switch(ui1)
 {
-case sendMPG_data:    Stream>>index;//index8
+case sendMMPG_data:   Stream>>index;//index8
                       Stream>>ui1;  //Flag8
                       Stream>>ui2;  //indexA
                       Stream>>ui3;  //Vmode(0x80) indexX(0x7F)
@@ -135,16 +135,12 @@ for(int i=0;i<getSize();i++)
 void WLModuleMPG::readXMLData(QXmlStreamReader &stream)
 {
 quint8 index;
-int size=4;
+int size=1;
 
 if(!stream.attributes().value("size").isEmpty()) size=stream.attributes().value("size").toString().toInt();    
 
 Init(size);
-/*
-if(!stream.attributes().value("inEMGStop").isEmpty()) setInEMGStop(stream.attributes().value("inEMGStop").toString().toInt());    
-if(!stream.attributes().value("inSDStop").isEmpty())  setInSDStop(stream.attributes().value("inSDStop").toString().toInt());
-if(!stream.attributes().value("inProbe").isEmpty())   setInProbe( stream.attributes().value("inProbe").toString().toInt());	
-*/
+
 while(!stream.atEnd())
 {
 stream.readNextStartElement();

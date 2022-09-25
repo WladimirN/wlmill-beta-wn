@@ -18,25 +18,6 @@
 #define idBuff  102
 #define idWhell 103
 
-enum typeModule {typeDevice=0
-                ,typeMAxis//1
-                ,typeMMPG//2
-                ,typeMPWM//3
-                ,typeMFreq//4
-                ,typeMIOPut	 //5
-                ,typeMPlanner//6
-                ,typeMCut//7
-                ,typeMEncoder//8
-                ,typeMConnect//9
-                ,typeMFW//10
-                ,typeMDCan//11
-                ,typeMCKey//12
-                ,typeMAIOPut//13
-                ,typeMUART//14
-                ,typeMDModbus//15
-                ,typeHeart=255
-                };
-
 
 #define comModule_getProp 255 //call property module
 #define comModule_reset   254 //reset module
@@ -61,11 +42,11 @@ enum typeInterface{typeInterfaceNo
 
 struct WLRemElement
 {
-typeElement typeE;
+WLElement::typeElement typeE;
 quint16 indexLocal;
 quint16 indexRemote;
 
-WLRemElement() {indexLocal=indexRemote=0; typeE=typeEEmpty;}
+WLRemElement() {indexLocal=indexRemote=0; typeE=WLElement::typeEEmpty;}
 
 void writeXMLData(QXmlStreamWriter &stream)
 {
@@ -88,7 +69,7 @@ QStringList Names=namesTypeElement.split(",");
 for(int i=0;i<Names.size();i++)
     if(stream.name()==Names[i])
      {
-     typeE=static_cast<typeElement>(i);
+     typeE=static_cast<WLElement::typeElement>(i);
      break;
      };
 
@@ -104,6 +85,28 @@ class WLDevice;
 class WLModule : public WLElement
 {
  Q_OBJECT
+public:
+    enum typeModule {typeDevice=0
+                    ,typeMAxis//1
+                    ,typeMMPG//2
+                    ,typeMPWM//3
+                    ,typeMFreq//4
+                    ,typeMIOPut	 //5
+                    ,typeMPlanner//6
+                    ,typeMCut//7
+                    ,typeMEncoder//8
+                    ,typeMConnect//9
+                    ,typeMFW//10
+                    ,typeMDCan//11
+                    ,typeMCKey//12
+                    ,typeMAIOPut//13
+                    ,typeMUART//14
+                    ,typeMDModbus//15
+                    ,typeMSpindle//16
+                    ,typeHeart=255
+                    };
+
+ Q_ENUM(typeModule)
 
 public:
 
@@ -111,6 +114,7 @@ public:
   ~WLModule();
 
 typeModule getTypeModule() {return m_type;}
+   QString getTypeModuleStr();
       void setTypeModule(typeModule _type) {m_type=_type;}
       bool isReady() {return m_ready;}
 

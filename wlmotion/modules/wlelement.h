@@ -31,20 +31,6 @@ const QString namesTypeElement("typeEEmpty"
                                ",typeEDModbus");
 
 
-enum typeElement{typeEEmpty=0
-                ,typeEInput
-                ,typeEOutput
-                ,typeEOutPWM
-                ,typeEEncoder
-                ,typeEAInput
-                ,typeEAxis
-                ,typeEDCan
-                ,typeEFreq
-                ,typeEMPG
-                ,typeEAOutput
-                ,typeEDModbus
-                };
-
 class WLModule;
 
 class WLElement : public QObject
@@ -52,11 +38,30 @@ class WLElement : public QObject
  Q_OBJECT
 
 public:
+    enum typeElement{typeEEmpty=0
+                    ,typeEInput
+                    ,typeEOutput
+                    ,typeEOutPWM
+                    ,typeEEncoder
+                    ,typeEAInput
+                    ,typeEAxis
+                    ,typeEDCan
+                    ,typeEFreq
+                    ,typeEMPG
+                    ,typeEAOutput
+                    ,typeEDModbus
+                    ,typeESpindle
+                    };
+
+Q_ENUM(typeElement)
+
+public:
 
     WLElement(WLModule *_Module);
    ~WLElement();
 
 typeElement getTypeElement() {return m_typeE;}
+    QString getTypeElementStr();
        void setTypeElement(typeElement _type) {m_typeE=_type;}
 
 quint8 getIndex() {return m_index;}

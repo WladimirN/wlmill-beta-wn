@@ -90,7 +90,7 @@ void  WLAxis::setInALM(int index)
 inALM->removeComment("inALM"+QString::number(getIndex()));
 disconnect(inALM,&WLIOPut::changed,this,&WLAxis::changedInALM);
 
-WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(typeMIOPut));
+WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(WLDevice::typeMIOPut));
 
 if(index>=ModuleIOPut->getSizeInputs()) index=0;
 
@@ -106,7 +106,7 @@ void  WLAxis::setInORG(int index)
 {
 inORG->removeComment("inORG"+QString::number(getIndex()));
 
-WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(typeMIOPut));
+WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(WLDevice::typeMIOPut));
 
 if(index>=ModuleIOPut->getSizeInputs()) index=0;
 
@@ -121,7 +121,7 @@ void  WLAxis::setInPEL(int index)
 {
 inPEL->removeComment("inPEL"+QString::number(getIndex()));
 
-WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(typeMIOPut));
+WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(WLDevice::typeMIOPut));
 
 if(index>=ModuleIOPut->getSizeInputs()) index=0;
 
@@ -135,7 +135,7 @@ void  WLAxis::setInMEL(int index)
 {
 inMEL->removeComment("inMEL"+QString::number(getIndex()));
 
-WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(typeMIOPut));
+WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(WLDevice::typeMIOPut));
 
 if(index>=ModuleIOPut->getSizeInputs()) index=0;
 
@@ -150,7 +150,7 @@ void  WLAxis::setOutRALM(int index)
 {
 outRALM->removeComment("outRALM"+QString::number(getIndex()));
 
-WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(typeMIOPut));
+WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(WLDevice::typeMIOPut));
 
 if(index>=ModuleIOPut->getSizeOutputs()) index=0;
 
@@ -163,7 +163,7 @@ void  WLAxis::setOutENB(int index)
 {
 outENB->removeComment("outENB"+QString::number(getIndex()));
 
-WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(typeMIOPut));
+WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(getModule()->getDevice()->getModule(WLDevice::typeMIOPut));
 
 if(index>=ModuleIOPut->getSizeOutputs()) index=0;
 

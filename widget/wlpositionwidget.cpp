@@ -275,9 +275,6 @@ pbWL->setPopupMode(QToolButton::InstantPopup);
 
 QMenu *menuWL = new QMenu();
 
-QAction *act=menuWL->addAction((tr("Show errPos")),[=](){m_showErrorPos=!m_showErrorPos;});
-act->setCheckable(true);
-
 QMenu *menuProgram = new QMenu(tr("Program"));
 
 menuProgram->addAction((tr("Start")),this,[=](){MillMachine->runGProgram();});
@@ -362,6 +359,9 @@ if(act->text()=="inStop")
 menuWL->addMenu(ignoreInput);
 
 menuWL->addAction((tr("Reset task")+"(ESC)"),this,[=](){MillMachine->reset();});
+
+QAction *act=menuWL->addAction((tr("Show real Pos.")),[=](){m_showErrorPos=!m_showErrorPos;});
+act->setCheckable(true);
 
 pbWL->setMenu(menuWL);
 
@@ -1058,7 +1058,7 @@ if(press)
 
 void WLPositionWidget::updateFSLabel()
 {
-labelF->setData(MillMachine->getCurSpeed()*60);
+labelF->setData(MillMachine->getCurFxyz()*60);
 labelS->setData(MillMachine->getCurSOut());
 }
 

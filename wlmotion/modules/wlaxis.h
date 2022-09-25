@@ -170,8 +170,6 @@ enum  statusAxis{AXIS_stop,AXIS_acc,AXIS_fconst,AXIS_dec,AXIS_wait};
 enum   stateAxis{AXIS_standby,AXIS_pos,AXIS_vel} ;
 enum    modeAxis{AXIS_alone,AXIS_slave,AXIS_sub,AXIS_track};
 
-enum   typeMotorAxis{AXIS_noMotor,AXIS_stepMotor,AXIS_encoderStepMotor,AXIS_errEncoderStepMotor};
-
 enum   typeMParAxis{AXIS_MParAll
                    ,AXIS_MParPlus
                    ,AXIS_MParMinus
@@ -352,9 +350,15 @@ class WLAxis : public WLElement
 {
     Q_OBJECT
 
+public:
+
+enum typeMotorAxis{AXIS_noMotor,AXIS_stepMotor,AXIS_encoderStepMotor,AXIS_spindleStepMotor,AXIS_errEncoderStepMotor};
+
+Q_ENUM(typeMotorAxis)
+
 public:	
- WLAxis(WLModuleAxis *_ModuleAxis);
-~WLAxis();
+ explicit WLAxis(WLModuleAxis *_ModuleAxis);
+         ~WLAxis();
 
 private:
  qint32 nowPosition;
@@ -540,7 +544,5 @@ public:
 virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual void  readXMLData(QXmlStreamReader &stream);
 };
-
-
 
 #endif // WLAXIS_H

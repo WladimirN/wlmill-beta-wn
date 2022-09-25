@@ -12,6 +12,7 @@
 #include "wlmodule.h"
 #include "wlaxis.h"
 #include "wlmoduleioput.h"
+#include "wlmodulespindle.h"
 
 //Spindle
 #define comSpindle_setEnable   1 //
@@ -21,6 +22,9 @@
 #define comSpindle_resetOutElement  5 //
 #define comSpindle_setAcc  6 //
 #define comSpindle_setDec  7 //
+#define comSpindle_setOutput 8 //
+#define comSpindle_setFastChange 9 //
+#define comSpindle_setInput 10 //
 
 //Planner
 #define comPlanner_addCirc       2 //
@@ -36,7 +40,6 @@
 #define comPlanner_setMaxNView     12
 #define comPlanner_clear           13
 #define comPlanner_toSpindle        14//to spindle command
-//#define comPlanner_setSOutFreqOut  14
 #define comPlanner_setKSOut        15 
 #define comPlanner_addULine        16
 #define comPlanner_setISlaveAxis   17
@@ -51,6 +54,7 @@
 
 #define comPlanner_setIgnoreInput 25 //set ignore input
 #define comPlanner_addDelay   26 //add Delay_ms element
+#define comPlanner_setISpindle 27 //set Spindle
 
 #define comPlanner_getDataPlanner    101
 
@@ -93,11 +97,14 @@ enum typeSignalBuf{_sigChgEmptyBuf_ui8
 #define errorLine_df     5
 #define errorLine_count  6
 
-#define PLF_enable    (1<<0)
-#define PLF_empty     (1<<2)
-#define PLF_moving    (1<<3)
-#define PLF_chgdata   (1<<4)
-#define PLF_usehpause (1<<5)
+#define PLF_enable     (1<<0)
+#define PLF_safeprobe  (1<<1)
+#define PLF_empty      (1<<2)
+#define PLF_moving     (1<<3)
+#define PLF_chgdata    (1<<4)
+#define PLF_usehpause  (1<<5)
+
+#define PLF_enableSOut (1<<7)
 
 const QString errorPlanner("0,no error\
 ,1,emg stop\
@@ -135,12 +142,7 @@ enum typeInputPlanner{PLANNER_inProbe
                      ,PLANNER_inStop};
 
 
-typedef struct
-{
-float  inValue=0;
-float outValue=0;
 
-}WLSpindleData;
 
 
 class WLModulePlanner : public WLModule
@@ -148,6 +150,8 @@ class WLModulePlanner : public WLModule
 	Q_OBJECT
 
 public:
+    enum typeInputSpindle{SPINDLE_inEMGStop};
+    enum typeOutputSpindle{SPINDLE_outENB};
 
 public:
     WLModulePlanner(WLDevice *_Device);
@@ -177,14 +181,9 @@ float m_decSpindle=0;
 float m_KF=1;
 float m_KSOut=1;
 
-WLSpindleData m_curSpindleData;
-
 float m_smoothAng=15;
 
 qint32  m_hPause;
-
-typeElement m_typeSOut;
-     quint8 m_iSout;
 
 WLIOPut *inProbe;
 WLIOPut *inPause;
@@ -207,24 +206,23 @@ QVector <quint8> m_indexsAxis;
 
 QTimer *updateTimer;
 
-QList<WLSpindleData> spindleDataList;
+quint8 iSpindle=255;
 
 private:
      bool setInput(typeInputPlanner getTypeModule,quint8 num);
      bool setIgnoreInput(typeInputPlanner getTypeModule,quint8 ignore);
 
-     bool addDataSpindle(WLSpindleData data);
-   //bool setOutput(typeOutputAxis type,quint8 num);
 public:
-     WLIOPut*  getInput(typeInputPlanner getTypeModule);
-
-     QList<WLSpindleData> getSpindleDataList() {return spindleDataList;}
-     void setSpindleDataList(QList<WLSpindleData> dataList);
+     WLIOPut*  getInput(typeInputPlanner type);
 
      void clear();
 
      void setModeRun(modeRunPlanner modeRun);
      modeRunPlanner getModeRun(){return m_modeRun;}
+
+     WLSpindle* getSpindle();
+
+     bool setISpindle(quint8 index);
 
      void setInProbe(int index);
      void setInPause(int index);
@@ -232,12 +230,6 @@ public:
 
      bool isIgnorePause() {return  m_ignoreInPause;}
      bool isIgnoreStop()  {return  m_ignoreInStop;}
-
-     float getAccSpindle() const;
-     float getDecSpindle() const;
-
-typeElement getTypeSOut() const;
-     quint8 getISOut() const;
 
      int getSizeBuf() {return m_sizeBuf;}
      int getCountBuf() {return m_sizeBuf-m_free;}
@@ -253,12 +245,6 @@ typeElement getTypeSOut() const;
     quint8 getIAxis(uint8_t i) {return m_indexsAxis.indexOf(i);}
 
     bool setHPause(quint8 enable,qint32 hPause);
-
-    bool setAccSpindle(float acc);
-    bool setDecSpindle(float dec);
-
-    bool setElementSpindle(typeElement element,quint8 i);
-    bool resetElementSpindle();
 
     bool clearDataSpindle();    
 
@@ -280,8 +266,6 @@ typeElement getTypeSOut() const;
 	bool setSOut(float s);
 	bool setKSOut(float k);
    float getKSOut(){return m_KSOut;}
-
-   WLSpindleData getCurSpindleDta(){return m_curSpindleData;}
 
 	bool setEnableSOut(quint8 enable);
 		
@@ -316,10 +300,9 @@ statusPlanner getStatus()  const {return m_status;}
    void setData(QDataStream &data);
    void getData(typeDataPlanner getTypeModule);
 
+
 private slots:
-
    void callTrackPlanner();
-
 
 public slots:
 	void sendGetDataBuf();
