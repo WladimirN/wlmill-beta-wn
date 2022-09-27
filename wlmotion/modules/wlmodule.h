@@ -104,6 +104,7 @@ public:
                     ,typeMDModbus//15
                     ,typeMSpindle//16
                     ,typeHeart=255
+                    ,typeMOscp//17
                     };
 
  Q_ENUM(typeModule)

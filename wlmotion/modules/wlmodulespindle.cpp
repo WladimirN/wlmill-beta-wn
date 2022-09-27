@@ -1,4 +1,4 @@
-#include "wlmoduleSpindle.h"
+#include "wlmodulespindle.h"
 
 WLModuleSpindle::WLModuleSpindle(WLDevice *_Device)
     : WLModule(_Device)

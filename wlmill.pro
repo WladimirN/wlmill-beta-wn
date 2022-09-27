@@ -12,10 +12,18 @@ QMAKE_LFLAGS = -no-pie
 #           QT_NO_INFO_OUTPUT\
 #           QT_NO_WARNING_OUTPUT\
 
+
 DEFINES  += DEF_QML
 #DEFINES  += DEF_CAMERA
+DEFINES  += DEF_PLOT
 DEFINES  += GCODE_MILL
 DEFINES  += DEF_HMAP
+
+contains(DEFINES, DEF_PLOT) {
+QT += printsupport
+SOURCES +=src/wlfile.cpp
+HEADERS +=src/wlfile.h
+}
 
 contains(DEFINES, DEF_CAMERA) {
 QT += multimedia multimediawidgets
@@ -29,8 +37,8 @@ TARGET = wlmill_cam
 
 contains(DEFINES, DEF_QML) {
 QT += qml quick quickwidgets
-SOURCES +=src/wlfile.cpp
-HEADERS +=src/wlfile.h
+SOURCES +=qcustomplot/qcustomplot.cpp
+HEADERS +=qcustomplot/qcustomplot.h
 }
 
 
