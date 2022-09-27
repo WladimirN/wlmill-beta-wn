@@ -36,6 +36,7 @@ HEADERS += \
       $$PWD/modules/wlmoduledmodbus.h \
       $$PWD/modules/wlmodulespindle.h \
       $$PWD/modules/wlspindle.h \
+      $$PWD/modules/wlmoduleoscp.h \
       $$PWD/wldevice.h \
       $$PWD/wlmotion.h
 
@@ -67,6 +68,7 @@ SOURCES += \
       $$PWD/modules/wlmoduledmodbus.cpp \
       $$PWD/modules/wlmodulespindle.cpp \
       $$PWD/modules/wlspindle.cpp \
+      $$PWD/modules/wlmoduleoscp.cpp \
       $$PWD/wldevice.cpp \
       $$PWD/wlmotion.cpp
 

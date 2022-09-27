@@ -102,9 +102,9 @@ public:
                     ,typeMAIOPut//13
                     ,typeMUART//14
                     ,typeMDModbus//15
-                    ,typeMSpindle//16
-                    ,typeHeart=255
+                    ,typeMSpindle//16                    
                     ,typeMOscp//17
+                    ,typeHeart=255
                     };
 
  Q_ENUM(typeModule)

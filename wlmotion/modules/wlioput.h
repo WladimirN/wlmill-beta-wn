@@ -73,6 +73,14 @@ Q_OBJECT
 
 public:
 
+enum typeDataIOPut{
+     dataIOPut_now=0,
+     dataIOPut_inv,
+     dataIOPut_enable
+   };
+
+Q_ENUM(typeDataIOPut)
+
 Q_PROPERTY(bool inv READ isInv() WRITE setInv() NOTIFY changedInv)
 Q_PROPERTY(bool now READ getNow() NOTIFY changed)
 Q_PROPERTY(bool out READ getNow() WRITE setOut())

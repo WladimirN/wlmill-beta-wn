@@ -41,6 +41,10 @@
 #include "wltimerscript.h"
 #include "wlheightmapwidget.h"
 
+#ifdef DEF_PLOT
+#include "wloscpwidget.h"
+#endif
+
 #ifdef DEF_CAMERA
 #include "wlcamera.h"
 #endif
@@ -189,6 +193,10 @@ WLLog *Log;
 
 #ifdef DEF_CAMERA
 WLCamera *camera;
+#endif
+
+#ifdef DEF_PLOT
+WLOscpWidget *oscp;
 #endif
 
 QTabWidget *tabWidget;

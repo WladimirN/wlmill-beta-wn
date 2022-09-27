@@ -29,6 +29,7 @@ if(name=="WLModuleAxis")    return createModule(typeMAxis);
 if(name=="WLModulePWM")     return createModule(typeMPWM);
 if(name=="WLModuleUART")    return createModule(typeMUART);
 if(name=="WLModuleSpindle") return createModule(typeMSpindle);
+if(name=="WLModuleOscp")    return createModule(typeMOscp);
 
 bool ok;
 
@@ -76,6 +77,9 @@ case typeMPlanner:if(createModule(WLDevice::typeMIOPut)
 case typeMSpindle:if(createModule(WLDevice::typeMIOPut)){
                       Module=new WLModuleSpindle(this);
                       }
+                  break;
+
+case typeMOscp:   Module=new WLModuleOscp(this);
                   break;
 
 case typeMAxis:   if(createModule(WLDevice::typeMIOPut)){

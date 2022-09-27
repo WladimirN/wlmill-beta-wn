@@ -1185,6 +1185,13 @@ setEnabled(true);
 //LScript->initCode();
 VisualWidget->updateViewGModel();
 
+#ifdef DEF_PLOT
+if(MillMachine->getMotionDevice()->getModule(WLModule::typeMOscp)){
+ oscp = new WLOscpWidget(MillMachine->getMotionDevice()->getModuleOscp(),this);
+ tabWidget->addTab(oscp,tr("Osciloscope"));
+ }
+#endif
+
 qDebug()<<"WLMill::readyMachine() >>>";
 }
 

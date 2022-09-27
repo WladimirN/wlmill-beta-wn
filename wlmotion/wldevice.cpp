@@ -683,9 +683,9 @@ WLModule* WLDevice::getModule(typeModule type)
 WLModule *ret=nullptr;
 
 for(int i=0;i<m_modules.size();i++)
-    if(m_modules[i]->getTypeModule()==type)
+    if(m_modules.at(i)->getTypeModule()==type)
 	    {
-        ret=m_modules[i];
+        ret=m_modules.at(i);
 		break;
 	    }
 
