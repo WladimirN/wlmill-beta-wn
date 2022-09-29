@@ -25,6 +25,7 @@ WLEditIOWidget::WLEditIOWidget(QWidget *parent) :
     connect(ui->checkBox,&QCheckBox::toggled,ui->spinBox,&QSpinBox::setEnabled);
     connect(ui->checkBox,&QCheckBox::toggled,ui->label,&QLabel::setEnabled);
     connect(ui->checkBox,&QCheckBox::toggled,this,&WLEditIOWidget::toggle);
+    connect(ui->label,&QPushButton::clicked,this,&WLEditIOWidget::onPBClicked);
 
     ui->checkBox->setChecked(true);
 }
@@ -278,6 +279,8 @@ if(m_enLatchInput)
 }
 }
 
+
+
 void WLEditIOWidget::setCheckable(bool enable)
 {
 if(m_Module) {
@@ -293,7 +296,7 @@ ui->checkBox->setChecked(check);
 emit toggle(check);
 }
 
-void WLEditIOWidget::mousePressEvent(QMouseEvent *event)
+void WLEditIOWidget::onPBClicked()
 {
 QMenu menu(this);
 
@@ -353,7 +356,10 @@ default: return;
 }
 
 
-menu.exec(event->globalPos());
+//menu.exec(event->globalPos());
+QPoint pos=ui->label->pos();
+pos.setY(pos.y()+ui->label->height());
+menu.exec(mapToGlobal(pos));
 }
 
 
