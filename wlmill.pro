@@ -33,7 +33,6 @@ SOURCES +=src/wlfile.cpp
 HEADERS +=src/wlfile.h
 }
 
-
 VERSION = 1.1.0
 
 QMAKE_TARGET_COMPANY = WLDEV

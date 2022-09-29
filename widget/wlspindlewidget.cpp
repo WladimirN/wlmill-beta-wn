@@ -109,6 +109,49 @@ WLSpindleWidget::WLSpindleWidget(WLSpindle *_Spindle,QWidget *parent) :
 
     initTableCalcSout();
     updateTypeOutS(0);
+
+    ui->gbOutputDir->setToolTip(
+                 tr(
+                "<b>Outputs direction</font></b>"
+                "<ol>"
+                  "<li>Forward - set 1 when dir forward</li>"
+                  "<li>Revers  - set 1 when dir revers</li>"
+                "</ol>"
+                  )
+                );
+
+    ui->gbOutputState->setToolTip(
+                 tr(
+                "<b>Outputs state</font></b>"
+                "<ol>"
+                  "<li>Run    - set 1 when spindle is moving</li>"
+                  "<li>Enable - set 1 when enable spindle</li>"
+                "</ol>"
+                  )
+                );
+
+    ui->gbSOut->setToolTip(
+                 tr(
+                "<b>Output control</font></b>"
+                "<ol>"
+                  "<li>Discrete - on/off spindle</li>"
+                  "<li>PWM - use pwm out</li>"
+                  "<li>Analog - use analog output</li>"
+                  "<li>Axis - use axis at spindle</li>"
+                  "<li>Fast changed - no slow change output</li>"
+                "</ol>"
+                  )
+                );
+
+    ui->gbAccelDecel->setToolTip(
+                 tr(
+                "<b>Data for calc time set rpm</font></b>"
+                "<ol>"
+                  "<li>Accel - rate of change during acceleration</li>"
+                  "<li>Decel - rate of change during deceleration</li>"
+                "</ol>"
+                  )
+                );
 }
 
 WLSpindleWidget::~WLSpindleWidget()

@@ -1726,7 +1726,7 @@ if(isAutoDrive()
                              }
                              else
                              {
-                             emit sendMessage(getFullName(),tr("no sensor signal (2)")
+                             emit sendMessage(getFullName(),tr("no sensor signal")+"(2)"
                                                           +(typePM==AXIS_inPEL ? "(inPEL=0)" :"")
                                                           +(typePM==AXIS_inMEL ? "(inMEL=0)" :"")
                                                           ,-214);
@@ -1765,7 +1765,7 @@ if(isAutoDrive()
                              }
                              else
                              {
-                             emit sendMessage(getFullName(),tr("no sensor signal (3)")
+                             emit sendMessage(getFullName(),tr("no sensor signal")+"(3)"
                                                           +(typePM==AXIS_inPEL ? "(inPEL=0)" :"")
                                                           +(typePM==AXIS_inMEL ? "(inMEL=0)" :"")
                                                           ,-214);
@@ -1882,7 +1882,7 @@ if(isAutoDrive()
     					      }
     					     else
                               {
-                              emit sendMessage(getFullName(),tr("no sensor signal (10)")
+                              emit sendMessage(getFullName(),tr("no sensor signal")+"(10)"
                                                            +(typePM==AXIS_inPEL ? "(inPEL=0)" :"")
                                                            +(typePM==AXIS_inMEL ? "(inMEL=0)" :"")
                                                            ,-214);

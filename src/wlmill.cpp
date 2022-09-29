@@ -814,7 +814,7 @@ WLEditText EditText;
 WLMCodeSH  codeSH(EditText.getDocument());
 
 EditText.setText(MScript->getCode());
-EditText.setLabel(tr("Please edit Script M:"));
+EditText.setLabel(tr("Edit")+"MScript:");
 
 EditText.show();
 
@@ -830,7 +830,7 @@ WLEditText EditText;
 WLMCodeSH  codeSH(EditText.getDocument());
 
 EditText.setText(LScript->getCode());
-EditText.setLabel(tr("Please edit Script L:"));
+EditText.setLabel(tr("Edit")+"LScript:");
 
 EditText.show();
 

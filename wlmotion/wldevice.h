@@ -54,6 +54,7 @@
 #define ETH_MAXTIMEOUTACK 256
 #define ETH_MAXETHPACK 256-1
 
+//v5
 #define WLM_PROTOCOL 0x0005 //beta
 /*hist
 0x0001 - start 2020
