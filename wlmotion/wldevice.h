@@ -54,11 +54,12 @@
 #define ETH_MAXTIMEOUTACK 256
 #define ETH_MAXETHPACK 256-1
 
-#define WLM_PROTOCOL 0x0004 //fixSpindle
+#define WLM_PROTOCOL 0x0005 //beta
 /*hist
 0x0001 - start 2020
 0x0002 - add inPause & move inProbe
 0x0003 - add Close Loop
+0x0004 - fixSpindle
 */
 
 const QString errorDevice("0,no error\

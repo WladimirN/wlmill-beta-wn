@@ -303,9 +303,6 @@ for(quint8 i=0;i<Outputs.size();i++)
 
 void WLModuleIOPut::update()
 {
-setInputInvStr(getInputInvStr());
-setOutputInvStr(getOutputInvStr());
-
 for(int i=2;i<getSizeInputs();i++) {
    callInputData(i);
    }
