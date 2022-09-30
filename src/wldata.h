@@ -1,23 +1,23 @@
-#ifndef WLGTOOL_H
-#define WLGTOOL_H
+#ifndef WLGDATAL_H
+#define WLGDATAL_H
 
 #include <QList>
 #include <QTextCodec>
 #include <QTextStream>
 
-typedef QMap<QString,QVariant> WLGTool;
+typedef QMap<QString,QVariant> WLEData;
 
-struct WLGTools
+struct WLData
 {
 public:
-    explicit WLGTools();
+    explicit WLData();
 
-bool setTool(int index,QMap<QString,QVariant>);
+bool setData(int index,QMap<QString,QVariant>);
 
-WLGTool getTool(int key);
-WLGTool getToolAt(int index);
+WLEData getData(int key);
+WLEData getDataAt(int index);
 
-WLGTool takeTool(int ikey);
+WLEData takeData(int ikey);
 
     void setValue(int ikey,QString key,QVariant value);
 QVariant getValue(int ikey,QString key,QVariant defvalue);
@@ -30,8 +30,8 @@ bool readFromFile(QString filename,QString split=";");
 bool writeToFile(QString filename ,QString split=";");
 
 private:
-QStringList m_keyList;
-QMap <int,QMap<QString,QVariant>> m_tools;
+
+QMap <int,WLEData> m_data;
 };
 
-#endif // WLGTOOL_H
+#endif // WLDATA_H

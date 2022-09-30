@@ -41,8 +41,31 @@ return gstr.contains(QRegExp("M\\d+"));
 
 void WLGCode::removeTool(int ikey)
 {
-m_data.Tools.takeTool(ikey);
-emit changedTools();
+m_data.dataTools.takeData(ikey);
+emit changedTool(-1);
+}
+
+void WLGCode::removeSC(int ikey)
+{
+m_data.dataSC.takeData(ikey);
+emit changedSC(-1);
+}
+
+void WLGCode::setDataSC(int ikey, QString key, QVariant value, bool send)
+{
+if(ikey>0) {
+  WLEData eSC=getSC(ikey);
+
+  bool add=eSC.isEmpty();
+
+  eSC.insert(key,value);
+
+  setSC(ikey,eSC);
+
+  if(add) {
+    emit changedSC(-1);
+    }
+  }
 }
 
 QList <int> WLGCode::loadStr(QString gstr)
@@ -169,6 +192,19 @@ if(isValidGCode("G64")
           ,isValidValue('Q') ? getValue('Q'):0);
  }
 
+if((isValidGCode("G154")||isValidGCode("G54.1"))
+&&(isValidValue('P')))
+ {
+ int isc=getValue('P');
+
+ if(0<isc && isc<100)  {
+   m_data.iSC=6+isc;
+   emit changedSC(m_data.iSC);
+   }
+   else {
+    qDebug()<<"error G154 P"<<isc;
+   }
+ }
 
 return MList;
 }
@@ -194,6 +230,17 @@ return plane;
 QString WLGCode::getActivGCodeString()
 {
 QString ret;
+
+if(!isGCode(53)
+ &&!isGCode(28)){
+ if(m_data.iSC<7)  {
+  ret+="G5"+QString::number(m_data.iSC+3)+" ";
+  }
+  else{
+  ret+="G154(P"+QString::number(m_data.iSC-6)+") ";
+  }
+}
+
 
 for(int i=0;i<GCodeSize;i++)    
    if(m_data.GCode[i])
@@ -266,7 +313,7 @@ return retList;
 void WLGCode::setDataTool(int ikey,QString key,QVariant value,bool send)
 {
 if(ikey>0) {
-   WLGTool Tool=getTool(ikey);
+  WLEData Tool=getTool(ikey);
 
   bool add=Tool.isEmpty();
 
@@ -274,21 +321,21 @@ if(ikey>0) {
 
   setTool(ikey,Tool);
 
-  if(send) {
-    emit changedTool(ikey);
-    }
-
   if(add) {
-    emit changedTools();
+    emit changedTool(-1);
     }
 }
 }
 
 QVariant WLGCode::getDataTool(int ikey, QString key,QVariant defvalue)
 {
-return m_data.Tools.getValue(ikey,key,defvalue);
+return m_data.dataTools.getValue(ikey,key,defvalue);
 }
 
+QVariant WLGCode::getDataSC(int ikey, QString key,QVariant defvalue)
+{
+return m_data.dataSC.getValue(ikey,key,defvalue);
+}
 
 double WLGCode::getHToolOfst()
 {
@@ -383,17 +430,30 @@ if(getDToolOfst()<0){
 return side;
 }
 
-void WLGCode::setTool(int ikey, WLGTool Tool)
+void WLGCode::setTool(int ikey, WLEData Tool)
 {
 if(ikey>0){
-m_data.Tools.setTool(ikey,Tool);
+m_data.dataTools.setData(ikey,Tool);
 emit changedTool(ikey);
 }
 }
 
-WLGTool const WLGCode::getTool(int ikey)
+void WLGCode::setSC(int ikey, WLEData SC)
 {
-return m_data.Tools.getTool(ikey);
+if(ikey>0){
+m_data.dataSC.setData(ikey,SC);
+emit changedSC(ikey);
+}
+}
+
+WLEData const WLGCode::getTool(int ikey)
+{
+return m_data.dataTools.getData(ikey);
+}
+
+WLEData const WLGCode::getSC(int ikey)
+{
+return m_data.dataSC.getData(ikey);
 }
 
 void WLGCode::setHTool(int i, float h)
@@ -433,15 +493,26 @@ double WLGCode::getDTool(int index)
     return getDataTool(index,"D",0).toDouble();
 }
 
-void WLGCode::readToolsFile(QString _fileName)
+void WLGCode::readToolFile(QString _fileName)
 {
-getTools()->readFromFile(_fileName);
-emit changedTools();
+getDataTool()->readFromFile(_fileName);
+emit changedTool(-1);
 }
 
-void WLGCode::writeToolsFile(QString _fileName)
+void WLGCode::writeToolFile(QString _fileName)
 {
-getTools()->writeToFile(_fileName);
+getDataTool()->writeToFile(_fileName);
+}
+
+void WLGCode::readSCFile(QString _fileName)
+{
+getDataSC()->readFromFile(_fileName);
+emit changedSC(-1);
+}
+
+void WLGCode::writeSCFile(QString _fileName)
+{
+getDataSC()->writeToFile(_fileName);
 }
 
 void WLGCode::writeXMLData(QXmlStreamWriter &stream)
@@ -610,28 +681,28 @@ switch(code)
    //**10
    case 53:m_data.GCode[53]=1;
            break;
+
    case 54:
    case 55:
    case 56:
    case 57:
    case 58:
    case 59:
-           m_data.GCode[28]=0;
-           m_data.GCode[53]=0;
+             m_data.GCode[28]=0;
+             m_data.GCode[53]=0;
+             m_data.GCode[54]=0;
+             m_data.GCode[55]=0;
+             m_data.GCode[56]=0;
+             m_data.GCode[57]=0;
+             m_data.GCode[58]=0;
+             m_data.GCode[59]=0;
 
-           m_data.GCode[54]=0;
-           m_data.GCode[55]=0;
-           m_data.GCode[56]=0;
-           m_data.GCode[57]=0;
-           m_data.GCode[58]=0;
-           m_data.GCode[59]=0;
-           m_data.GCode[code]=1;
+             if(m_data.iSC!=code-53){
+              m_data.iSC=code-53;//"Check SK";
+              emit changedSC(m_data.iSC);
+              }
+              break;
 
-           if(m_data.iSC!=code-53)
-            {
-            m_data.iSC=code-53;//"Check SK";
-            }
-           break;
    //--smooth
    case 61: m_data.GCode[61]=1; //No smooth
             m_data.GCode[64]=0;
@@ -767,7 +838,7 @@ return true;
 
 bool WLGCode::isValidGCode(QString Gx)
 {
-    return GValidList.contains(Gx);
+return GValidList.contains(Gx);
 }
 
 WLGPoint WLGCode::getCurPoint()
@@ -812,7 +883,7 @@ return ret;
 int WLGCode::getActivSC(WLGPoint *P)
 {
  if(P!=nullptr)
-    *P=isGCode(53) ? WLGPoint():getSC(m_data.iSC);
+    *P=isGCode(53) ? WLGPoint():getOffsetSC(m_data.iSC);
 
 return isGCode(53) ? 0 : m_data.iSC;
 }
@@ -919,7 +990,7 @@ return newPoint;
 
 WLGPoint WLGCode::getPointSC(int iSC,WLGPoint GPoint,bool back)
 {
-WLGPoint SC=getSC(iSC);
+WLGPoint SC=getOffsetSC(iSC);
 
 if(getRefPoint0SC(iSC).a!=0)
 {
@@ -1067,80 +1138,102 @@ return getPointActivSC(newPoint,true);
 
 void  WLGCode::rotAboutRotPointSC(int i,float a)
 {
-m_data.refPoint0SC[i].a=a;
-
-emit changedSK(i);
+if(i>0){
+ WLEData eSC=getSC(i);
+ eSC.insert("a",a);
+ setSC(i,eSC);
+ }
 }
 
 
 
-WLGPoint  WLGCode::getSC(int i,bool *ok)
-{
-if(0<=i&&i<sizeSC) 
-  {
-  if(ok) *ok=true;
-  return m_data.offsetSC[i];
-  } 
-else 
-  {
-  if(ok) *ok=false;
-  return WLGPoint();
-  }
+WLGPoint  WLGCode::getOffsetSC(int i,bool *ok)
+{    
+WLGPoint  ret;
+
+if(i>=0) {
+WLEData eSC=getSC(i);
+
+ret.x=eSC.value("X",0).toDouble();
+ret.y=eSC.value("Y",0).toDouble();
+ret.z=eSC.value("Z",0).toDouble();
+ret.a=eSC.value("A",0).toDouble();
+ret.b=eSC.value("B",0).toDouble();
+ret.c=eSC.value("C",0).toDouble();
+
+if(ok) *ok=true;
+}
+else {
+if(ok) *ok=false;
 }
 
-WLGPoint  WLGCode::getRefPoint0SC(int i,bool *ok)
-{
-if(0<=i&&i<sizeSC) 
-  {
-  if(ok) *ok=true;
-  return m_data.refPoint0SC[i];
-  } 
-else 
-  {
-  if(ok) *ok=false;
-  return WLGPoint();
-  }
+return ret;
 }
 
-WLGPoint  WLGCode::getRefPoint1SC(int i,bool *ok)
+WLGPoint  WLGCode::getRefPointSC(int i,int iref,bool *ok)
 {
-if(0<=i&&i<sizeSC) 
-  {
-  if(ok) *ok=true;
-  return m_data.refPoint1SC[i];
-  } 
-else 
-  {
-  if(ok) *ok=false;
-  return WLGPoint();
-  }
+WLGPoint  ret;
+
+if(i>=0) {
+WLEData eSC=getSC(i);
+
+ret.x=eSC.value("Xref"+QString::number(iref),0).toDouble();
+ret.y=eSC.value("Yref"+QString::number(iref),0).toDouble();
+ret.z=eSC.value("Zref"+QString::number(iref),0).toDouble();
+ret.a=eSC.value("Aref"+QString::number(iref),0).toDouble();
+ret.b=eSC.value("Bref"+QString::number(iref),0).toDouble();
+ret.c=eSC.value("Cref"+QString::number(iref),0).toDouble();
+
+if(ok) *ok=true;
+}
+else {
+if(ok) *ok=false;
+}
+
+return ret;
 }
 
 bool WLGCode::setOffsetSC(int i, WLGPoint P,bool send)
-{
-if(0<i&&i<sizeSC)
+{    
+if(i>0)
    {
-   m_data.offsetSC[i]=P;
+   WLEData eSC=getSC(i);
 
-   if(send) emit changedSK(m_data.iSC);
-   return 1;
+   bool add=eSC.isEmpty();
+
+   eSC.insert("X",P.x);
+   eSC.insert("Y",P.y);
+   eSC.insert("Z",P.z);
+   eSC.insert("A",P.a);
+   eSC.insert("B",P.b);
+   eSC.insert("C",P.c);
+
+   setSC(i,eSC);
+
+   if(add) {
+     emit changedSC(-1);
+     }
    }
 
-return 0;
+return false;
 }
 
-WLGPoint  WLGCode::getOffsetSC(int i,bool *ok)
+bool WLGCode::setRefPointSC(int i,int iref, WLGPoint P)
 {
- if(0<=i&&i<sizeSC)
-  {
-  if(ok) *ok=true;
-  return m_data.offsetSC[i];
-  } 
-else 
-  {
-  if(ok) *ok=false;
-  return WLGPoint();
-  }
+if(i<=0) return false;
+
+WLEData eSC=getSC(i);
+
+eSC.insert("Xref"+QString::number(iref),P.x);
+eSC.insert("Yref"+QString::number(iref),P.y);
+eSC.insert("Zref"+QString::number(iref),P.z);
+eSC.insert("Aref"+QString::number(iref),P.a);
+eSC.insert("Bref"+QString::number(iref),P.b);
+eSC.insert("Cref"+QString::number(iref),P.c);
+
+setSC(i,eSC);
+
+return true;
 }
  
 

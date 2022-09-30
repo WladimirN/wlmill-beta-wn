@@ -233,7 +233,7 @@ for(qint32 index=0;(index<indexData.size())
 
     Point.select=ETraj.index;
 
-    m_GModel.setOffsetFrame(GCode.getSC(GCode.getActivSC()).to3D());
+    m_GModel.setOffsetFrame(GCode.getOffsetSC(GCode.getActivSC()).to3D());
 
     if(istart!=-1)
       Points=ETraj.calcPoints(&ok,&m_GModel,1);
