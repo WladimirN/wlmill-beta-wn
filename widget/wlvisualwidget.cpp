@@ -1785,7 +1785,7 @@ trackTraj.clear();
 
 m_Program->setGModelData(m_MillMachine->getGModel()->getData());
 
-m_MillMachine->getGModel()->setOffsetFrame(m_MillMachine->getGCode()->getSC(m_MillMachine->getGCode()->getActivSC()).to3D());
+m_MillMachine->getGModel()->setOffsetFrame(m_MillMachine->getGCode()->getOffsetSC(m_MillMachine->getGCode()->getActivSC()).to3D());
 
 QTimer::singleShot(200,this,SLOT(setViewCenter()));
 }

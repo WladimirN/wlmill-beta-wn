@@ -61,15 +61,14 @@ private slots:
 
    void setLatchInput(int);
 
+   void onPBClicked();
+
 public slots:
    void setCheckable(bool enable);
    void setChecked(bool check);
 
 signals:
    void toggle(bool);
-   // QWidget interface   
-protected:   
-   void mousePressEvent(QMouseEvent *event);
 };
 
 #endif // WLEDITIOPUTWIDGETT_H

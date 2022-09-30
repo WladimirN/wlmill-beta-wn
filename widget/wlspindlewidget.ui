@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="1">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="gbOutputDir">
      <property name="title">
       <string>Output dir</string>
      </property>
@@ -30,7 +30,7 @@
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QGroupBox" name="groupBox_10">
+    <widget class="QGroupBox" name="gbAccelDecel">
      <property name="title">
       <string>Time (S/sec^2)</string>
      </property>
@@ -91,7 +91,7 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QGroupBox" name="groupBox_12">
+    <widget class="QGroupBox" name="gbOutputState">
      <property name="title">
       <string>Output state</string>
      </property>
@@ -108,7 +108,7 @@
    <item row="0" column="2" rowspan="3">
     <widget class="QGroupBox" name="gbSOut">
      <property name="title">
-      <string>Output value</string>
+      <string>Output control</string>
      </property>
      <property name="checkable">
       <bool>true</bool>
@@ -139,7 +139,7 @@
    <item row="0" column="4" rowspan="3">
     <widget class="QGroupBox" name="gbCorrectSOut">
      <property name="title">
-      <string>Calc S Out</string>
+      <string>Calc output value</string>
      </property>
      <property name="checkable">
       <bool>false</bool>

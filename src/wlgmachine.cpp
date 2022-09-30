@@ -481,7 +481,7 @@ QTimer *autoSaveTimer = new QTimer;
 connect(autoSaveTimer,SIGNAL(timeout()),SLOT(saveConfig()));
 autoSaveTimer->start(5*60*1000);
 
-connect(&m_GCode,SIGNAL(changedSK(int)),SLOT(saveConfig()));
+connect(&m_GCode,SIGNAL(changedSC(int)),SLOT(saveConfig()));
 
 if(motDevice->isValidProtocol()
   ||(!motDevice->isReady())){ //no device
@@ -991,7 +991,7 @@ stream.writeAttribute("G1StartAt",QString("%1,%2").arg(getDistG1StartAt()).arg(g
  stream.writeStartElement("GModel");
   m_GModel.writeXMLData(stream);
  stream.writeEndElement();
-
+/*
  for(int i=0;i<sizeSC;i++)
  {
  stream.writeStartElement("SC");
@@ -1001,7 +1001,8 @@ stream.writeAttribute("G1StartAt",QString("%1,%2").arg(getDistG1StartAt()).arg(g
  stream.writeAttribute("refPoint0",m_GCode.getRefPoint0SC(i).toString());
  stream.writeAttribute("refPoint1",m_GCode.getRefPoint1SC(i).toString());
  stream.writeEndElement();
- } 
+ }
+*/
 
  stream.writeStartElement("GCode");
  getGCode()->writeXMLData(stream);
@@ -1019,7 +1020,8 @@ FileXML.close();
 
 motDevice->writeToFile(configGMPath+motDevice->getNameDevice()+".xml");
 
-getGCode()->getTools()->writeToFile(toolsFile);
+getGCode()->writeToolFile(toolsFile);
+getGCode()->writeSCFile(scFile);
 }
 
 void WLGMachine::saveMScript(QString txt)
@@ -1393,7 +1395,7 @@ if(FileXML.isOpen())
          {
          qDebug()<<"loadTool";
 
-         WLGTool Tool;
+         WLEData Tool;
 
          if(!stream.attributes().value("Data").isEmpty())
            {
@@ -1419,7 +1421,7 @@ if(FileXML.isOpen())
              }
            }
 
-         getGCode()->setTool(Tool.value("index",getGCode()->getTools()->count()).toInt(),Tool);
+         getGCode()->setTool(Tool.value("index",getGCode()->getDataTool()->count()).toInt(),Tool);
          continue;
          }
 
@@ -1478,7 +1480,8 @@ if(FileXML.isOpen())
   ModulePlanner->setEnableSOut(false);
   }
 
-  getGCode()->getTools()->readFromFile(toolsFile);
+  getGCode()->readToolFile(toolsFile);
+  getGCode()->readSCFile(scFile);
 
   updatePosible();
 
@@ -3327,7 +3330,7 @@ qDebug()<<"WLGMachine::addCalcGModel";
 
 for(int i=0;i<addTraj.size();i++)
    {
-   getGModel()->setOffsetFrame(getGCode()->getSC(getGCode()->getActivSC()).to3D());
+   getGModel()->setOffsetFrame(getGCode()->getOffsetSC(getGCode()->getActivSC()).to3D());
 
    addModelTraj+=addTraj[i].calcModelPoints(&ok,getGModel(),2);
    }

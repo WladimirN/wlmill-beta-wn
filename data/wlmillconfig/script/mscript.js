@@ -41,23 +41,22 @@ function M9()
 //у нужной сторки необходимо убрать комментарий шпинделя
 function M3()
 {
-//DIALOG.message("M3 шпиндель включен!",0); //пример сообщения
-//MACHINE.enableSOut(1);  //пример включения аналогового или ШИМ(PWM) выхода
-//MACHINE.setOutput(1,1); //пример включения дискретным выходом
+MACHINE.setStateSpindle(1)	
+//DIALOG.message("M3 шпиндель включен!",0); 
 return 1;
 }
 
 function M4()
 {
+MACHINE.setStateSpindle(-1)
 return 1;
 }
 
 //функция выключения шпинделя
 function M5()
 {
-//DIALOG.message("M5 шпиндель выключен!",0); //	
-//MACHINE.enableSOut(0);  //пример включения аналогового или ШИМ(PWM) выхода
-//MACHINE.setOutput(1,0); //пример включения дискретным выходом
+MACHINE.setStateSpindle(0)	
+//DIALOG.message("M5 шпиндель выключен!",0);	
 return 1;
 }
 
