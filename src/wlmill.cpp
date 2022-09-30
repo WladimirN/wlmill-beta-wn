@@ -4,6 +4,7 @@
 #include <QColor>
 #include <QLineEdit>
 #include <QTime>
+#include <QString>
 
 #include <QMessageBox>
 #include <QTextCursor>
@@ -29,6 +30,8 @@
 #include "wlconsolemodbus.h"
 #include "wlconsolescript.h"
 #include "wlspindlewidget.h"
+#include "wlgsctablemodel.h"
+#include "wlgtoolstablemodel.h"
 
 #include <QJoysticks.h>
 
@@ -101,7 +104,7 @@ WLMill::WLMill(QWidget *parent)
     Program->setShowGCode(MillMachine->getGCode());
 
 //  connect(MillMachine,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
-    connect(MillMachine->getGCode(),SIGNAL(changedSK(int)),Program,SLOT(updateShowTraj()),Qt::DirectConnection);
+    connect(MillMachine->getGCode(),SIGNAL(changedSC(int)),Program,SLOT(updateShowTraj()),Qt::DirectConnection);
 
     connect(MillMachine,&WLGMachine::changedReady,this,&WLMill::readyMachine);
 
@@ -389,12 +392,13 @@ MFile->addSeparator();
 
 MFile->addAction(tr("Save coordinates"),this,SLOT(onSaveSC()));
 MFile->addAction(tr("Load coordinates"),this,SLOT(onLoadSC()));
-MFile->addAction(tr("Close"),this,SLOT(close()));
 MFile->addSeparator();
 
 MFile->addAction(tr("Save Tools"),this,SLOT(onSaveTools()));
 MFile->addAction(tr("Load Tools"),this,SLOT(onLoadTools()));
 MFile->addSeparator();
+
+MFile->addAction(tr("Close"),this,SLOT(close()));
 
 MenuBar->addMenu(MFile);
 
@@ -521,14 +525,11 @@ addDockWidget(Qt::RightDockWidgetArea,dockPosition);
 
 void WLMill::createTabTools()
 {
-//dockTools=new QDockWidget(this);
-//
-//dockTools->setWindowTitle(tr("Tools"));
-//dockTools->setObjectName("DTools");
+ToolWidget = new WLDataWidget(MillMachine->getGCode(),this);
 
-ToolsWidget = new WLToolsWidget(MillMachine->getGCode(),this);
+ToolWidget ->setModel(new WLGToolsTableModel(MillMachine->getGCode(),ToolWidget));
 
-WLTBarTools *tBarTools = new WLTBarTools(MScript,this);
+WLTBarTool *tBarTools = new WLTBarTool(MScript,this);
 
 MScript->addObject(tBarTools,"TOOLBARTOOLS");
 MScript->addBeforeInitScript("TOOLBARTOOLS.removeButtons();");
@@ -540,18 +541,36 @@ connect(MillMachine,&WLGMachine::changedPossibleManual,tBarTools,&QToolBar::setE
 
 tBarTools->setObjectName("tbtool");
 
-ToolsWidget->addToolBar(tBarTools);
+ToolWidget->addToolBar(tBarTools);
 
-ToolsWidget->show();
+ToolWidget->show();
 
-//dockTools->setWidget(ToolsWidget);
-//
-//dockTools->setFeatures(QDockWidget::DockWidgetFloatable
-//                      |QDockWidget::DockWidgetMovable
-//                      |QDockWidget::DockWidgetClosable);
-//
-//addDockWidget(Qt::LeftDockWidgetArea,dockTools);
-tabWidget->addTab(ToolsWidget,"Tools");
+tabWidget->addTab(ToolWidget,"Tools");
+}
+
+void WLMill::createTabSC()
+{
+SCWidget = new WLDataWidget(MillMachine->getGCode(),this);
+
+SCWidget ->setModel(new WLGSCTableModel(MillMachine->getGCode(),SCWidget));
+
+WLTBarData *tBarSC = new WLTBarData(MScript,this);
+
+MScript->addObject(tBarSC,"TOOLBARSC");
+MScript->addBeforeInitScript("TOOLBARSC.removeButtons();");
+
+connect(tBarSC,&WLTBarScript::runScript,this,[=](QString txt){MScript->runScript(txt);});
+tBarSC->setIconSize(QSize(48,48));
+
+connect(MillMachine,&WLGMachine::changedPossibleManual,tBarSC,&QToolBar::setEnabled);
+
+tBarSC->setObjectName("tbsc");
+
+SCWidget->addToolBar(tBarSC);
+
+SCWidget->show();
+
+tabWidget->addTab(SCWidget,"SC");
 }
 
 void WLMill::createDockIOPut()
@@ -765,47 +784,54 @@ void WLMill::onSaveSC()
 {
 if(lastFileSC.isEmpty()) lastFileSC=QCoreApplication::applicationDirPath();
 
-QString fileName = QFileDialog::getSaveFileName(this, tr("Save coordinates"),lastFileSC,"sc (*.scxml)");
+QString fileName = QFileDialog::getSaveFileName(this, tr("Save coordinates"),lastFileSC,"CS (*.csv);;sc (*.scxml)");
 
-if(!fileName.isEmpty())
-{
-QFile FileXML(lastFileSC=fileName);
-if(FileXML.open(QIODevice::WriteOnly))
-{
-QXmlStreamWriter stream(&FileXML);
 
-stream.setAutoFormatting(true);
+if(!fileName.isEmpty()){
+QFileInfo fi(fileName);
 
-stream.setCodec(QTextCodec::codecForName("Windows-1251"));
-stream.writeStartDocument("1.0");
+if(fi.suffix()==("scxml"))
+  {
+  QFile FileXML(lastFileSC=fileName);
+  if(FileXML.open(QIODevice::WriteOnly))
+  {
+  QXmlStreamWriter stream(&FileXML);
 
-stream.writeStartElement("WLMill-SC");
+  stream.setAutoFormatting(true);
 
- for(int i=0;i<sizeSC;i++)
- {
- stream.writeStartElement("SC");
- stream.writeAttribute("i",QString::number(i));
+  stream.setCodec(QTextCodec::codecForName("Windows-1251"));
+  stream.writeStartDocument("1.0");
 
- stream.writeAttribute("GPoint",MillMachine->getGCode()->getOffsetSC(i).toString());
- stream.writeAttribute("refPoint0",MillMachine->getGCode()->getRefPoint0SC(i).toString());
- stream.writeAttribute("refPoint1",MillMachine->getGCode()->getRefPoint1SC(i).toString());
- stream.writeEndElement();
+  stream.writeStartElement("WLMill-SC");
+
+   for(int i=0;i<sizeSC;i++)
+   {
+   stream.writeStartElement("SC");
+   stream.writeAttribute("i",QString::number(i));
+
+   stream.writeAttribute("GPoint",MillMachine->getGCode()->getOffsetSC(i).toString());
+   stream.writeAttribute("refPoint0",MillMachine->getGCode()->getRefPoint0SC(i).toString());
+   stream.writeAttribute("refPoint1",MillMachine->getGCode()->getRefPoint1SC(i).toString());
+   stream.writeEndElement();
+   }
+
+   stream.writeStartElement("author");
+   stream.writeAttribute("Name","BocharovSergey");
+   stream.writeAttribute("e-mail","bs_info@mail.ru");
+   stream.writeAttribute("phone","+79139025883");
+   stream.writeEndElement();
+
+  stream.writeEndElement();
+
+  stream.writeEndDocument();
+
+   FileXML.close();
+  }
  }
-
- stream.writeStartElement("author");
- stream.writeAttribute("Name","BocharovSergey");
- stream.writeAttribute("e-mail","bs_info@mail.ru");
- stream.writeAttribute("phone","+79139025883");
- stream.writeEndElement();
-
-stream.writeEndElement();
-
-stream.writeEndDocument();
-
- FileXML.close();
-}
-
-}
+ else if(fi.suffix()==("csv")){
+  MillMachine->getGCode()->writeSCFile(fileName);
+ }
+ }
 }
 
 void WLMill::onEditCodeMScript()
@@ -842,61 +868,68 @@ if(EditText.exec()) {
 
 void WLMill::onLoadSC()
 {
-if(lastFileSC.isEmpty()) lastFileSC=QCoreApplication::applicationDirPath();
+if(MillMachine->isActiv())  return;
 
-QString fileName = QFileDialog::getOpenFileName(this, tr("Download coordinates"),lastFileSC,("sc (*.scxml)"));
+QString fileName = QFileDialog::getOpenFileName(this, tr("Download coordinates"),lastFileSC,("CS (*.csv);;sc (*.scxml)"));
 
 if(!fileName.isEmpty())
 {
-QFile FileXML(lastFileSC=fileName);
+QFileInfo fi(fileName);
 
-QXmlStreamReader stream;
+if(fi.suffix()==("scxml")){
+    QFile FileXML(lastFileSC=fileName);
 
-qDebug()<<"load ConfigXML";
-//bool ret=0;
+    QXmlStreamReader stream;
 
-if(FileXML.open(QIODevice::ReadOnly))
-  {
- qDebug()<<"open ConfigXML";
-  stream.setDevice(&FileXML);
+    qDebug()<<"load ConfigXML";
+    //bool ret=0;
 
-  while(!stream.atEnd())
-   {
-   if(stream.readNext()==QXmlStreamReader::StartElement)
-   if(stream.name()=="WLMill-SC")
-    {
-    //Program->loadFile(stream.attributes().value("LastProgram").toString());
+    if(FileXML.open(QIODevice::ReadOnly))
+      {
+     qDebug()<<"open ConfigXML";
+      stream.setDevice(&FileXML);
 
-	 while(!stream.atEnd())
-	 { 
-        stream.readNextStartElement();
-		qDebug()<<"findElement "<<stream.name()<<" "<<stream.tokenString();
-        if(stream.name()=="WLMill-SC") break;
-		if(stream.tokenType()!=QXmlStreamReader::StartElement) continue;
+      while(!stream.atEnd())
+       {
+       if(stream.readNext()==QXmlStreamReader::StartElement)
+       if(stream.name()=="WLMill-SC")
+        {
+        //Program->loadFile(stream.attributes().value("LastProgram").toString());
 
-		if(stream.name()=="SC")
-		 {
-		 qDebug()<<"loadSC";
+         while(!stream.atEnd())
+         {
+            stream.readNextStartElement();
+            qDebug()<<"findElement "<<stream.name()<<" "<<stream.tokenString();
+            if(stream.name()=="WLMill-SC") break;
+            if(stream.tokenType()!=QXmlStreamReader::StartElement) continue;
 
-         int i=0;
-         i=stream.attributes().value("i").toString().toInt();
+            if(stream.name()=="SC")
+             {
+             qDebug()<<"loadSC";
 
-         WLGPoint Gp;
+             int i=0;
+             i=stream.attributes().value("i").toString().toInt();
 
-         Gp.fromString(stream.attributes().value("GPoint").toString());
-         MillMachine->getGCode()->setOffsetSC(i,Gp);
-		 
-         Gp.fromString(stream.attributes().value("refPoint0").toString());
-         MillMachine->getGCode()->setRefPoint0SC(i,Gp);
-		 
-         Gp.fromString(stream.attributes().value("refPoint1").toString());
-         MillMachine->getGCode()->setRefPoint1SC(i,Gp);
-		 continue;		 
-	     }     
-	 }	 
+             WLGPoint Gp;
+
+             Gp.fromString(stream.attributes().value("GPoint").toString());
+             MillMachine->getGCode()->setOffsetSC(i,Gp);
+
+             Gp.fromString(stream.attributes().value("refPoint0").toString());
+             MillMachine->getGCode()->setRefPoint0SC(i,Gp);
+
+             Gp.fromString(stream.attributes().value("refPoint1").toString());
+             MillMachine->getGCode()->setRefPoint1SC(i,Gp);
+             continue;
+             }
+         }
+        }
+       }
+      }
     }
-   }
-  }
+    else if (fi.suffix()==("csv")) {
+    MillMachine->getGCode()->readSCFile(fileName);
+    }
 }
 
 MillMachine->saveConfig();
@@ -906,10 +939,10 @@ void WLMill::onSaveTools()
 {
 if(MillMachine->isActiv())  return;
 
-QString fileName = QFileDialog::getSaveFileName(this, tr("Save Tools"),toolsFile,("CSV(;) (*.csv);all type(*.*)"));
+QString fileName = QFileDialog::getSaveFileName(this, tr("Save Tools"),toolsFile,("Tools (*.csv);;all type(*.*)"));
 
 if(!fileName.isEmpty())
-  MillMachine->getGCode()->writeToolsFile(fileName);
+  MillMachine->getGCode()->writeToolFile(fileName);
 
 }
 
@@ -917,10 +950,10 @@ void WLMill::onLoadTools()
 {
 if(MillMachine->isActiv())  return;
 
-QString fileName = QFileDialog::getOpenFileName(this, tr("Load Tools"),toolsFile,("CSV(;) (*.csv);all type(*.*)"));
+QString fileName = QFileDialog::getOpenFileName(this, tr("Load Tools"),toolsFile,("Tools (*.csv);;all type(*.*)"));
 
 if(!fileName.isEmpty())
-    MillMachine->getGCode()->readToolsFile(fileName);
+    MillMachine->getGCode()->readToolFile(fileName);
 }
 
 void WLMill::onSaveDebugFile()
@@ -1154,6 +1187,7 @@ qDebug()<<"WLMill::readyMachine() <<<";
 createMenuBar();
 
 createTabTools();
+createTabSC();
 
 createDockIOPut();
 createDockPosition();
@@ -1319,7 +1353,8 @@ VisualWidget->setClearColor(color);
 Program->setLastMovElement(setting.value("Program/iLastElement",0).toUInt());
 Program->loadFile(setting.value("Program/file","").toString(),true);
 
-ToolsWidget->setHeadersTable(setting.value("Tools/showColumn","").toString().split(","));
+ToolWidget->setHeadersTable(setting.value("Tools/showColumn","").toString().split(",",QString::SkipEmptyParts));
+SCWidget->setHeadersTable(setting.value("SC/showColumn","").toString().split(",",QString::SkipEmptyParts));
 //lastProg=(m_setting.value("view/zoomDir",0).toBool());
 
 return true;
@@ -1337,7 +1372,8 @@ setting.setValue("View/clearColor",VisualWidget->getClearColor().name());
 setting.setValue("Program/file",Program->getNameFile());
 setting.setValue("Program/iLastElement",Program->getLastMovElement());
 
-setting.setValue("Tools/showColumn",ToolsWidget->getHeaderTable().join(","));
+setting.setValue("Tools/showColumn",ToolWidget->getHeaderTable().join(","));
+setting.setValue("SC/showColumn",SCWidget->getHeaderTable().join(","));
 }
 
 void WLMill::saveDataState()

@@ -5,34 +5,22 @@
 #include <QAbstractTableModel>
 
 #include "wlgcode.h"
+#include "wldatatablemodel.h"
 
-class WLGToolsTableModel : public QAbstractTableModel
+class WLGToolsTableModel : public WLDataTableModel
 {
 Q_OBJECT
 
 public:
     explicit WLGToolsTableModel(WLGCode *GCode,QObject *parent = nullptr);
 
-    Q_INVOKABLE void setHeaders(QStringList);
-    QStringList getHeaders();
-
-      void setScaleFont(double scale);
-    double getScaleFont() const;
-
 public:
-    int rowCount(const QModelIndex &parent) const;
-    int columnCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
 
-
+     void setHeaders(QStringList headers);
 private:
-    WLGCode *GCode=nullptr;
- QStringList    headers;
- QStringList defheaders;
- double     m_scaleFont=1.5;
+    WLGCode *mGCode=nullptr;
+
 };
 
 #endif // WLGTOOLSTABLEMODEL_H

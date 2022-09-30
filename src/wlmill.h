@@ -33,7 +33,7 @@
 #include "wledittext.h"
 #include "wlmcodesh.h"
 #include "wllog.h"
-#include "wltoolswidget.h"
+#include "wldatawidget.h"
 #include "wlmpgwidget.h"
 #include "wleditmpgwidget.h"
 #include "wltbuttonscript.h"
@@ -127,6 +127,7 @@
 #define   configGKFile QCoreApplication::applicationDirPath()+"//wlmillconfig//mkconfig.xml"
 #define        pamFile QCoreApplication::applicationDirPath()+"//wlmillconfig//pam.dat"
 #define      toolsFile QCoreApplication::applicationDirPath()+"//wlmillconfig//tools.csv"
+#define         scFile QCoreApplication::applicationDirPath()+"//wlmillconfig//cs.csv"
 
 #define    iconsGMPath QCoreApplication::applicationDirPath()+"//icons//"
 #define   _iconsGMPath QCoreApplication::applicationDirPath()+"//wlmillconfig//icons//"
@@ -138,6 +139,18 @@
 #define   _lScriptFile QCoreApplication::applicationDirPath()+"//wlmillconfig//script//lscript.js"
 #define    _scriptPath QCoreApplication::applicationDirPath()+"//wlmillconfig//script//"
 #define       _qmlPath QCoreApplication::applicationDirPath()+"//wlmillconfig//qml//"
+
+class WLTBarTool: public WLTBarData
+{
+Q_OBJECT
+
+public:
+    explicit WLTBarTool(WLEVScript *_script,QWidget *parent=nullptr):WLTBarData (_script,parent)    {
+    }
+
+    Q_INVOKABLE     int selectTool(){return curIndex();}
+    Q_INVOKABLE QString selectData(){return curData();}
+};
 
 class WLMill : public QMainWindow
 {
@@ -236,7 +249,8 @@ QToolBar *TBMessage;
 QToolBar *TBScript;
 QToolBar *TBWireChild;
 
-WLToolsWidget *ToolsWidget=nullptr;
+WLDataWidget *ToolWidget=nullptr;
+WLDataWidget *SCWidget=nullptr;
 /*
 QToolBar *TBWireCorrect;
 QToolBar *TBWireEdit;
@@ -287,6 +301,7 @@ private:
  void autoSaveChekers();
 
  void createTabTools();
+ void createTabSC();
 
  void createDockPosition();
  void createDockConsoleMScript();

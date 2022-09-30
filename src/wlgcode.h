@@ -12,15 +12,16 @@
 #include "wl3dpoint.h"
 #include "wl6dpoint.h"
 #include "wlframe.h"
-#include "wlgtool.h"
+#include "wldata.h"
 
 #define GNO_err  1
 #define GNO_use  0
 #define GErr    -1
 
-#define GCodeSize 1000
-
 #define sizeSC 7
+#define maxPG154 100
+
+#define GCodeSize 1000
 
 typedef struct GPar
 {
@@ -327,11 +328,12 @@ return ret;
 
 struct WLGCodeData
 {
- WLGPoint    offsetSC[sizeSC]; //Системы координат смещение
- WLGPoint refPoint0SC[sizeSC]; //Вращение опорная точка
- WLGPoint refPoint1SC[sizeSC]; //Вращение проверочная точка
+ //WLGPoint    offsetSC[sizeSC]; //Системы координат смещение
+ //WLGPoint refPoint0SC[sizeSC]; //Вращение опорная точка
+ //WLGPoint refPoint1SC[sizeSC]; //Вращение проверочная точка
 
- WLGTools  Tools;
+ WLData  dataTools;
+ WLData  dataSC;
 
  WLGPoint G43Position;
  WLGPoint G28Position;
@@ -471,29 +473,30 @@ public:
 
    int getActivSC(WLGPoint *P=nullptr);
 
-   WLGPoint getSC(int i,bool *ok=nullptr);
    WLGPoint getOffsetSC(int i,bool *ok=nullptr);
    WLGPoint getOffsetActivSC(bool *ok=nullptr) {return getOffsetSC(m_data.iSC,ok);}
-   WLGPoint getRefPoint0SC(int i,bool *ok=nullptr);
-   WLGPoint getRefPoint1SC(int i,bool *ok=nullptr);
+   WLGPoint getRefPointSC(int i,int iref,bool *ok=nullptr);
+   WLGPoint getRefPoint0SC(int i,bool *ok=nullptr){return getRefPointSC(i,0,ok);}
+   WLGPoint getRefPoint1SC(int i,bool *ok=nullptr){return getRefPointSC(i,1,ok);}
 
    bool setOffsetActivSC(WLGPoint P)    {return setOffsetSC(m_data.iSC,P);}
    bool setOffsetSC(int i,WLGPoint P,bool send=true);
 
-   bool setRefPoint0SC(int i,WLGPoint P)  {if(0<i&&i<sizeSC) {m_data.refPoint0SC[i]=P; return 1;} else return 0;}
-   bool setRefPoint1SC(int i,WLGPoint P)  {if(0<i&&i<sizeSC) {m_data.refPoint1SC[i]=P; return 1;} else return 0;}
+   bool setRefPointSC(int i,int iref, WLGPoint P);
+   bool setRefPoint0SC(int i,WLGPoint P){return setRefPointSC(i,0,P);}
+   bool setRefPoint1SC(int i,WLGPoint P){return setRefPointSC(i,1,P);}
 
    void rotAboutRotPointSC(int i,float a);
 
-   void setXSC(double X) {setXSC(X,m_data.iSC);}
-   void setYSC(double Y) {setXSC(Y,m_data.iSC);}
-   void setZSC(double Z) {setXSC(Z,m_data.iSC);}
-
-   void setXSC(double X,int i)       {m_data.offsetSC[i].x=X;}
-   void setYSC(double Y,int i)       {m_data.offsetSC[i].y=Y;}
-   void setZSC(double Z,int i)       {m_data.offsetSC[i].z=Z;}
-
-   void setOffsetASC(double A,int i) {m_data.offsetSC[i].a=A; }
+   //void setXSC(double X) {setXSC(X,m_data.iSC);}
+   //void setYSC(double Y) {setXSC(Y,m_data.iSC);}
+   //void setZSC(double Z) {setXSC(Z,m_data.iSC);}
+   //
+   //void setXSC(double X,int i)       {m_data.offsetSC[i].x=X;}
+   //void setYSC(double Y,int i)       {m_data.offsetSC[i].y=Y;}
+   //void setZSC(double Z,int i)       {m_data.offsetSC[i].z=Z;}
+   //
+   //void setOffsetASC(double A,int i) {m_data.offsetSC[i].a=A; }
 
     bool calcCenterPointR(WLGPoint startPoint,WLGPoint endPoint);
 
@@ -543,13 +546,17 @@ public:
 
     int getCompSide();
 
-    void setTool(int ikey,WLGTool Tool);
+    void setTool(int ikey,WLEData Tool);
+    void setSC(int ikey,WLEData SC);
 
-    WLGTool const getTool(int ikey);
+    WLEData const getSC(int ikey);
+    WLEData const getTool(int ikey);
 
     QVariant getDataTool(int ikey,QString key,QVariant defvalue);
+    QVariant getDataSC(int ikey,QString key,QVariant defvalue);
 
-    WLGTools *getTools() {return &m_data.Tools;}
+    WLData *getDataTool() {return &m_data.dataTools;}
+    WLData *getDataSC()   {return &m_data.dataSC;}
 
 
 private:
@@ -573,6 +580,10 @@ public:
     Q_INVOKABLE void setDataTool(int ikey,QString key,QVariant value,bool send=true);
     Q_INVOKABLE void setDataCurTool(QString key,QVariant value,bool send=true){setDataTool(getT(),key,value,send);}
 
+    Q_INVOKABLE void removeSC(int ikey);
+    Q_INVOKABLE void setDataSC(int ikey,QString key,QVariant value,bool send=true);
+    Q_INVOKABLE void setDataCurSC(QString key,QVariant value,bool send=true){setDataTool(getSC(),key,value,send);}
+
     Q_INVOKABLE double  getDataToolNum(int ikey,QString key,double  defvalue) {return getDataTool(ikey,key,defvalue).toDouble();}
     Q_INVOKABLE QString getDataToolStr(int ikey,QString key,QString defvalue) {return getDataTool(ikey,key,defvalue).toString();}
 
@@ -582,10 +593,16 @@ public:
     Q_INVOKABLE void setHTool(int i,float h);
     Q_INVOKABLE void setDTool(int i,float d);
 
-    Q_INVOKABLE  int getT() {return getValue('T');}
+    Q_INVOKABLE     int getT()   {return getValue('T');}
+    Q_INVOKABLE     int getSC() {return m_data.iSC;}
+    Q_INVOKABLE    void setSC(int isc);
+
+    Q_INVOKABLE QString getSCGStr(int iSC=-1);//G54... G154 P...
+
     Q_INVOKABLE double getValue(QString name);
 
-    Q_INVOKABLE double getGSC(){return m_data.iSC+53;}
+    Q_INVOKABLE double  getGSC(){return m_data.iSC+53;}
+
 
     Q_INVOKABLE double getHTool(int index);
     Q_INVOKABLE double getDTool(int index);
@@ -594,16 +611,16 @@ public:
 
     Q_INVOKABLE  void push() {m_dataStack=m_data;}
 
-    Q_INVOKABLE  void  pop() {memcpy(m_dataStack.offsetSC,m_data.offsetSC,sizeof(WLGPoint)*sizeSC);
-                              memcpy(m_dataStack.refPoint0SC,m_data.refPoint0SC,sizeof(WLGPoint)*sizeSC);
-                              memcpy(m_dataStack.refPoint1SC,m_data.refPoint1SC,sizeof(WLGPoint)*sizeSC);
-
-                              m_dataStack.Tools=m_data.Tools;
+    Q_INVOKABLE  void  pop() {
+                              m_dataStack.dataTools=m_data.dataTools;
                               m_data=m_dataStack;
                              }
 
-    Q_INVOKABLE void readToolsFile(QString _fileName);
-    Q_INVOKABLE void writeToolsFile(QString _fileName);
+    Q_INVOKABLE void readToolFile(QString _fileName);
+    Q_INVOKABLE void writeToolFile(QString _fileName);
+
+    Q_INVOKABLE void readSCFile(QString _fileName);
+    Q_INVOKABLE void writeSCFile(QString _fileName);
 private:
     WLGCodeData m_data;
 
@@ -611,10 +628,9 @@ private:
 
 signals:
 
-void changedSK(int);
 void changedF();
 void changedTool(int);
-void changedTools();
+void changedSC(int);
 
 public:
 

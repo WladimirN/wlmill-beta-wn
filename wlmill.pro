@@ -33,7 +33,7 @@ SOURCES +=src/wlfile.cpp
 HEADERS +=src/wlfile.h
 }
 
-VERSION = 1.1.0
+VERSION = 1.1.1
 
 QMAKE_TARGET_COMPANY = WLDEV
 QMAKE_TARGET_PRODUCT = WLMill
@@ -77,9 +77,8 @@ HEADERS += \
     widget/wlheightmapwidget.h \
     widget/wleditmillwidget.h \
     widget/wlpositionwidget.h \
-    widget/wlvisualwidget.h \
-    widget/wltoolswidget.h \
-    widget/wltoolswidget.h \
+    widget/wlvisualwidget.h \    
+    widget/wldatawidget.h \
     widget/wlgaxislabel.h \
     widget/wleditpoint.h \
     widget/wlgdrivewidget.h \
@@ -102,7 +101,6 @@ HEADERS += \
     src/wlmcodesh.h \
     src/wlopengl.h \
     src/wlpad.h \
-    src/wlgtool.h \
     src/wlgpoint.h \
     src/wlmachine.h \
     src/wldoublespinbox.h \
@@ -112,7 +110,10 @@ HEADERS += \
     src/wlmill.h \
     src/wlgdrive.h \
     model/wlheightmaptablemodel.h \
-    model/wlgtoolstablemodel.h
+    model/wlgsctablemodel.h \
+    model/wlgtoolstablemodel.h \
+    model/wldatatablemodel.h \
+    src/wldata.h
 
 SOURCES += \
     widget/wldevicewidget.cpp \
@@ -136,7 +137,7 @@ SOURCES += \
     widget/wlheightmapwidget.cpp \
     widget/wlvisualwidget.cpp \
     widget/wlgaxislabel.cpp \
-    widget/wltoolswidget.cpp \
+    widget/wldatawidget.cpp \
     widget/wleditmillwidget.cpp \
     widget/wleditpoint.cpp \
     widget/wlpositionwidget.cpp \
@@ -162,14 +163,16 @@ SOURCES += \
     src/wlelementtraj.cpp \
     src/wljoysticks.cpp \
     src/wlheightmap.cpp \
-    src/wlgtool.cpp \
     src/wlgpoint.cpp \
     src/wlgmachine.cpp \
     src/wlmill.cpp \
     src/wlgdrive.cpp \
     model/wlheightmaptablemodel.cpp \
     model/wlgtoolstablemodel.cpp \
-    main.cpp
+    model/wlgsctablemodel.cpp \
+    model/wldatatablemodel.cpp \
+    main.cpp \
+    src/wldata.cpp
 
 FORMS += \
     widget/wldevicewidget.ui \
@@ -195,7 +198,7 @@ FORMS += \
     widget/wlheightmapwidget.ui\    
     widget/wlpositionwidget.ui \
     widget/wleditpoint.ui \
-    widget/wltoolswidget.ui \
+    widget/wldatawidget.ui \
     widget/wlgdrivewidget.ui \
     widget/wlerrorpidwidget.ui \
     widget/wlspindlewidget.ui
