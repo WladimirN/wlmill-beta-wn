@@ -90,6 +90,8 @@ Mutex.lock();
 m_fileName=file;
 
 indexData.clear();
+toolList.clear();
+scList.clear();
 
 if(File.isOpen()) File.close();
 
@@ -100,6 +102,7 @@ File.setFileName(QCoreApplication::applicationDirPath()+"//prog.bkp");
 
 if(srcFile.open(QIODevice::ReadOnly)
     &&File.open(QIODevice::WriteOnly)){
+
 while(!srcFile.atEnd())
     {
     srcFile.getChar(&buf);
@@ -111,7 +114,7 @@ while(!srcFile.atEnd())
     if(buf=='\n')
        {
        EP.offsetInFile=File.pos();
-       indexData+=EP;
+       indexData+=EP;       
        }
     }
 
@@ -126,6 +129,22 @@ if(File.open(QIODevice::ReadOnly)){
  }
 
 Mutex.unlock();
+
+WLGCode GCode;
+
+for(int i=0;i<getElementCount();i++)
+    {
+    QString str=getTextElement(i);
+    GCode.loadStr(str);
+
+    if(scList.indexOf(GCode.getSC())==-1)
+       scList+=GCode.getSC();
+
+    if(toolList.indexOf(GCode.getT())==-1)
+       toolList+=GCode.getT();
+    }
+
+qDebug()<<"End check program"<<" T"<<toolList.size()<<" SC"<<scList.size();
 
 if(build) QTimer::singleShot(0,this,SLOT(updateShowTraj()));
 

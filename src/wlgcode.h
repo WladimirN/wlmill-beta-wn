@@ -603,7 +603,6 @@ public:
 
     Q_INVOKABLE double  getGSC(){return m_data.iSC+53;}
 
-
     Q_INVOKABLE double getHTool(int index);
     Q_INVOKABLE double getDTool(int index);
 
