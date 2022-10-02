@@ -64,7 +64,7 @@ if(0<=index&&index<count()) {
 
 int WLData::count() const
 {
-    return m_data.count();
+return m_data.count();
 }
 
 bool WLData::readFromFile(QString filename, QString split)
@@ -91,7 +91,7 @@ if(list.size()==headersList.size())
        }
     }
 
-m_data.insert(Data.value("index").toInt(),Data);
+m_data.insert(Data.value("index",m_data.count()).toInt(),Data);
 }
 
 file.close();
@@ -105,7 +105,7 @@ return false;
 
 bool WLData::writeToFile(QString filename, QString split)
 {
-QStringList headersList;
+QStringList headersList=m_headers;
 
 foreach(WLEData Data,m_data)
 {
@@ -116,8 +116,8 @@ foreach(QString key,Data.keys())
   }
 }
 
-headersList.removeOne("index");
 headersList.prepend("index");
+headersList.removeDuplicates();
 
 QFile file(filename);
 QTextStream stream(&file);
@@ -151,5 +151,15 @@ return true;
 }
 
 return false;
+}
+
+void WLData::setHeaders(QStringList headers)
+{
+m_headers=headers;
+}
+
+void WLData::clear()
+{
+m_data.clear();
 }
 

@@ -598,6 +598,7 @@ public:
     Q_INVOKABLE    void setSC(int isc);
 
     Q_INVOKABLE QString getSCGStr(int iSC=-1);//G54... G154 P...
+    Q_INVOKABLE QString getTGStr(int iTool=-1);//T1
 
     Q_INVOKABLE double getValue(QString name);
 

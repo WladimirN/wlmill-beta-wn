@@ -15,12 +15,15 @@ public:
     explicit WLGToolsTableModel(WLGCode *GCode,QObject *parent = nullptr);
 
 public:
-    QVariant data(const QModelIndex &index, int role) const;
+     void setHeaders(QStringList m_headers);
 
-     void setHeaders(QStringList headers);
 private:
     WLGCode *mGCode=nullptr;
 
+    // QAbstractItemModel interface
+public:
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+    QVariant data(const QModelIndex &index, int role) const;
 };
 
 #endif // WLGTOOLSTABLEMODEL_H

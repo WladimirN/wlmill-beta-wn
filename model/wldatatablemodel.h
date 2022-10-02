@@ -21,7 +21,7 @@ public:
 virtual  Q_INVOKABLE void setHeaders(QStringList);
 
 public:
-    WLData const *getData(){return  mdata;}
+    WLData const *getData(){return  m_data;}
 
 public:
     int rowCount(const QModelIndex &parent) const;
@@ -32,11 +32,11 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
 
 protected:
-    QStringList    headers;
-    QStringList defheaders;
+    QStringList    m_headers;
+    QStringList m_defheaders;
 
 private:
-    WLData *mdata;
+    WLData *m_data;
     double  m_scaleFont=1.5;
 };
 

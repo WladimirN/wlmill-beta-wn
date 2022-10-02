@@ -432,6 +432,7 @@ return side;
 void WLGCode::setTool(int ikey, WLEData Tool)
 {
 if(ikey>0){
+Tool.insert("GCode",QString("T%1").arg(ikey));
 m_data.dataTools.setData(ikey,Tool);
 emit changedTool(ikey);
 }
@@ -440,6 +441,7 @@ emit changedTool(ikey);
 void WLGCode::setSC(int ikey, WLEData SC)
 {
 if(ikey>0){
+SC.insert("GCode",getSCGStr(ikey));
 m_data.dataSC.setData(ikey,SC);
 emit changedSC(ikey);
 }
@@ -508,6 +510,14 @@ return QString("G154 P%1").arg(iSC-6);
 }
 }
 
+QString WLGCode::getTGStr(int iTool)
+{
+if(iTool==-1)
+    iTool=m_data.iSC;
+
+return QString("T%1").arg(iTool);
+}
+
 double WLGCode::getHTool(int index)
 {
 return getDataTool(index,"H",0).toDouble();
@@ -520,7 +530,21 @@ double WLGCode::getDTool(int index)
 
 void WLGCode::readToolFile(QString _fileName)
 {
-getDataTool()->readFromFile(_fileName);
+WLData data;
+
+data.readFromFile(_fileName);
+
+blockSignals(true);
+
+getDataTool()->clear();
+
+for (int i=0;i<data.count();i++) {
+WLEData tool=data.getDataAt(i);
+setTool(tool.value("index").toInt(),tool);
+}
+
+blockSignals(false);
+
 emit changedTool(-1);
 }
 
@@ -531,7 +555,21 @@ getDataTool()->writeToFile(_fileName);
 
 void WLGCode::readSCFile(QString _fileName)
 {
-getDataSC()->readFromFile(_fileName);
+WLData data;
+
+data.readFromFile(_fileName);
+
+blockSignals(true);
+
+getDataSC()->clear();
+
+for (int i=0;i<data.count();i++) {
+WLEData sc=data.getDataAt(i);
+setSC(sc.value("index").toInt(),sc);
+}
+
+blockSignals(false);
+
 emit changedSC(-1);
 }
 

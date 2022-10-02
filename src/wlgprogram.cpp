@@ -90,8 +90,8 @@ Mutex.lock();
 m_fileName=file;
 
 indexData.clear();
-toolList.clear();
-scList.clear();
+m_toolList.clear();
+m_scList.clear();
 
 if(File.isOpen()) File.close();
 
@@ -137,14 +137,18 @@ for(int i=0;i<getElementCount();i++)
     QString str=getTextElement(i);
     GCode.loadStr(str);
 
-    if(scList.indexOf(GCode.getSC())==-1)
-       scList+=GCode.getSC();
+    if(GCode.getSC()!=0 && m_scList.indexOf(GCode.getSC())==-1)
+       m_scList+=GCode.getSC();
 
-    if(toolList.indexOf(GCode.getT())==-1)
-       toolList+=GCode.getT();
+    if(GCode.getT()!=0 && m_toolList.indexOf(GCode.getT())==-1)
+       m_toolList+=GCode.getT();
     }
 
-qDebug()<<"End check program"<<" T"<<toolList.size()<<" SC"<<scList.size();
+qDebug()<<"End check program"<<" T"<<m_toolList.size()<<" SC"<<m_scList.size();
+
+changedToolList(m_toolList);
+changedSCList(m_scList);
+
 
 if(build) QTimer::singleShot(0,this,SLOT(updateShowTraj()));
 

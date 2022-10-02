@@ -1921,6 +1921,7 @@ newSCG.y=newOffsetSC.y;
 newSCG.z=newOffsetSC.z;
 
 m_GCode.setOffsetSC(iSC,newSCG);
+m_GCode.setDataSC(iSC,"GProgram",m_Program->getName());
 }
 
 void WLGMachine::setCurPositionSCT(QString nameCoord,double pos)
@@ -2573,15 +2574,31 @@ qDebug()<<"WLGMachine::runGProgram"<<istart<<m_Program->getName();
 
 if(isRunGProgram()) return false;
 
+QList <int> iSCList=m_Program->getSCList();
+foreach(int iSC,iSCList) {
+  if(m_GCode.getSC(iSC).isEmpty()) {
+    sendMessage(metaObject()->className(),tr("no inicial")+": "+m_GCode.getSCGStr(iSC),-1);
+    return 0;
+    }
+  }
+
+QList <int> toolList=m_Program->getToolList();
+foreach(int tool,toolList) {
+  if(m_GCode.getTool(tool).isEmpty()) {
+    sendMessage(metaObject()->className(),tr("no inicial")+": "+m_GCode.getTGStr(tool),-1);
+    return 0;
+    }
+  }
+
 if(isPause())  {
-  sendMessage(metaObject()->className()," error runGProgram, pause activ!",-1);
+  sendMessage(metaObject()->className(),tr("pause activ"),-1);
   return 0;
   }
 
 foreach(WLGDrive *MDrive,getGDrives())
   {
   if(!MDrive->isEnable()) {
-    sendMessage(metaObject()->className(),QString(tr(" error runGProgram, drive %1 not enable!")).arg(MDrive->getName()),-1);
+    sendMessage(metaObject()->className(),QString(tr("drive %1 not enable!")).arg(MDrive->getName()),-1);
     return 0;
     }
 

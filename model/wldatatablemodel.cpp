@@ -4,26 +4,32 @@
 
 WLDataTableModel::WLDataTableModel(WLData *data,QObject *parent):QAbstractTableModel (parent)
 {
-mdata=data;
-defheaders=QStringList()<<"index,all";
-headers=defheaders;
+m_data=data;
+m_defheaders=QStringList()<<"index,all";
+m_headers=m_defheaders;
 }
 
 void WLDataTableModel::setHeaders(QStringList _headers)
 {
 if(_headers.isEmpty()){
-  headers=defheaders;
+  m_headers=m_defheaders;
   }
   else{
-  headers=_headers;
+  m_headers=_headers;
   }
+
+QStringList head=m_headers;
+
+head.removeOne("all");
+
+m_data->setHeaders(head);
 
 emit layoutChanged();
 }
 
 QStringList WLDataTableModel::getHeaders()
 {
-    return headers;
+    return m_headers;
 }
 
 void WLDataTableModel::setScaleFont(double scale)
@@ -42,12 +48,12 @@ return m_scaleFont;
 
 int WLDataTableModel::rowCount(const QModelIndex &parent) const
 {
-return mdata->count();
+return m_data->count();
 }
 
 int WLDataTableModel::columnCount(const QModelIndex &parent) const
 {
-return headers.size();
+return m_headers.size();
 }
 
 QVariant WLDataTableModel::data(const QModelIndex &index, int role) const
@@ -55,24 +61,24 @@ QVariant WLDataTableModel::data(const QModelIndex &index, int role) const
 if (!index.isValid()) return QVariant();
 
 if (role == Qt::DisplayRole || role == Qt::EditRole) {    
-  if(headers[index.column()]!="all")  {
-     QVariant var=mdata->getValueAt(index.row(),headers[index.column()],"");
+  if(m_headers[index.column()]!="all")  {
+     QVariant var=m_data->getValueAt(index.row(),m_headers[index.column()],"");
      double d;
      bool ok;
      d=var.toDouble(&ok);
 
-     if(ok&&headers[index.column()]!="index")
+     if(ok&&m_headers[index.column()]!="index")
         return QString::number(d,'f',3);
      else
-        return mdata->getValueAt(index.row(),headers[index.column()],"").toString();
+        return m_data->getValueAt(index.row(),m_headers[index.column()],"").toString();
      }
      else {
      QStringList ret;
-     WLEData edata=mdata->getDataAt(index.row());
+     WLEData edata=m_data->getDataAt(index.row());
 
      foreach(QString key,edata.keys())
        {
-       if(headers.indexOf(key)==-1)
+       if(m_headers.indexOf(key)==-1)
            ret+=key+":\""+edata.value(key).toString()+"\"";
        }
 
@@ -84,7 +90,7 @@ if (role == Qt::DisplayRole || role == Qt::EditRole) {
 if (role == Qt::FontRole){
    QFont font;
 
-   if(index.column()<(headers.size()-1))
+   if(index.column()<(m_headers.size()-1))
       font.setPointSizeF(font.pointSize()*m_scaleFont);
 
    bool ok;
@@ -96,8 +102,8 @@ if (role == Qt::FontRole){
    }
 
 if (role == Qt::BackgroundRole){
-   if(mdata->getValueAt(index.row(),headers[index.column()],"").toString().isEmpty()
-    &&index.column()<(headers.size()-1))
+   if(m_data->getValueAt(index.row(),m_headers[index.column()],"").toString().isEmpty()
+    &&index.column()<(m_headers.size()-1))
        return QColor(Qt::lightGray);
    }
 
@@ -114,19 +120,19 @@ if(!index.isValid()) return false;
 
 if(role==Qt::EditRole){
 
-int ikey = mdata->getKeyAt(index.row());
+int ikey = m_data->getKeyAt(index.row());
 
-WLEData edata=mdata->getData(ikey);
+WLEData edata=m_data->getData(ikey);
 
 bool   ok;
 double dvalue=value.toString().replace(",",".").toDouble(&ok);
 
 if(ok)
-    edata.insert(headers[index.column()],dvalue);
+    edata.insert(m_headers[index.column()],dvalue);
 else
-    edata.insert(headers[index.column()],value);
+    edata.insert(m_headers[index.column()],value);
 
-mdata->setData(ikey,edata);
+m_data->setData(ikey,edata);
 }
 
 return true;
@@ -138,8 +144,7 @@ if(role==Qt::DisplayRole) {
 if(orientation==Qt::Vertical) { 
  }
  else {
- if(section>0)
- return headers.at(section);
+ return m_headers.at(section);
  }
 
 return QVariant();
@@ -150,9 +155,10 @@ return QAbstractItemModel::headerData(section,orientation,role);
 
 Qt::ItemFlags WLDataTableModel::flags(const QModelIndex &index) const
 {
-if (!index.isValid()) return NULL;
+if (!index.isValid()) QAbstractTableModel::flags(index);
 
-return QAbstractTableModel::flags(index) | (0 < index.column() &&  index.column() < headers.size()-1 ? Qt::ItemIsEditable : Qt::NoItemFlags);
+return QAbstractTableModel::flags(index) | ( m_headers.at(index.column())!="index"
+                                           &&m_headers.at(index.column())!="all"   ? Qt::ItemIsEditable : Qt::NoItemFlags);
 }
 
 
