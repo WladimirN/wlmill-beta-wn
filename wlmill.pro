@@ -33,7 +33,7 @@ SOURCES +=src/wlfile.cpp
 HEADERS +=src/wlfile.h
 }
 
-VERSION = 1.1.1
+VERSION = 1.1.2
 
 QMAKE_TARGET_COMPANY = WLDEV
 QMAKE_TARGET_PRODUCT = WLMill
@@ -113,7 +113,8 @@ HEADERS += \
     model/wlgsctablemodel.h \
     model/wlgtoolstablemodel.h \
     model/wldatatablemodel.h \
-    src/wldata.h
+    src/wldata.h \
+    model/wlgdatatablemodel.h
 
 SOURCES += \
     widget/wldevicewidget.cpp \
@@ -172,7 +173,8 @@ SOURCES += \
     model/wlgsctablemodel.cpp \
     model/wldatatablemodel.cpp \
     main.cpp \
-    src/wldata.cpp
+    src/wldata.cpp \
+    model/wlgdatatablemodel.cpp
 
 FORMS += \
     widget/wldevicewidget.ui \

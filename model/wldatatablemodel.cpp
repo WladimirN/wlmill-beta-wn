@@ -144,6 +144,7 @@ if(role==Qt::DisplayRole) {
 if(orientation==Qt::Vertical) { 
  }
  else {
+ if(m_headers.at(section)!="index")
  return m_headers.at(section);
  }
 

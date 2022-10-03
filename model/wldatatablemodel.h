@@ -32,11 +32,11 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
 
 protected:
-    QStringList    m_headers;
+    QStringList m_headers;
     QStringList m_defheaders;
+        WLData *m_data;
 
 private:
-    WLData *m_data;
     double  m_scaleFont=1.5;
 };
 

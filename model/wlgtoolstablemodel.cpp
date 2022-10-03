@@ -2,10 +2,9 @@
 #include <QColor>
 #include <QFont>
 
-WLGToolsTableModel::WLGToolsTableModel(WLGCode *GCode,QObject *parent):WLDataTableModel(&GCode->data()->dataTools,parent)
+WLGToolsTableModel::WLGToolsTableModel(WLGCode *GCode,QObject *parent)
+                    :WLGDataTableModel(GCode,&GCode->data()->dataTools,parent)
 {
-mGCode=GCode;
-
 connect(mGCode,&WLGCode::changedTool,[=](int number){
 if(number<0) {
   emit layoutChanged();
@@ -39,7 +38,7 @@ if (role == Qt::BackgroundRole
    return QColor(100,200,100);
    }
 
-return WLDataTableModel::data(index,role);
+return WLGDataTableModel::data(index,role);
 }
 
 void WLGToolsTableModel::setHeaders(QStringList headers)

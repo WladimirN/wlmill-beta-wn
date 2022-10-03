@@ -527,7 +527,12 @@ void WLMill::createTabTools()
 {
 ToolWidget = new WLDataWidget(MillMachine->getGCode(),this);
 
-ToolWidget ->setModel(new WLGToolsTableModel(MillMachine->getGCode(),ToolWidget));
+WLGToolsTableModel *toolsModel=new WLGToolsTableModel(MillMachine->getGCode(),ToolWidget);
+
+connect(Program,&WLGProgram::changedToolList,toolsModel,&WLGDataTableModel::setSelectList);
+
+ToolWidget ->setModel(toolsModel);
+
 
 WLTBarTool *tBarTools = new WLTBarTool(MScript,this);
 
@@ -552,7 +557,11 @@ void WLMill::createTabSC()
 {
 SCWidget = new WLDataWidget(MillMachine->getGCode(),this);
 
-SCWidget ->setModel(new WLGSCTableModel(MillMachine->getGCode(),SCWidget));
+WLGSCTableModel *scModel=new WLGSCTableModel(MillMachine->getGCode(),SCWidget);
+
+connect(Program,&WLGProgram::changedSCList,scModel,&WLGDataTableModel::setSelectList);
+
+SCWidget ->setModel(scModel);
 
 WLTBarData *tBarSC = new WLTBarData(MScript,this);
 

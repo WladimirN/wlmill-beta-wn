@@ -2,10 +2,9 @@
 #include <QColor>
 #include <QFont>
 
-WLGSCTableModel::WLGSCTableModel(WLGCode *GCode,QObject *parent):WLDataTableModel(&GCode->data()->dataSC,parent)
+WLGSCTableModel::WLGSCTableModel(WLGCode *GCode,QObject *parent)
+              :WLGDataTableModel(GCode,&GCode->data()->dataSC,parent)
 {
-mGCode=GCode;
-
 connect(mGCode,&WLGCode::changedSC,[=](int number){
   if(number<0){
     emit layoutChanged();
@@ -22,16 +21,16 @@ QVariant WLGSCTableModel::data(const QModelIndex &index, int role) const
 if (!index.isValid()) return QVariant();
 
 if (role == Qt::BackgroundRole
-  &&(m_headers[index.column()]=="index"||m_headers.at(index.column())=="GCode")){
+   &&(m_headers[index.column()]=="index"||m_headers.at(index.column())=="GCode")){
     if(mGCode->getSC()==mGCode->getDataSC()->getValueAt(index.row(),"index","-1").toInt()){
       return QColor(250,100,100);
     }
-    else {
+    else{
      return QVariant();
     }
-  }
+ }
 
-return WLDataTableModel::data(index,role);
+return WLGDataTableModel::data(index,role);
 }
 
 void WLGSCTableModel::setHeaders(QStringList headers)

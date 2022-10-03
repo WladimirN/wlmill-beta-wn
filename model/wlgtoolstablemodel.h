@@ -5,9 +5,9 @@
 #include <QAbstractTableModel>
 
 #include "wlgcode.h"
-#include "wldatatablemodel.h"
+#include "wlgdatatablemodel.h"
 
-class WLGToolsTableModel : public WLDataTableModel
+class WLGToolsTableModel : public WLGDataTableModel
 {
 Q_OBJECT
 
@@ -16,9 +16,6 @@ public:
 
 public:
      void setHeaders(QStringList m_headers);
-
-private:
-    WLGCode *mGCode=nullptr;
 
     // QAbstractItemModel interface
 public:
