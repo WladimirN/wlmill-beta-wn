@@ -12,6 +12,8 @@ int main(int argc, char *argv[])
 { 
 	QApplication a(argc, argv);
 
+    //QApplication::setAttribute(Qt::AA_ForceRasterWidgets, false);
+
     QTranslator translator;
     translator.load(QApplication::applicationDirPath()+"//lang//WLMill_"+QLocale::system().name());
 

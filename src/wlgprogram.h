@@ -66,6 +66,9 @@ private:
 
     WLGModel   m_GModel;
 
+    QList <int> m_toolList;
+    QList <int> m_scList;
+
 public:
     QList <WLElementGProgram> indexData;
     QList <WLShowPointProgram>  showPoints;
@@ -94,6 +97,9 @@ void setGModelData(WLGModelData _GModelData) {m_GModel.setData(_GModelData); upd
 
 Q_INVOKABLE quint32 getActivElement()   {return iActivElement;}
 Q_INVOKABLE quint32 getLastMovElement() {return iLastMovElement;}
+
+QList <int> getSCList() {return m_scList;}
+QList <int> getToolList() {return m_toolList;}
 
 void setLastMovElement(quint32 val) {iLastMovElement=val;}
 void setTextProgram(QString txt);
@@ -168,6 +174,9 @@ public slots:
  void setActivElement(int i) {if(iActivElement!=i) emit changedActivElement(iActivElement=i);}
  
 signals:
+
+  void changedToolList(QList <int>);
+  void changedSCList(QList <int>);
 
   void startedBuildShow();
   void changedShowTraj();

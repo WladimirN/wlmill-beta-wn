@@ -90,6 +90,8 @@ Mutex.lock();
 m_fileName=file;
 
 indexData.clear();
+m_toolList.clear();
+m_scList.clear();
 
 if(File.isOpen()) File.close();
 
@@ -100,6 +102,7 @@ File.setFileName(QCoreApplication::applicationDirPath()+"//prog.bkp");
 
 if(srcFile.open(QIODevice::ReadOnly)
     &&File.open(QIODevice::WriteOnly)){
+
 while(!srcFile.atEnd())
     {
     srcFile.getChar(&buf);
@@ -111,7 +114,7 @@ while(!srcFile.atEnd())
     if(buf=='\n')
        {
        EP.offsetInFile=File.pos();
-       indexData+=EP;
+       indexData+=EP;       
        }
     }
 
@@ -126,6 +129,26 @@ if(File.open(QIODevice::ReadOnly)){
  }
 
 Mutex.unlock();
+
+WLGCode GCode;
+
+for(int i=0;i<getElementCount();i++)
+    {
+    QString str=getTextElement(i);
+    GCode.loadStr(str);
+
+    if(GCode.getSC()!=0 && m_scList.indexOf(GCode.getSC())==-1)
+       m_scList+=GCode.getSC();
+
+    if(GCode.getT()!=0 && m_toolList.indexOf(GCode.getT())==-1)
+       m_toolList+=GCode.getT();
+    }
+
+qDebug()<<"End check program"<<" T"<<m_toolList.size()<<" SC"<<m_scList.size();
+
+changedToolList(m_toolList);
+changedSCList(m_scList);
+
 
 if(build) QTimer::singleShot(0,this,SLOT(updateShowTraj()));
 
@@ -233,7 +256,7 @@ for(qint32 index=0;(index<indexData.size())
 
     Point.select=ETraj.index;
 
-    m_GModel.setOffsetFrame(GCode.getSC(GCode.getActivSC()).to3D());
+    m_GModel.setOffsetFrame(GCode.getOffsetSC(GCode.getActivSC()).to3D());
 
     if(istart!=-1)
       Points=ETraj.calcPoints(&ok,&m_GModel,1);

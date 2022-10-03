@@ -1,5 +1,5 @@
-#ifndef WLGTOOLSTABLEMODEL_H
-#define WLGTOOLSTABLEMODEL_H
+#ifndef WLGSCTABLEMODEL_H
+#define WLGSCTABLEMODEL_H
 
 #include <QObject>
 #include <QAbstractTableModel>
@@ -7,15 +7,15 @@
 #include "wlgcode.h"
 #include "wlgdatatablemodel.h"
 
-class WLGToolsTableModel : public WLGDataTableModel
+class WLGSCTableModel : public WLGDataTableModel
 {
 Q_OBJECT
 
 public:
-    explicit WLGToolsTableModel(WLGCode *GCode,QObject *parent = nullptr);
+    explicit WLGSCTableModel(WLGCode *GCode,QObject *parent = nullptr);
 
 public:
-     void setHeaders(QStringList m_headers);
+   void setHeaders(QStringList m_headers);
 
     // QAbstractItemModel interface
 public:
@@ -23,4 +23,4 @@ public:
     QVariant data(const QModelIndex &index, int role) const;
 };
 
-#endif // WLGTOOLSTABLEMODEL_H
+#endif // WLGSCTABLEMODEL_H
