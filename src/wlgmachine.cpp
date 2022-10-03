@@ -670,7 +670,10 @@ if(getMotionDevice()->getModuleIOPut())
   connect(MIOPut,&WLModuleIOPut::changedOutput,this
           ,[=](int index){m_LScript->runFunction(QString("changedOutput(%1,%2)").arg(index).arg(MIOPut->getOutput(index)->getNow()),true);});
 
-}
+  }
+
+connect(m_Program,&WLGProgram::changedProgram(LModuleIOPut::changedOutput,this
+        ,[=](int index){m_LScript->runFunction(QString("changedOutput(%1,%2)").arg(index).arg(MIOPut->getOutput(index)->getNow()),true);});
 }
 
 void WLGMachine::initJoystick()

@@ -18,6 +18,9 @@ WLOscpWidget::WLOscpWidget(WLModuleOscp *MOscp, QWidget *parent) :
 
      connect(ui->pbRun,&QPushButton::toggled,this,&WLOscpWidget::onPBRun);
      connect(mMOscp,&WLModuleOscp::changedValues,this,&WLOscpWidget::addData,Qt::ConnectionType::QueuedConnection);
+
+     connect(ui->horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(horzScrollBarChanged(int)));
+     connect(ui->plot->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(xAxisChanged(QCPRange)));
 }
 
 WLOscpWidget::~WLOscpWidget()
@@ -38,8 +41,6 @@ mGraph1->rescaleValueAxis(false, false);
 ui->plot->xAxis->setRange(ui->plot->xAxis->range().upper, 3, Qt::AlignRight);
 
 ui->plot->replot();
-
-
 //qDebug()<<"WLOscpWidget::addData"<<lastTime<<time<<values.first();
 
 lastTime+=time;
@@ -55,4 +56,19 @@ if(press) {
  else{
  mMOscp->setRun(false);
  }
+}
+
+void WLOscpWidget::horzScrollBarChanged(int value)
+{
+if (qAbs(ui->plot->xAxis->range().center()-value/100.0) > 0.01) // if user is dragging plot, we don't want to replot twice
+  {
+  ui->plot->xAxis->setRange(value/100.0, ui->plot->xAxis->range().size(), Qt::AlignCenter);
+  ui->plot->replot();
+  }
+}
+
+void WLOscpWidget::xAxisChanged(QCPRange range)
+{
+  ui->horizontalScrollBar->setValue(qRound(range.center()*100.0)); // adjust position of scroll bar slider
+  ui->horizontalScrollBar->setPageStep(qRound(range.size()*100.0)); // adjust size of scroll bar slider
 }

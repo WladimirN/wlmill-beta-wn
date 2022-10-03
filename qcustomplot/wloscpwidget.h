@@ -34,6 +34,9 @@ private:
 private slots:
    void addData(double time,QList <double> values);
    void onPBRun(bool press);
+
+   void horzScrollBarChanged(int value);
+   void xAxisChanged(QCPRange range);
 };
 
 #endif // WLOSCPWIDGET_H
