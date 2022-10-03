@@ -177,9 +177,7 @@ signals:
   void changedActiv(bool);
   void changedActivElement(int);
 
-  void changedProgram(QString);
-  void changedProgram();
-  
+  void changedProgram();  
   
   void changedBuildTrajPercent(int);
 
@@ -189,6 +187,7 @@ signals:
   void sendMessage(QString,QString,int);
 
   void changedCurrentIndex(long index);
+
 };
 
 

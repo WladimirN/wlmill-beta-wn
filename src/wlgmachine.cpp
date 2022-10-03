@@ -630,6 +630,9 @@ m_MScript->addProperty("WLScriptPath",_scriptPath);
 m_MScript->addProperty("WLMillConfigPath",configMMPath);
 */
 
+connect(m_Program,&WLGProgram::changedProgram,this
+        ,[=](){m_MScript->runFunction(QString("changedGProgram()"),true);});
+
 }
 
 void WLGMachine::initLScript()
@@ -670,7 +673,10 @@ if(getMotionDevice()->getModuleIOPut())
   connect(MIOPut,&WLModuleIOPut::changedOutput,this
           ,[=](int index){m_LScript->runFunction(QString("changedOutput(%1,%2)").arg(index).arg(MIOPut->getOutput(index)->getNow()),true);});
 
-}
+  }
+
+connect(m_Program,&WLGProgram::changedProgram,this
+        ,[=](){m_LScript->runFunction(QString("changedGProgram()"),true);});
 }
 
 void WLGMachine::initJoystick()
