@@ -525,7 +525,7 @@ addDockWidget(Qt::RightDockWidgetArea,dockPosition);
 
 void WLMill::createTabTools()
 {
-ToolWidget = new WLDataWidget(MillMachine->getGCode(),this);
+ToolWidget = new WLDataWidget(this);
 
 WLGToolsTableModel *toolsModel=new WLGToolsTableModel(MillMachine->getGCode(),ToolWidget);
 
@@ -555,7 +555,7 @@ tabWidget->addTab(ToolWidget,"Tools");
 
 void WLMill::createTabSC()
 {
-SCWidget = new WLDataWidget(MillMachine->getGCode(),this);
+SCWidget = new WLDataWidget(this);
 
 WLGSCTableModel *scModel=new WLGSCTableModel(MillMachine->getGCode(),SCWidget);
 

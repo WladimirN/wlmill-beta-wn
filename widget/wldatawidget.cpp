@@ -1,13 +1,14 @@
 #include <QMessageBox>
+#include <QInputDialog>
+#include <QString>
 #include "wldatawidget.h"
 #include "ui_wldatawidget.h"
 
-WLDataWidget::WLDataWidget(WLGCode *_GCode,QWidget *parent) :
+WLDataWidget::WLDataWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::WLDataWidget)
 {
     ui->setupUi(this);
-    m_GCode=_GCode;
 }
 
 WLDataWidget::~WLDataWidget()
@@ -26,6 +27,18 @@ connect(ui->tableViewData->itemDelegate(),&QAbstractItemDelegate::closeEditor,[=
 foreach(QModelIndex index,ui->tableViewData->selectionModel()->selection().indexes()) {
     m_Model->setData(index,m_Model->data(ui->tableViewData->selectionModel()->currentIndex(),Qt::EditRole),Qt::EditRole);
     }
+});
+
+QHeaderView  *header = ui->tableViewData->horizontalHeader();
+
+header->setToolTip(tr("double click for edit column"));
+
+connect(header, &QHeaderView::sectionDoubleClicked,[=](int logicalIndex){
+    bool ok;
+    QString text = QInputDialog::getMultiLineText(this, tr("Enter column names"),
+                                                  tr("Example:")+"index,GCode,all", m_Model->getHeaders().join(","), &ok);
+    if (ok && !text.isEmpty())
+        m_Model->setHeaders(text.split(",",QString::SkipEmptyParts));
 });
 }
 

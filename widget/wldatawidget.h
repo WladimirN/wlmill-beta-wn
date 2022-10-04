@@ -37,7 +37,7 @@ class WLDataWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit WLDataWidget(WLGCode *_GCode,QWidget *parent = nullptr);
+    explicit WLDataWidget(QWidget *parent = nullptr);
     ~WLDataWidget();
 
     void setModel(WLDataTableModel *Model);
@@ -52,7 +52,6 @@ public:
 private:
     Ui::WLDataWidget *ui;
 
-    WLGCode *m_GCode;
     WLDataTableModel *m_Model=nullptr;
 
 private slots:
