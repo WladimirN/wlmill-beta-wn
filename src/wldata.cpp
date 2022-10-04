@@ -74,12 +74,12 @@ QFile file(filename);
 
 if(file.open(QIODevice::ReadOnly)){
 
-headersList=static_cast<QString>(file.readLine()).simplified().split(split);
+headersList=static_cast<QString>(QTextCodec::codecForName("Windows-1251")->toUnicode(file.readLine())).simplified().split(split);
 
 m_data.clear();
 
 while(!file.atEnd())    {
-QStringList list=static_cast<QString>(file.readLine()).simplified().split(split);
+QStringList list=static_cast<QString>(QTextCodec::codecForName("Windows-1251")->toUnicode(file.readLine())).simplified().split(split);
 
 WLEData Data;
 
@@ -120,6 +120,8 @@ headersList.removeDuplicates();
 
 QFile file(filename);
 QTextStream stream(&file);
+
+stream.setCodec(QTextCodec::codecForName("Windows-1251"));
 
 if(file.open(QIODevice::WriteOnly)){
 
