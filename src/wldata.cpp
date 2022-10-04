@@ -74,7 +74,6 @@ QFile file(filename);
 
 if(file.open(QIODevice::ReadOnly)){
 
-
 headersList=static_cast<QString>(file.readLine()).simplified().split(split);
 
 m_data.clear();

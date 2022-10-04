@@ -213,8 +213,8 @@ RESOURCES += \
 win32:RC_ICONS +=wlmill.ico
 
 include (QJoysticks/QJoysticks.pri)
-include (wlmotion/WLMotion.pri)
-include (wlscript/WLScript.pri)
+include (WLMotion/WLMotion.pri)
+include (WLScript/WLScript.pri)
 
 DISTFILES += \
     data/icons/play-red.png \

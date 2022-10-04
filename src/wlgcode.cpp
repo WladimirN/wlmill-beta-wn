@@ -532,20 +532,20 @@ void WLGCode::readToolFile(QString _fileName)
 {
 WLData data;
 
-data.readFromFile(_fileName);
+if(data.readFromFile(_fileName)){
+ blockSignals(true);
 
-blockSignals(true);
+ getDataTool()->clear();
 
-getDataTool()->clear();
+ for (int i=0;i<data.count();i++) {
+ WLEData tool=data.getDataAt(i);
+ setTool(tool.value("index").toInt(),tool);
+ }
 
-for (int i=0;i<data.count();i++) {
-WLEData tool=data.getDataAt(i);
-setTool(tool.value("index").toInt(),tool);
-}
+ blockSignals(false);
 
-blockSignals(false);
-
-emit changedTool(-1);
+ emit changedTool(-1);
+ }
 }
 
 void WLGCode::writeToolFile(QString _fileName)
@@ -557,20 +557,20 @@ void WLGCode::readSCFile(QString _fileName)
 {
 WLData data;
 
-data.readFromFile(_fileName);
+if(data.readFromFile(_fileName)){
+ blockSignals(true);
 
-blockSignals(true);
+ getDataSC()->clear();
 
-getDataSC()->clear();
+ for (int i=0;i<data.count();i++) {
+ WLEData sc=data.getDataAt(i);
+ setSC(sc.value("index").toInt(),sc);
+ }
 
-for (int i=0;i<data.count();i++) {
-WLEData sc=data.getDataAt(i);
-setSC(sc.value("index").toInt(),sc);
-}
+ blockSignals(false);
 
-blockSignals(false);
-
-emit changedSC(-1);
+ emit changedSC(-1);
+ }
 }
 
 void WLGCode::writeSCFile(QString _fileName)

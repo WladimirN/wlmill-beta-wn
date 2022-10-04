@@ -1352,6 +1352,7 @@ if(FileXML.isOpen())
          continue;
          }
 
+    //--old
     if(stream.name()=="SC"){
 		 qDebug()<<"loadSC";
 		 WL3DPoint SC;
@@ -1394,9 +1395,8 @@ if(FileXML.isOpen())
            m_GCode.setRefPoint1SC(i,GP);
            continue;
            }
-
 	     }
-
+      //---
         if(stream.name()=="Tool")
          {
          qDebug()<<"loadTool";
