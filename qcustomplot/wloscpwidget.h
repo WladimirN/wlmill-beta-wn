@@ -6,6 +6,7 @@
 #include "wlmoduleoscp.h"
 #include "wlioput.h"
 #include "wlaxis.h"
+#include "wlchoscpwidget.h"
 
 namespace Ui {
 class WLOscpWidget;
@@ -24,10 +25,8 @@ private:
 
     WLModuleOscp *mMOscp;
 
-    QPointer<QCPGraph> mGraph1;
-    QPointer<QCPGraph> mGraph2;
-    QPointer<QCPGraph> mGraph3;
-    QPointer<QCPGraph> mGraph4;
+    QList <QPointer<QCPGraph>> mGraphs;
+    QList <WLChOscpWidget*> chWidgets;
 
     double lastTime=0;
 

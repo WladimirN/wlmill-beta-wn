@@ -132,7 +132,8 @@ HEADERS += \
     model/wlgsctablemodel.h \
     model/wlgtoolstablemodel.h \
     model/wldatatablemodel.h \
-    src/wldata.h
+    src/wldata.h \
+    qcustomplot/wlchoscpwidget.h
 
 
 SOURCES += \
@@ -192,7 +193,8 @@ SOURCES += \
     model/wlgsctablemodel.cpp \
     model/wldatatablemodel.cpp \
     main.cpp \
-    src/wldata.cpp
+    src/wldata.cpp \
+    qcustomplot/wlchoscpwidget.cpp
 
 FORMS += \
     widget/wldevicewidget.ui \
@@ -221,7 +223,8 @@ FORMS += \
     widget/wldatawidget.ui \
     widget/wlgdrivewidget.ui \
     widget/wlerrorpidwidget.ui \
-    widget/wlspindlewidget.ui
+    widget/wlspindlewidget.ui \
+    qcustomplot/wlchoscpwidget.ui
 
 RESOURCES += \
     image.qrc \

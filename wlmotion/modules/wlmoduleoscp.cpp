@@ -10,8 +10,8 @@ Init(1);
 
 WLModuleOscp::~WLModuleOscp()
 {
-while(Oscp.isEmpty())
-      delete Oscp.takeLast();
+while(chOscp.isEmpty())
+      delete chOscp.takeLast();
 }
 
 bool WLModuleOscp::Init(int _size)
@@ -19,6 +19,7 @@ bool WLModuleOscp::Init(int _size)
 if(InitOscp(_size))
 {
 update();
+setRun(false);
 return true;
 }
 else
@@ -28,22 +29,22 @@ else
 bool WLModuleOscp::InitOscp(int size)
 {
 if(size<1
- ||Oscp.size()== size
+ ||chOscp.size()== size
  ||isReady()) return false;
 
-WLOscp *nOscp;
+WLChOscp *nOscp;
 
-if(size>Oscp.size())
- for(int i=Oscp.size();i<size;i++ )
+if(size>chOscp.size())
+ for(int i=chOscp.size();i<size;i++ )
   {
-  nOscp = new WLOscp;
+  nOscp = new WLChOscp;
   nOscp->index=i;
-  Oscp+=nOscp;
+  chOscp+=nOscp;
   }
 else
-    while(Oscp.size()!= size)
+    while(chOscp.size()!= size)
 	  {	  
-      nOscp=Oscp.takeLast();
+      nOscp=chOscp.takeLast();
 
       delete nOscp;
       }
@@ -51,23 +52,44 @@ else
 return true;
 }
 
-WLOscp *WLModuleOscp::getOscp(int index)
+void WLModuleOscp::getAvaibleSource()
 {
-Q_ASSERT(((index<Oscp.size()))&&(index<255));
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
 
-    return index<Oscp.size() ? Oscp.at(index): nullptr;
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMOscp
+      <<(quint8)comMOscp_getAvaSource;
+
+emit sendCommand(data);
 }
 
-bool WLModuleOscp::setSourceChannel(quint8 indexch, WLModule::typeModule module, WLElement::typeElement element, uint8_t indexElement, uint8_t typeData)
+WLChOscp *WLModuleOscp::getOscp(int index)
 {
-WLOscp *Oscp=getOscp(indexch);
+Q_ASSERT(((index<chOscp.size()))&&(index<255));
+
+    return index<chOscp.size() ? chOscp.at(index): nullptr;
+}
+
+bool WLModuleOscp::setSourceChannel(WLChOscp chOscp)
+{
+return setSourceChannel(chOscp.index
+                       ,chOscp.src.element
+                       ,chOscp.indexElement
+                       ,chOscp.src.typeData);
+}
+
+bool WLModuleOscp::setSourceChannel(quint8 indexch,WLElement::typeElement element, uint8_t indexElement, uint8_t typeData)
+{
+WLChOscp *Oscp=getOscp(indexch);
 
 if(Oscp){
-Oscp->module=module;
-Oscp->element=element;
-Oscp->indexElement=indexElement;
-Oscp->typeData=typeData;
+Oscp->src.element=element;
+Oscp->src.typeData=typeData;
 
+Oscp->indexElement=indexElement;
 
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -78,10 +100,9 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 Stream<<(quint8)typeMOscp
       <<(quint8)comMOscp_setSourceChannel
       <<(quint8)indexch
-      <<(quint8)Oscp->module
-      <<(quint8)Oscp->element
+      <<(quint8)Oscp->src.element
       <<(quint8)Oscp->indexElement
-      <<(quint8)Oscp->typeData;
+      <<(quint8)Oscp->src.typeData;
 
 emit sendCommand(data);
 return true;
@@ -101,7 +122,20 @@ Stream.setByteOrder(QDataStream::LittleEndian);
 Stream<<(quint8)typeMOscp<<(quint8)comMOscp_setRun<<(quint8)run;
 
 emit sendCommand(data);
+
 return true;
+}
+
+void WLModuleOscp::update()
+{
+getAvaibleSource();
+}
+
+void WLModuleOscp::backup()
+{
+foreach(WLChOscp *channel,chOscp){
+  setSourceChannel(*channel);
+  }
 }
 
 
@@ -118,6 +152,27 @@ Stream>>ui1;
 
 switch(ui1)
 {
+case sendMOscp_avaSource:{
+                         source.clear();
+
+                         while(!Stream.atEnd())
+                          {
+                          quint8 telement;
+                          quint8 tdata;
+
+                          Stream>>telement>>tdata;
+
+                          WLSrcChOscp src;
+
+                          src.element=static_cast<WLElement::typeElement>(telement);
+                          src.typeData=tdata;
+
+                          source<<src;
+                          }
+
+                         emit changedSource(source);
+                         }
+
 case sendMOscp_dataCh : {
                         quint32 time_us;
                         Stream>>time_us;
@@ -133,66 +188,66 @@ case sendMOscp_dataCh : {
                           case OSC_u8: {
                                        quint8 u8;
                                        Stream>>u8;
-                                       Oscp[i]->value=u8;
+                                       chOscp[i]->value=u8;
                                        }
                                        break;
 
                           case OSC_i8: {
                                        qint8 i8;
                                        Stream>>i8;
-                                       Oscp[i]->value=i8;
+                                       chOscp[i]->value=i8;
                                        }
                                        break;
 
                           case OSC_u16: {
                                         quint16 ui16;
                                         Stream>>ui16;
-                                        Oscp[i]->value=ui16;
+                                        chOscp[i]->value=ui16;
                                         }
                                         break;
 
                           case OSC_i16: {
                                         qint16 i16;
                                         Stream>>i16;
-                                        Oscp[i]->value=i16;
+                                        chOscp[i]->value=i16;
                                         }
                                         break;
 
                           case OSC_u32:{
                                        quint32 ui32;
                                        Stream>>ui32;
-                                       Oscp[i]->value=ui32;
+                                       chOscp[i]->value=ui32;
                                        }
                                        break;
 
                           case OSC_i32:{
                                        qint32 i32;
                                        Stream>>i32;
-                                       Oscp[i]->value=i32;
+                                       chOscp[i]->value=i32;
                                        }
                                        break;
                           case OSC_f:  {
                                        float f32;
                                        Stream>>f32;
-                                       Oscp[i]->value=f32;
+                                       chOscp[i]->value=f32;
                                        }
                                        break;
                           case OSC_d: {
                                       double d;
                                       Stream>>d;
-                                      Oscp[i]->value=d;
+                                      chOscp[i]->value=d;
                                       }
                                       break;
                           case OSC_dl: {
                                        qint64 dl;
                                        Stream>>dl;
-                                       Oscp[i]->value=dl;
+                                       chOscp[i]->value=dl;
                                        }
                                        break;
-                          case OSC_empty: Oscp[i]->value=0;break;
+                          case OSC_empty: chOscp[i]->value=0;break;
                           }
 
-                         values+=Oscp[i]->value;
+                         values+=chOscp[i]->value;
                          }
 
                         emit changedValues((double)time_us/1000000,values);
