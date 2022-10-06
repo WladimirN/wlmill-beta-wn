@@ -37,13 +37,13 @@ m_data.axisY.value=GPoint.y;
 m_data.axisZ.value=GPoint.z;
 
 if(m_data.axisA.rotary)
-   GPoint.a-=((int)(GPoint.a/360.0))*360;
+   GPoint.a-=(lround(GPoint.a/360))*360;
 
 if(m_data.axisA.rotary)
-   GPoint.b-=((int)(GPoint.b/360.0))*360;
+   GPoint.b-=(lround(GPoint.b/360))*360;
 
 if(m_data.axisA.rotary)
-   GPoint.c-=((int)(GPoint.c/360.0))*360;
+   GPoint.c-=(lround(GPoint.c/360))*360;
 
 m_data.axisA.value=GPoint.a;
 m_data.axisB.value=GPoint.b;
