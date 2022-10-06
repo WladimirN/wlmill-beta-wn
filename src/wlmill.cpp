@@ -1090,8 +1090,9 @@ switch(QMessageBox::question(this, tr("Confirmation:"),
 	   QMessageBox::Yes|QMessageBox::No))
 	    {
 		
-        case QMessageBox::Yes:     qDebug()<<"WLMill close";
+        case QMessageBox::Yes:     MillMachine->setEnable(false);
                                    saveDataState();
+                                   qDebug()<<"WLMill close";
 			                       break;
 
         default:                   event->ignore();
@@ -1387,6 +1388,7 @@ setting.setValue("SC/showColumn",SCWidget->getHeaderTable().join(","));
 
 void WLMill::saveDataState()
 {
+qDebug()<<"WLMill::saveDataState()";
 if(!MillMachine->isReady()) return;
 
 QSettings settings(configGMPath+"state",QSettings::IniFormat);

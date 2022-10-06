@@ -1483,7 +1483,8 @@ if(FileXML.isOpen())
   setSOut(m_GCode.getValue('S'));
 
   ModulePlanner->setModeRun(PLANNER_normal);  
-  ModulePlanner->setEnableSOut(false);
+  ModulePlanner->setEnableSOut(false);  
+  ModulePlanner->stopMov();
   }
 
   getGCode()->readToolFile(toolsFile);
@@ -3593,6 +3594,7 @@ if(isEmptyMotion())   {
 while((ModulePlanner->getFree()>0)
    &&(!MillTraj.isEmpty())
    &&(!isRunGProgram()
+     ||isRunMScript()
      ||MillTraj.size()>1
      ||MillTraj.first().isScript()
      ||m_iProgram==(m_Program->getElementCount()))
