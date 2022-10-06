@@ -41,12 +41,12 @@ if (role == Qt::BackgroundRole
 return WLGDataTableModel::data(index,role);
 }
 
-void WLGToolsTableModel::setHeaders(QStringList headers)
+void WLGToolsTableModel::setHeaders(QString strheaders)
 {
-if(headers.isEmpty())
-   headers=QString("GCode,Diam,D,H,Xg,Yg,Zg,all").split(",");
+if(strheaders.isEmpty())
+   strheaders=QString("GCode,Diam,D,H,Xg,Yg,Zg,all");
 
-WLDataTableModel::setHeaders(headers);
+WLGDataTableModel::setHeaders(strheaders);
 }
 
 Qt::ItemFlags WLGToolsTableModel::flags(const QModelIndex &index) const

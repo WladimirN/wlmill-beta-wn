@@ -37,15 +37,16 @@ connect(header, &QHeaderView::sectionDoubleClicked,[=](int logicalIndex){
     bool ok;
     QString text = QInputDialog::getMultiLineText(this, tr("Enter column names"),
                                                   tr("Example:")+"index,GCode,all", m_Model->getHeaders().join(","), &ok);
-    if (ok && !text.isEmpty())
-        m_Model->setHeaders(text.split(",",QString::SkipEmptyParts));
+    if (ok && !text.isEmpty()) {
+        m_Model->setHeaders(text);
+        }
 });
 }
 
-void WLDataWidget::setHeadersTable(QStringList headers)
+void WLDataWidget::setHeadersTable(QString strheaders)
 {
 if(m_Model)
-   m_Model->setHeaders(headers);
+   m_Model->setHeaders(strheaders);
 }
 
 QStringList WLDataWidget::getHeaderTable()

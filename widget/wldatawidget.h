@@ -42,7 +42,7 @@ public:
 
     void setModel(WLDataTableModel *Model);
 
-    void setHeadersTable(QStringList headers);
+    void setHeadersTable(QString strheaders);
     QStringList getHeaderTable();
 
     void addToolBar(WLTBarData *toolBar);

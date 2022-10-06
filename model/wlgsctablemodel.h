@@ -15,7 +15,7 @@ public:
     explicit WLGSCTableModel(WLGCode *GCode,QObject *parent = nullptr);
 
 public:
-   void setHeaders(QStringList m_headers);
+   void setHeaders(QString strheaders);
 
     // QAbstractItemModel interface
 public:

@@ -18,7 +18,7 @@ public:
     double getScaleFont() const;
 
 public:
-virtual  Q_INVOKABLE void setHeaders(QStringList);
+virtual  Q_INVOKABLE void setHeaders(QString);
 
 public:
     WLData const *getData(){return  m_data;}

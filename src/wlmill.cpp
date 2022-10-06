@@ -1362,8 +1362,8 @@ VisualWidget->setClearColor(color);
 Program->setLastMovElement(setting.value("Program/iLastElement",0).toUInt());
 Program->loadFile(setting.value("Program/file","").toString(),true);
 
-ToolWidget->setHeadersTable(setting.value("Tools/showColumn","").toString().split(",",QString::SkipEmptyParts));
-SCWidget->setHeadersTable(setting.value("SC/showColumn","").toString().split(",",QString::SkipEmptyParts));
+ToolWidget->setHeadersTable(setting.value("Tools/showColumn","").toString());
+SCWidget->setHeadersTable(setting.value("SC/showColumn","").toString());
 //lastProg=(m_setting.value("view/zoomDir",0).toBool());
 
 return true;

@@ -9,13 +9,13 @@ m_defheaders=QStringList()<<"index,all";
 m_headers=m_defheaders;
 }
 
-void WLDataTableModel::setHeaders(QStringList _headers)
+void WLDataTableModel::setHeaders(QString strheaders)
 {
-if(_headers.isEmpty()){
+if(strheaders.isEmpty()){
   m_headers=m_defheaders;
   }
   else{
-  m_headers=_headers;
+  m_headers=strheaders.simplified().remove(" ").split(",",QString::SkipEmptyParts);
   }
 
 QStringList head=m_headers;
