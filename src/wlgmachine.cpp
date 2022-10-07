@@ -1493,6 +1493,7 @@ if(FileXML.isOpen())
   setSOut(m_GCode.getValue('S'));
 
   ModulePlanner->setModeRun(PLANNER_normal);  
+  ModulePlanner->stopMov();
 
 /*
   if(m_motDevice->getModulePWM())
