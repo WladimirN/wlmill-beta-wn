@@ -352,7 +352,7 @@ class WLAxis : public WLElement
 
 public:
 
-enum typeMotorAxis{AXIS_noMotor,AXIS_stepMotor,AXIS_encoderStepMotor,AXIS_spindleStepMotor,AXIS_errEncoderStepMotor};
+enum typeMotorAxis{AXIS_noMotor,AXIS_stepMotor,AXIS_encoderStepMotor,AXIS_errEncoderStepMotor,AXIS_spindleStepMotor};
 
 Q_ENUM(typeMotorAxis)
 

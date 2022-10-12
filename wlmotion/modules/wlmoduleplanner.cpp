@@ -291,6 +291,7 @@ void WLModulePlanner::backup()
 setKF(getKF());
 setKSOut(getKSOut());
 setSmoothAng(getSmoothAng());
+setModeRun(getModeRun());
 
 setInProbe(getInput(PLANNER_inProbe)->getIndex());
 setInPause(getInput(PLANNER_inPause)->getIndex());
