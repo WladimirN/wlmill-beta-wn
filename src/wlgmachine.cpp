@@ -677,6 +677,7 @@ if(getMotionDevice()->getModuleIOPut())
 
 connect(m_Program,&WLGProgram::changedProgram,this
         ,[=](){m_LScript->runFunction(QString("changedGProgram()"),true);});
+
 }
 
 void WLGMachine::initJoystick()

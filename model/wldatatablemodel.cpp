@@ -141,6 +141,7 @@ return true;
 QVariant WLDataTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 if(role==Qt::DisplayRole) {
+
 if(orientation==Qt::Vertical) { 
  }
  else {
@@ -160,6 +161,7 @@ if (!index.isValid()) QAbstractTableModel::flags(index);
 
 return QAbstractTableModel::flags(index) | ( m_headers.at(index.column())!="index"
                                            &&m_headers.at(index.column())!="all"   ? Qt::ItemIsEditable : Qt::NoItemFlags);
+
 }
 
 

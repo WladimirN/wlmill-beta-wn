@@ -24,6 +24,8 @@
 
 #define GCodeSize 1000
 
+#define GCodeSize 1000
+
 typedef struct GPar
 {
 double value;
@@ -194,17 +196,7 @@ public:
 
    void rotAboutRotPointSC(int i,float a);
 
-   //void setXSC(double X) {setXSC(X,m_data.iSC);}
-   //void setYSC(double Y) {setXSC(Y,m_data.iSC);}
-   //void setZSC(double Z) {setXSC(Z,m_data.iSC);}
-   //
-   //void setXSC(double X,int i)       {m_data.offsetSC[i].x=X;}
-   //void setYSC(double Y,int i)       {m_data.offsetSC[i].y=Y;}
-   //void setZSC(double Z,int i)       {m_data.offsetSC[i].z=Z;}
-   //
-   //void setOffsetASC(double A,int i) {m_data.offsetSC[i].a=A; }
-
-    bool calcCenterPointR(WLGPoint startPoint,WLGPoint endPoint);
+   bool calcCenterPointR(WLGPoint startPoint,WLGPoint endPoint);
 
     int setGCode(QString val);
     int setGCode(int val) {return setGCode(QString::number(val));}

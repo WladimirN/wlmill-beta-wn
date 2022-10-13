@@ -21,6 +21,7 @@ public:
 public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
     QVariant data(const QModelIndex &index, int role) const;
+
 };
 
 #endif // WLGSCTABLEMODEL_H

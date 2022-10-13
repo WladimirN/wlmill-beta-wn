@@ -41,6 +41,10 @@
 #include "wltimerscript.h"
 #include "wlheightmapwidget.h"
 
+#ifdef DEF_PLOT
+#include "wloscpwidget.h"
+#endif
+
 #ifdef DEF_CAMERA
 #include "wlcamera.h"
 #endif
@@ -147,7 +151,6 @@ Q_OBJECT
 public:
     explicit WLTBarTool(WLEVScript *_script,QWidget *parent=nullptr):WLTBarData (_script,parent)    {
     }
-
     Q_INVOKABLE     int selectTool(){return curIndex();}
     Q_INVOKABLE QString selectData(){return curData();}
 };
@@ -202,6 +205,10 @@ WLLog *Log;
 
 #ifdef DEF_CAMERA
 WLCamera *camera;
+#endif
+
+#ifdef DEF_PLOT
+WLOscpWidget *oscp;
 #endif
 
 QTabWidget *tabWidget;

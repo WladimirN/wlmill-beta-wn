@@ -47,6 +47,7 @@ if(strheaders.isEmpty())
    strheaders=QString("GCode,Diam,D,H,Xg,Yg,Zg,all");
 
 WLGDataTableModel::setHeaders(strheaders);
+
 }
 
 Qt::ItemFlags WLGToolsTableModel::flags(const QModelIndex &index) const

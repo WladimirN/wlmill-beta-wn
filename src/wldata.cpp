@@ -79,6 +79,7 @@ headersList=static_cast<QString>(QTextCodec::codecForName("Windows-1251")->toUni
 m_data.clear();
 
 while(!file.atEnd())    {
+
 QStringList list=static_cast<QString>(QTextCodec::codecForName("Windows-1251")->toUnicode(file.readLine())).simplified().split(split);
 
 WLEData Data;
@@ -163,4 +164,3 @@ void WLData::clear()
 {
 m_data.clear();
 }
-

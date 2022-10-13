@@ -533,7 +533,6 @@ connect(Program,&WLGProgram::changedToolList,toolsModel,&WLGDataTableModel::setS
 
 ToolWidget ->setModel(toolsModel);
 
-
 WLTBarTool *tBarTools = new WLTBarTool(MScript,this);
 
 MScript->addObject(tBarTools,"TOOLBARTOOLS");
@@ -795,7 +794,6 @@ if(lastFileSC.isEmpty()) lastFileSC=QCoreApplication::applicationDirPath();
 
 QString fileName = QFileDialog::getSaveFileName(this, tr("Save coordinates"),lastFileSC,"CS (*.csv);;sc (*.scxml)");
 
-
 if(!fileName.isEmpty()){
 QFileInfo fi(fileName);
 
@@ -834,7 +832,7 @@ if(fi.suffix()==("scxml"))
 
   stream.writeEndDocument();
 
-   FileXML.close();
+  FileXML.close();
   }
  }
  else if(fi.suffix()==("csv")){
@@ -1228,6 +1226,13 @@ setEnabled(true);
 //MScript->initCode();
 //LScript->initCode();
 VisualWidget->updateViewGModel();
+
+#ifdef DEF_PLOT
+if(MillMachine->getMotionDevice()->getModule(WLModule::typeMOscp)){
+ oscp = new WLOscpWidget(MillMachine->getMotionDevice()->getModuleOscp(),this);
+ tabWidget->addTab(oscp,tr("Osciloscope"));
+ }
+#endif
 
 qDebug()<<"WLMill::readyMachine() >>>";
 }

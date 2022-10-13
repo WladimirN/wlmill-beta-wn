@@ -34,6 +34,7 @@ void clear();
 
 private:
 QStringList m_headers;
+
 QMap <int,WLEData> m_data;
 };
 

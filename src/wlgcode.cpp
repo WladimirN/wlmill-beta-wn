@@ -241,6 +241,7 @@ if(!isGCode(53)
   ret+=getSCGStr()+" ";
   }
 
+
 for(int i=0;i<GCodeSize;i++)    
    if(m_data.GCode[i])
        {
@@ -762,6 +763,7 @@ switch(code)
 
              setSC(code-53);
              break;
+
 
    //--smooth
    case 61: m_data.GCode[61]=1; //No smooth

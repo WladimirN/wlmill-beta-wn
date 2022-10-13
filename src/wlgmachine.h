@@ -78,7 +78,8 @@ class WLGMachine : public WLMachine
 {
 	Q_OBJECT
 
-Q_PROPERTY(bool busy  READ isBusy NOTIFY changedBusy())
+Q_PROPERTY(bool busy    READ isBusy NOTIFY changedBusy())
+Q_PROPERTY(bool pmanual READ isPossiblyManual NOTIFY changedPossibleManual())
 
 private:
     enum StateMMachine{noInit,Init,Ready};

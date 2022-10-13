@@ -18,6 +18,7 @@ public:
     double getScaleFont() const;
 
 public:
+
 virtual  Q_INVOKABLE void setHeaders(QString);
 
 public:
@@ -32,6 +33,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const;
 
 protected:
+
     QStringList m_headers;
     QStringList m_defheaders;
         WLData *m_data;

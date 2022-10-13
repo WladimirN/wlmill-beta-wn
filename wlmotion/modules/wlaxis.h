@@ -111,19 +111,6 @@ const QString errorAxis("0,no error\
 
 #define sendAxis_signal 200
 
-enum typeDataAxis{
-   dataAxis_pos
-  ,dataAxis_F
-  ,dataAxis_latch2
-  ,dataAxis_latch3
-  ,dataAxis_modeStatus
-  ,dataAxis_posReal
-  ,dataAxis_posTarget
-  ,dataAxis_posMin
-  ,dataAxis_posMax
-  ,dataAxis_posError
-  };
-
 #define sendAxis_data          202 //send data Axis
 
 #define errorAxis_setdata    1
@@ -188,7 +175,7 @@ enum   typePulseAxis{AXIS_pulse_SD
 enum   typeFindAxis{AXIS_findNO
                    ,AXIS_findPEL
                    ,AXIS_findMEL
-				   ,AXIS_findORG};
+                   ,AXIS_findORG};
 
 struct WLMParAxis
 {
@@ -352,11 +339,25 @@ class WLAxis : public WLElement
 
 public:
 
-enum typeMotorAxis{AXIS_noMotor,AXIS_stepMotor,AXIS_encoderStepMotor,AXIS_errEncoderStepMotor,AXIS_spindleStepMotor};
+ enum typeDataAxis{
+       dataAxis_pos
+      ,dataAxis_F
+      ,dataAxis_latch2
+      ,dataAxis_latch3
+      ,dataAxis_modeStatus
+      ,dataAxis_posReal
+      ,dataAxis_posTarget
+      ,dataAxis_posMin
+      ,dataAxis_posMax
+      ,dataAxis_posError
+      };
+
+enum typeMotorAxis{AXIS_noMotor,AXIS_stepMotor,AXIS_encoderStepMotor,AXIS_spindleStepMotor,AXIS_errEncoderStepMotor};
 
 Q_ENUM(typeMotorAxis)
+Q_ENUM(typeDataAxis)
 
-public:	
+public:
  explicit WLAxis(WLModuleAxis *_ModuleAxis);
          ~WLAxis();
 

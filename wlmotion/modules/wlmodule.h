@@ -102,7 +102,8 @@ public:
                     ,typeMAIOPut//13
                     ,typeMUART//14
                     ,typeMDModbus//15
-                    ,typeMSpindle//16
+                    ,typeMSpindle//16                    
+                    ,typeMOscp//17
                     ,typeHeart=255
                     };
 

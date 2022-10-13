@@ -1,7 +1,6 @@
 # ----------------------------------------------------
 # WLDEV.RU WLMill
 # ------------------------------------------------------
-
 TEMPLATE = app
 TARGET = wlmill
 QT += core widgets serialport gui network opengl script
@@ -12,18 +11,41 @@ QMAKE_LFLAGS = -no-pie
 #           QT_NO_INFO_OUTPUT\
 #           QT_NO_WARNING_OUTPUT\
 
-DEFINES  += DEF_QML
+#DEFINES  += DEF_QML
 #DEFINES  += DEF_CAMERA
+DEFINES  += DEF_PLOT
 DEFINES  += GCODE_MILL
 DEFINES  += DEF_HMAP
 
+contains(DEFINES, DEF_PLOT) {
+QT += printsupport
+
+SOURCES +=qcustomplot/qcustomplot.cpp \
+          qcustomplot/wloscpwidget.cpp \
+          qcustomplot/wlchoscpwidget.cpp
+
+HEADERS +=qcustomplot/qcustomplot.h \
+          qcustomplot/wloscpwidget.h \
+          qcustomplot/wlchoscpwidget.h
+
+FORMS +=qcustomplot/wloscpwidget.ui \
+        qcustomplot/wlchoscpwidget.ui
+
+INCLUDEPATH += qcustomplot
+
+}
+
 contains(DEFINES, DEF_CAMERA) {
 QT += multimedia multimediawidgets
+
 SOURCES +=widget/wlcamera.cpp \
           widget/wlcameraview.cpp
+
 HEADERS +=widget/wlcamera.h \
           widget/wlcameraview.h
+
 FORMS   +=widget/wlcamera.ui
+
 TARGET = wlmill_cam
 }
 
@@ -114,8 +136,8 @@ HEADERS += \
     model/wlgsctablemodel.h \
     model/wlgtoolstablemodel.h \
     model/wldatatablemodel.h \
-    src/wldata.h \
-    model/wlgdatatablemodel.h
+    model/wlgdatatablemodel.h \
+    src/wldata.h
 
 SOURCES += \
     widget/wldevicewidget.cpp \
@@ -173,9 +195,9 @@ SOURCES += \
     model/wlgtoolstablemodel.cpp \
     model/wlgsctablemodel.cpp \
     model/wldatatablemodel.cpp \
+    model/wlgdatatablemodel.cpp \
     main.cpp \
-    src/wldata.cpp \
-    model/wlgdatatablemodel.cpp
+    src/wldata.cpp
 
 FORMS += \
     widget/wldevicewidget.ui \
@@ -220,5 +242,4 @@ include (WLScript/WLScript.pri)
 DISTFILES += \
     data/icons/play-red.png \
     data/icons/cancel.png \
-    data/icons/wl.png \
     data/icons/wl.png

@@ -55,7 +55,7 @@
 #define ETH_MAXETHPACK 256-1
 
 //v5
-#define WLM_PROTOCOL 0x0005 //beta
+#define WLM_PROTOCOL 0x0005 //MOScp
 /*hist
 0x0001 - start 2020
 0x0002 - add inPause & move inProbe

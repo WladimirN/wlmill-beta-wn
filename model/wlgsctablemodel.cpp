@@ -2,6 +2,7 @@
 #include <QColor>
 #include <QFont>
 
+
 WLGSCTableModel::WLGSCTableModel(WLGCode *GCode,QObject *parent)
               :WLGDataTableModel(GCode,&GCode->data()->dataSC,parent)
 {

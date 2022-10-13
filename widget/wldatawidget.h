@@ -41,7 +41,6 @@ public:
     ~WLDataWidget();
 
     void setModel(WLDataTableModel *Model);
-
     void setHeadersTable(QString strheaders);
     QStringList getHeaderTable();
 
@@ -55,7 +54,6 @@ private:
     WLDataTableModel *m_Model=nullptr;
 
 private slots:
-
 };
 
 #endif // WLDATAWIDGET_H

@@ -14,6 +14,7 @@
 #include "modules/wlmoduleuart.h"
 #include "modules/wlmoduledmodbus.h"
 #include "modules/wlmodulespindle.h"
+#include "modules/wlmoduleoscp.h"
 
 class WLMotion: public WLDevice
 {
@@ -26,6 +27,7 @@ public:
 
 public:
 WLModulePlanner* getModulePlanner() {return static_cast<WLModulePlanner*>(getModule(typeMPlanner));}
+WLModuleOscp*    getModuleOscp()    {return static_cast<WLModuleOscp*>(getModule(typeMOscp));}
 WLModuleSpindle* getModuleSpindle() {return static_cast<WLModuleSpindle*>(getModule(typeMSpindle));}
 WLModuleAxis*    getModuleAxis()    {return static_cast<WLModuleAxis*>(getModule(typeMAxis));}
 WLModuleIOPut*   getModuleIOPut()   {return static_cast<WLModuleIOPut*>(getModule(typeMIOPut));}
