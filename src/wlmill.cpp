@@ -153,13 +153,11 @@ void WLMill::createTBar2()
 WLTBarScript *tBar = new WLTBarScript(MScript,tr("toolbar 2"),this);
 
 MScript->addObject(tBar,"TOOLBAR2");
-MScript->addBeforeInitScript("TOOLBAR1.removeButtons();");
+MScript->addBeforeInitScript("TOOLBAR2.removeButtons();");
 
 connect(tBar,&WLTBarScript::runScript,this,[=](QString txt){MScript->runScript(txt);});
 
 tBar->setIconSize(QSize(48,48));
-
-connect(MillMachine,&WLGMachine::changedPossibleManual,tBar,&QToolBar::setEnabled);
 
 tBar->setObjectName("tb2");
 addToolBar(tBar);
@@ -170,7 +168,7 @@ void WLMill::createTBar1()
 WLTBarScript *tBar = new WLTBarScript(MScript,tr("toolbar 1"),this);
 
 MScript->addObject(tBar,"TOOLBAR1");
-MScript->addBeforeInitScript("TOOLBAR2.removeButtons();");
+MScript->addBeforeInitScript("TOOLBAR1.removeButtons();");
 
 connect(tBar,&WLTBarScript::runScript,this,[=](QString txt){MScript->runScript(txt);});
 
