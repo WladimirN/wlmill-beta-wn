@@ -45,16 +45,16 @@ else
  }
 }
 
-bool WLEVScript::runFunction(QString _func,bool _detectError)
+bool WLEVScript::runFunction(QString _func,bool _chError)
 {
-qDebug()<<"WLEVScript::runFunction"<<_func<<" detError"<<_detectError;
+qDebug()<<"WLEVScript::runFunction"<<_func<<" chError:"<<_chError;
 
 QMutexLocker locker(&Mutex);
 WLTaskScript funcSript;
 bool ret = false;
 
 funcSript.taskStr=_func;
-funcSript.detectError=_detectError;
+funcSript.chError=_chError;
 funcSript.type=WLTaskScript::Func;
 
 if(isEnable())
@@ -78,14 +78,14 @@ if(isEnable())
 return ret;
 }
 
-bool WLEVScript::runScript(QString _script,bool _detectError)
+bool WLEVScript::runScript(QString _script,bool _chError)
 {
 QMutexLocker locker(&Mutex);
 WLTaskScript taskSript;
 bool ret = false;
 
 taskSript.taskStr=_script;
-taskSript.detectError=_detectError;
+taskSript.chError=_chError;
 taskSript.type=WLTaskScript::Script;
 
 if(m_enable)
@@ -120,6 +120,11 @@ if(engine)
   }
 
 return false;
+}
+
+bool WLEVScript::isFuncDefined(QString name)
+{
+return allCode.contains(QRegExp("function[\\s]+"+name+"[(][^(]*[)][\\s]*[/]*"));
 }
 
 QVariant WLEVScript::getValue(QString name,QVariant def)
@@ -469,21 +474,19 @@ void WLEVScript::evalTask(WLTaskScript taskScript)
 {
 qDebug()<<"WLEVScript::evalTask"<<taskScript.taskStr<<taskScript.type;
 
-//Mutex.unlock();
 QScriptValue svfunc;
 
 timeProcess.start();
 
 switch(taskScript.type)
-{case WLTaskScript::Func:if(taskScript.detectError)
+{case WLTaskScript::Func:if(taskScript.chError)
                           {
                           QString find=taskScript.taskStr;
 
                           find.remove(QRegExp("[(].*[)]"));
 
-                          if(allCode.contains(QRegExp("function[\\s]+"+find+"[(][^(]*[)][\\s]*[/]*"))){
-
-                             svfunc = engine->evaluate(taskScript.taskStr);
+                          if(isFuncDefined(find)){
+                            svfunc = engine->evaluate(taskScript.taskStr);
 
                             if(svfunc.isError())   {
                                qDebug()<<"WLEVScript::evalTask"<<taskScript.taskStr<<"error func:"<<svfunc.toString();
@@ -512,7 +515,7 @@ switch(taskScript.type)
 
 case WLTaskScript::Script:   svfunc = engine->evaluate(taskScript.taskStr);
 
-                             if(taskScript.detectError&&svfunc.isError()) {
+                             if(taskScript.chError&&svfunc.isError()) {
                                 clearTimeout();
                                 clearInterval();
 

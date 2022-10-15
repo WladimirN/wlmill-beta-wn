@@ -2744,20 +2744,20 @@ preRunProgramList+=getGCode()->getActivGCodeString();
 //  preRunProgramList+=QString("G53 G0 Z%1").arg(planeZ);
 
 if(getCurrentPosition().z<getGCode()->getG28Position().z)
-  preRunProgramList+=QString("G53 G0 Z%1").arg(getGCode()->getG28Position().z);
+  preRunProgramList+=QString("G53 G0 Z%1 //add wlmill -up z").arg(getGCode()->getG28Position().z);
 
-preRunProgramList+=QString("G53 G0 X%1 Y%2").arg(endPoint.x).arg(endPoint.y);
-preRunProgramList+=QString("G53 G0 A%1 B%2 C%3").arg(endPoint.a).arg(endPoint.b).arg(endPoint.c);
+preRunProgramList+=QString("G53 G0 X%1 Y%2 //add wlmill -mov xy").arg(endPoint.x).arg(endPoint.y);
+preRunProgramList+=QString("G53 G0 A%1 B%2 C%3 //add wlmill -mov abc").arg(endPoint.a).arg(endPoint.b).arg(endPoint.c);
 
 if(getGCode()->isGCode(0)||getDistG1StartAt()==0.0){
-   preRunProgramList+=QString("G0 Z%1").arg(curGPoint.z);
+   preRunProgramList+=QString("G0 Z%1 //add wlmill -mov z down G0 only").arg(curGPoint.z);
    }
    else{
-   preRunProgramList+=QString("G0 Z%1").arg(curGPoint.z+getDistG1StartAt());
+   preRunProgramList+=QString("G0 Z%1 //add wlmill -mov z down G0").arg(curGPoint.z+getDistG1StartAt());
 
    double F = getFeedG1StartAt() > 0 ? getFeedG1StartAt() : getGCode()->getValue('F');
 
-   preRunProgramList+=QString("G1 Z%1 F%2").arg(curGPoint.z).arg(F);
+   preRunProgramList+=QString("G1 Z%1 F%2 //add wlmill -mov z down G1").arg(curGPoint.z).arg(F);
    }
 
 preRunProgramList+=getGCode()->getContextGCodeList();
