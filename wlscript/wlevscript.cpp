@@ -263,6 +263,8 @@ if(m_enable!=enable){
 
  Mutex.unlock();
 
+ allCode.clear();
+
  SLoadCode LC;
 
  LC.code=baseCode;
