@@ -1145,7 +1145,8 @@ void WLDevice::setVersionProtocol(quint16 _ver)
 {
 m_versionProtocol=_ver;
 
-if(!isValidProtocol()) sendMessage(getNameDevice(),tr("no valid protol (update firmware)"),0);
+if(!isValidProtocol())
+    sendMessage(getNameDevice(),tr("no valid protol (update firmware)")+QString("%1/%2").arg(WLM_PROTOCOL).arg(m_versionProtocol),0);
 
 emit changedVersionProtocol(m_versionProtocol);
 }

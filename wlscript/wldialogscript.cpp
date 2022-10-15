@@ -105,6 +105,19 @@ if(!str.isEmpty()) {
 return str;
 }
 
+QString WLDialogScript::enterLoadFile(QString txt, QString lastFile)
+{
+str = QFileDialog::getOpenFileName(parentWidget, txt,lastFile,"(*.txt)");
+
+retOk=false;
+
+if(!str.isEmpty()) {
+  retOk=true;
+  }
+
+return str;
+}
+
 
 
 int WLDialogScript::message(QString txt)

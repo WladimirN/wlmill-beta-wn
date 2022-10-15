@@ -399,8 +399,8 @@ case WLAxis::AXIS_noMotor:
                     ui->gbMParPlus->setVisible(false);                   
                     ui->gbErrorPos->setVisible(false);
                        ui->gbInput->setVisible(false);
-                      ui->gbOutput->setVisible(false);
-                      ui->gbDynamic->setVisible(false);
+                      ui->gbOutput->setVisible(false);                      
+                     ui->gbDynamic->setVisible(false);
                    break;
 
 case WLAxis::AXIS_stepMotor:
@@ -411,7 +411,7 @@ case WLAxis::AXIS_stepMotor:
                     ui->gbErrorPos->setVisible(false);
                        ui->gbInput->setVisible(true);
                       ui->gbOutput->setVisible(true);
-                     ui->gbDynamic->setVisible(true);
+                     ui->gbDynamic->setVisible(!m_slave);
                    break;
 
 case WLAxis::AXIS_encoderStepMotor:
@@ -432,7 +432,7 @@ case WLAxis::AXIS_errEncoderStepMotor:
                     ui->gbErrorPos->setVisible(true);
                        ui->gbInput->setVisible(true);
                       ui->gbOutput->setVisible(true);
-                     ui->gbDynamic->setVisible(true);
+                     ui->gbDynamic->setVisible(!m_slave);
                     break;
 
 case WLAxis::AXIS_spindleStepMotor:
