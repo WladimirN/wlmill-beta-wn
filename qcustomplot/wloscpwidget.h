@@ -28,7 +28,8 @@ private:
     QList <QPointer<QCPGraph>> mGraphs;
     QList <WLChOscpWidget*> chWidgets;
 
-    double lastTime=0;
+    double lastTime=0;    
+    double period=.100;
 
 private slots:
    void addData(double time,QList <double> values);

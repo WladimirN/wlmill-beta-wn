@@ -38,9 +38,27 @@ WLOscpWidget::WLOscpWidget(WLModuleOscp *MOscp, QWidget *parent) :
      mGraphs<<Graph;
      chWidgets<<chw;
 
-       ui->layoutChannels->addWidget(chw);
+     ui->layoutChannels->addWidget(chw);
+
+     if(i!=0)
+         chw->setDisabled(true);
      }
 
+     ui->cBoxPeriod->addItem("50"+tr("ms"),0.05);
+     ui->cBoxPeriod->addItem("100"+tr("ms"),0.1);
+     ui->cBoxPeriod->addItem("200"+tr("ms"),0.2);
+     ui->cBoxPeriod->addItem("500"+tr("ms"),0.5);
+     ui->cBoxPeriod->addItem("1000"+tr("ms"),1);
+     ui->cBoxPeriod->addItem("2000"+tr("ms"),2);
+     ui->cBoxPeriod->addItem("5000"+tr("ms"),5);
+     ui->cBoxPeriod->addItem("10000"+tr("ms"),10);
+
+     connect(ui->cBoxPeriod,QOverload<int>::of(&QComboBox::currentIndexChanged),this,[=](){
+     period=ui->cBoxPeriod->currentData().toDouble();
+     });
+
+
+     ui->cBoxPeriod->setCurrentIndex(3);
 }
 
 WLOscpWidget::~WLOscpWidget()
@@ -72,18 +90,24 @@ bool ok;
 
 ui->plot->yAxis->setRange(mGraphs.first()->getValueRange(ok));
 
-if(lastTime>3)
-    ui->plot->xAxis->setRange(ui->plot->xAxis->range().upper, 3, Qt::AlignRight);
+if(lastTime>period*5)
+    ui->plot->xAxis->setRange(ui->plot->xAxis->range().upper, period*5, Qt::AlignRight);
 else
-    ui->plot->xAxis->setRange(0,3);
+    ui->plot->xAxis->setRange(0,period*5);
 
-ui->horizontalScrollBar->setRange(0+3*100/2,lastTime*100.0-3*100/2); // adjust size of scroll bar slider
-ui->horizontalScrollBar->setValue(lastTime*100.0-3*100/2);
+ui->horizontalScrollBar->setRange(0+period*5*100/2,lastTime*100.0-period*5*100/2); // adjust size of scroll bar slider
+ui->horizontalScrollBar->setValue(lastTime*100.0-period*5*100/2);
 
 ui->plot->replot();
 //qDebug()<<"WLOscpWidget::addData"<<lastTime<<time<<values.first();
 
 lastTime+=time;
+
+ui->labelTime->setText(tr("Time:")+QString::number(lastTime,'f',3));
+
+if(lastTime>5*60)
+  ui->pbRun->click();
+
 }
 
 
@@ -109,7 +133,7 @@ void WLOscpWidget::horzScrollBarChanged(int value)
 
 //if (qAbs(ui->plot->xAxis->range().center()-value/100.0) > 0.01) // if user is dragging plot, we don't want to replot twice
   {
-  ui->plot->xAxis->setRange(value/100.0, 3, Qt::AlignCenter);
+  ui->plot->xAxis->setRange(value/100.0, period*5, Qt::AlignCenter);
   ui->plot->replot();
   }
 
