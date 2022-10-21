@@ -873,7 +873,29 @@ if((ModulePlanner->getStatus()==PLANNER_pause
     m_elementsTime=m_iProgram;
 
     foreach(WLDrive *mD,getDrives())
-                        mD->setMainPad();
+       {
+       mD->setMainPad();
+
+       if(mD->getAxis()) {
+
+        mD->getAxis()->clearMParList();
+
+        QList <dataPad> padList=mD->pad()->getDataList();
+
+        foreach(dataPad pad,padList){
+            if(pad.name=="fast"
+             ||pad.name=="minusFast"){
+              mD->getAxis()->addMParList(pad.Aac/mD->getDriveDim().value
+                                        ,pad.Ade/mD->getDriveDim().value
+                                        ,pad.Vst/mD->getDriveDim().value
+                                        ,pad.Vma/mD->getDriveDim().value
+                                        ,pad.name);
+             }
+
+            }
+        }
+       }
+
     if(getDrive("Z"))
        ModulePlanner->setHPause(isUseHPause(),m_hPause/getDrive("Z")->dimension());
 

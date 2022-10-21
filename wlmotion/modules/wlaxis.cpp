@@ -546,6 +546,44 @@ emit sendCommand(data);
 return true;
 }
 
+bool WLAxis::addMParList(float Aac, float Ade, float Fst, float Fma, QString name)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)comAxis_addMParList<<getIndex()
+       <<Aac
+       <<Ade
+       <<Fst
+       <<Fma;
+
+data.append(name);
+data.append('\0');
+
+
+qDebug()<<"WLAxis::addMParList"<<name.data()<<data.size()<<name.toUtf8().size();
+
+emit sendCommand(data);
+return true;
+}
+
+bool WLAxis::clearMParList()
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)comAxis_clearMParList<<getIndex();
+
+emit sendCommand(data);
+return true;
+}
+
 bool WLAxis::movPos(quint8 mask,qint32 Dist,float Fmov)
 {
 QByteArray data;
