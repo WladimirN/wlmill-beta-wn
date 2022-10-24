@@ -14,7 +14,6 @@ minPosition=std::numeric_limits<qint32>::min();
 homePosition=0;
 errPosition=0;
 
-
 status=AXIS_stop;
 mode=AXIS_alone;
 
@@ -831,7 +830,7 @@ switch((typeDataAxis)type)
                        emit changedErrPosition(errPosition);
                        break;
 
- case dataAxis_F:      data>>Freq;
+ case dataAxis_Fsum:      data>>Freq;
                        emit changedFreq(Freq);
                        break;
 

@@ -76,7 +76,7 @@ if(!QFileInfo::exists(file))
 
 stopBuildShow();
 
-QMutexLocker loker(&MutexShowBuild);
+QMutexLocker loker0(&MutexShowBuild);
 
 char buf;
 
@@ -130,32 +130,49 @@ if(File.open(QIODevice::ReadOnly)){
 
 Mutex.unlock();
 
-WLGCode GCode;
+if(getElementCount()<500000){
+ checkData();
+  }
 
-for(int i=0;i<getElementCount();i++)
-    {
-    QString str=getTextElement(i);
-    GCode.loadStr(str);
-
-    if(GCode.getSC()!=0 && m_scList.indexOf(GCode.getSC())==-1)
-       m_scList+=GCode.getSC();
-
-    if(GCode.getT()!=0 && m_toolList.indexOf(GCode.getT())==-1)
-       m_toolList+=GCode.getT();
-    }
-
-qDebug()<<"End check program"<<" T"<<m_toolList.size()<<" SC"<<m_scList.size();
-
-changedToolList(m_toolList);
-changedSCList(m_scList);
-
-
-if(build) QTimer::singleShot(0,this,SLOT(updateShowTraj()));
+if(build)
+    QTimer::singleShot(0,this,SLOT(updateShowTraj()));
 
 emit changedProgram();
 emit changedTrajSize(getElementCount());
 
 return ret;
+}
+
+void WLGProgram::checkData()
+{
+WLGCode GCode;
+
+QList <int> toolList;
+QList <int> scList;
+
+int i=0;
+
+for(;i<getElementCount();i++)
+    {
+    QString str=getTextElement(i);
+    GCode.loadStr(str);
+
+    if(GCode.getSC()!=0 && scList.indexOf(GCode.getSC())==-1)
+       scList+=GCode.getSC();
+
+    if(GCode.getT()!=0 && toolList.indexOf(GCode.getT())==-1)
+       toolList+=GCode.getT();
+    }
+
+if(i==getElementCount()){
+  m_toolList=toolList;
+  m_scList  =scList;
+
+  qDebug()<<"End check program"<<" T"<<m_toolList.size()<<" SC"<<m_scList.size();
+
+  emit changedToolList(m_toolList);
+  emit changedSCList(m_scList);
+  }
 }
 
 

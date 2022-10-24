@@ -47,8 +47,8 @@ private:
 
 	long time;
 
-    bool m_build;
-    bool m_buildShow;
+    bool m_build=false;
+    bool m_buildShow=false;
 	bool updateF;
 	QFile File;
 
@@ -145,7 +145,6 @@ public slots:
 
     void saveFile() {saveFile(m_fileName);}
 
-
     void updateShowTraj() {
                           qDebug()<<"updateShowTraj()";
                           m_buildShow=false;
@@ -154,23 +153,26 @@ public slots:
 
     void clear();
 
-private slots:
-   void calcTime();
+private:
    void buildShowTraj(WLGCodeData GCodeData);
+   void checkData();
+
+private slots:
+   void calcTime();   
 
    void updateShowTraj_p() {if(m_showGCode)
                                  {
                                  m_buildShow=true;
 
                                  m_showGCodeData=m_showGCode->getData();
-
                                  buildShowTraj(m_showGCodeData);
                                  }
                            }
 
+
 public slots:
 
- void stopBuildShow() {m_buildShow=false;}
+ void stopBuildShow() {m_buildShow=false;} 
  void setActivElement(int i) {if(iActivElement!=i) emit changedActivElement(iActivElement=i);}
  
 signals:

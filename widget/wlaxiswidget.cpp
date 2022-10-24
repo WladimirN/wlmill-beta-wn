@@ -272,6 +272,7 @@ void WLAxisWidget::setEditSpindle(bool en)
  }
  else{
  ui->cbTypeMotor->addItem("stepMotor",(WLAxis::AXIS_stepMotor));
+ ui->cbTypeMotor->addItem("errStepMotor",(WLAxis::AXIS_errStepMotor));
 
  WLModuleEncoder *ModuleEncoder=static_cast<WLModuleEncoder*>(m_axis->getModule()->getDevice()->getModule(WLModule::typeMEncoder));
 
@@ -423,11 +424,23 @@ case WLAxis::AXIS_encoderStepMotor:
                     ui->gbInput->setVisible(true);
                    ui->gbOutput->setVisible(true);
                   ui->gbDynamic->setVisible(false);
+                   break;
 
 case WLAxis::AXIS_errEncoderStepMotor:
                    ui->gbTypePulse->setVisible(true);
                      ui->gbEncoder->setVisible(true);
-                         ui->gbPID->setVisible(true);
+                         ui->gbPID->setVisible(false);
+                    ui->gbMParPlus->setVisible(false);
+                    ui->gbErrorPos->setVisible(true);
+                       ui->gbInput->setVisible(true);
+                      ui->gbOutput->setVisible(true);
+                     ui->gbDynamic->setVisible(!m_slave);
+                    break;
+
+case WLAxis::AXIS_errStepMotor:
+                   ui->gbTypePulse->setVisible(true);
+                     ui->gbEncoder->setVisible(false);
+                         ui->gbPID->setVisible(false);
                     ui->gbMParPlus->setVisible(false);
                     ui->gbErrorPos->setVisible(true);
                        ui->gbInput->setVisible(true);

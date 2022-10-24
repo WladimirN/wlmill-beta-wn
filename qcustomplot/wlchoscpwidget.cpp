@@ -63,11 +63,11 @@ if(device)
 ui->sbIndex->setEnabled(true);
  switch(etype)
  {
- case WLElement::typeEInput: ui->sbIndex->setRange(0,device->getModuleIOPut()->getSizeInputs());
+ case WLElement::typeEInput: ui->sbIndex->setRange(0,device->getModuleIOPut()->getSizeInputs()-1);
                              break;
- case WLElement::typeEOutput:ui->sbIndex->setRange(0,device->getModuleIOPut()->getSizeOutputs());;
+ case WLElement::typeEOutput:ui->sbIndex->setRange(0,device->getModuleIOPut()->getSizeOutputs()-1);;
                              break;
- case WLElement::typeEAxis:  ui->sbIndex->setRange(0,device->getModuleAxis()->getSizeAxis());
+ case WLElement::typeEAxis:  ui->sbIndex->setRange(0,device->getModuleAxis()->getSizeAxis()-1);
                              break;
 
  default: ui->sbIndex->setEnabled(false);

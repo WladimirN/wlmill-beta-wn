@@ -74,7 +74,7 @@ for(int i=0;i<getSizeAxis();i++)
   {
   Axis[i]->getData(WLAxis::dataAxis_posError);
   Axis[i]->getData(WLAxis::dataAxis_pos);
-  Axis[i]->getData(WLAxis::dataAxis_F);
+  Axis[i]->getData(WLAxis::dataAxis_Fsum);
   }
 }
 

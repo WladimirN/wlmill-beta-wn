@@ -344,7 +344,7 @@ public:
 
  enum typeDataAxis{
        dataAxis_pos
-      ,dataAxis_F
+      ,dataAxis_Fsum
       ,dataAxis_latch2
       ,dataAxis_latch3
       ,dataAxis_modeStatus
@@ -353,9 +353,15 @@ public:
       ,dataAxis_posMin
       ,dataAxis_posMax
       ,dataAxis_posError
+      ,dataAxis_Asum
       };
 
-enum typeMotorAxis{AXIS_noMotor,AXIS_stepMotor,AXIS_encoderStepMotor,AXIS_spindleStepMotor,AXIS_errEncoderStepMotor};
+enum typeMotorAxis{AXIS_noMotor
+                  ,AXIS_stepMotor
+                  ,AXIS_encoderStepMotor
+                  ,AXIS_spindleStepMotor
+                  ,AXIS_errEncoderStepMotor
+                  ,AXIS_errStepMotor};
 
 Q_ENUM(typeMotorAxis)
 Q_ENUM(typeDataAxis)

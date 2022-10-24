@@ -269,6 +269,6 @@ virtual void writeXMLData(QXmlStreamWriter &stream);
 virtual  void readXMLData(QXmlStreamReader &stream);
 
 
-    };
+};
 
 #endif //WLDEVICE_H
