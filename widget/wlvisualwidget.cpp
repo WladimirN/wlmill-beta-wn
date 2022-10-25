@@ -1065,8 +1065,10 @@ vertexLocation = progOneColor.attributeLocation("a_position");
 progOneColor.enableAttributeArray(vertexLocation);
 progOneColor.setAttributeBuffer(vertexLocation,GL_FLOAT,0,3);
 
+glEnable(GL_PROGRAM_POINT_SIZE);
+
 glLineWidth(3);
-glDrawArrays(GL_LINE_STRIP, 0,trackTraj.size());
+glDrawArrays(GL_POINTS, 0,trackTraj.size());
 vGLBufTrack.release();
 }
 

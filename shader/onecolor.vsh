@@ -11,6 +11,7 @@ uniform float u_scale;
 void main()
 {
     // Calculate vertex position in screen space
+    gl_PointSize = 3;
     gl_Position = mpv_matrix * vec4(a_position*u_scale,1);
 
 }
