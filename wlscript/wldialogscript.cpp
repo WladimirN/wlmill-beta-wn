@@ -92,9 +92,9 @@ if(EnterString.exec()){
 return str=def;
 }
 
-QString WLDialogScript::enterSaveFile(QString txt,QString lastFile)
-{
-str = QFileDialog::getSaveFileName(parentWidget, txt,lastFile,"(*.txt)");
+QString WLDialogScript::enterSaveFile(QString txt,QString lastFile,QString mask)
+{    
+str = QFileDialog::getSaveFileName(parentWidget, txt,lastFile,mask);
 
 retOk=false;
 
@@ -105,9 +105,9 @@ if(!str.isEmpty()) {
 return str;
 }
 
-QString WLDialogScript::enterLoadFile(QString txt, QString lastFile)
+QString WLDialogScript::enterLoadFile(QString txt, QString lastFile,QString mask)
 {
-str = QFileDialog::getOpenFileName(parentWidget, txt,lastFile,"(*.txt)");
+str = QFileDialog::getOpenFileName(parentWidget, txt,lastFile,mask);
 
 retOk=false;
 

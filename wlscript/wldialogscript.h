@@ -37,8 +37,8 @@ Q_INVOKABLE int message(QString txt);
 Q_INVOKABLE double enterNum(QString txt,double def=0,int decimals=0);
 Q_INVOKABLE QString enterString(QString txt,QString def);
 
-Q_INVOKABLE QString enterSaveFile(QString txt,QString lastFile);
-Q_INVOKABLE QString enterLoadFile(QString txt,QString lastFile);
+Q_INVOKABLE QString enterSaveFile(QString txt,QString lastFile,QString mask="(*.*)");
+Q_INVOKABLE QString enterLoadFile(QString txt,QString lastFile,QString mask="(*.*)");
 
 Q_INVOKABLE int isOk()     {return  retOk;}
 Q_INVOKABLE int isCancel() {return !retOk;}
