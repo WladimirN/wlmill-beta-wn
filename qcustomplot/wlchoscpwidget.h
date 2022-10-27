@@ -18,7 +18,7 @@ public:
 
     ~WLChOscpWidget();
 
-    bool isChecked();
+    bool isChecked();    
 private:
     Ui::WLChOscpWidget *ui;
 
@@ -36,6 +36,7 @@ private slots:
 
 public slots:
    void setSource(QList<WLSrcChOscp> _src);
+   void setColor(QColor);
 };
 
 

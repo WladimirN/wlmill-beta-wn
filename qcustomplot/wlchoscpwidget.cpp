@@ -2,6 +2,7 @@
 #include "ui_wlchoscpwidget.h"
 #include <QMetaEnum>
 #include <QSpinBox>
+#include <QPainter>
 #include "wlmoduleioput.h"
 #include "wlelement.h"
 #include "wlaxis.h"
@@ -28,6 +29,8 @@ WLChOscpWidget::WLChOscpWidget(WLModuleOscp *_module,quint8 _iCh,QWidget *parent
     connect(ui->cbElement,QOverload<int>::of(&QComboBox::currentIndexChanged),this,&WLChOscpWidget::updateSource);
     connect(ui->cbTypeData,QOverload<int>::of(&QComboBox::currentIndexChanged),this,&WLChOscpWidget::updateSource);
     connect(ui->sbIndex,QOverload<int>::of(&QSpinBox::valueChanged),this,&WLChOscpWidget::updateSource);
+    connect(ui->groupBox,&QGroupBox::toggled,this,&WLChOscpWidget::updateSource);
+
 
     updateSource();
 }
@@ -50,6 +53,8 @@ quint8 tdata=ui->cbTypeData->currentData().toInt();
 
 if(ui->groupBox->isChecked())
    m_module->setSourceChannel(m_iCh,etype,index,tdata);
+else
+   m_module->setSourceChannel(m_iCh,WLElement::typeEEmpty,0,0);
 }
 
 void WLChOscpWidget::updateIElement()
@@ -131,4 +136,17 @@ void WLChOscpWidget::setSource(QList<WLSrcChOscp> _src)
 {
 src=_src;
 updateElement();
+}
+
+void WLChOscpWidget::setColor(QColor color)
+{
+QSize size=ui->color->size();
+QPixmap pixmap(size);
+QPainter painter;
+painter.begin(&pixmap);
+painter.drawRect(0,0,size.width(),size.height());
+painter.fillRect(0,0,size.width(),size.height(),color);
+painter.end();
+
+ui->color->setPixmap(pixmap);
 }

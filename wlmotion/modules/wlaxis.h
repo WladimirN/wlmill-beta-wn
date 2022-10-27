@@ -354,6 +354,7 @@ public:
       ,dataAxis_posMax
       ,dataAxis_posError
       ,dataAxis_Asum
+      ,dataAxis_outPid
       };
 
 enum typeMotorAxis{AXIS_noMotor

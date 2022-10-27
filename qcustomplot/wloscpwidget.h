@@ -31,6 +31,12 @@ private:
     double lastTime=0;    
     double period=.100;
 
+    QButtonGroup *selectChannel;
+
+private:
+
+   void initSelectorChannel();
+
 private slots:
    void addData(double time,QList <double> values);
    void onPBRun(bool press);

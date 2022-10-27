@@ -16,9 +16,22 @@ WLOscpWidget::WLOscpWidget(WLModuleOscp *MOscp, QWidget *parent) :
     connect(ui->horizontalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(horzScrollBarChanged(int)));
     connect(ui->plot->xAxis, SIGNAL(rangeChanged(QCPRange)), this, SLOT(xAxisChanged(QCPRange)));
 
+    initSelectorChannel();
+
+    QPushButton *button = new QPushButton(this);
+
+    button->setText("scale");
+    ui->layoutChannels->addWidget(button);
+
+    connect(button,&QPushButton::clicked,this,[=](){
+        bool ok;
+
+        ui->plot->yAxis->setRange(mGraphs[selectChannel->checkedId()]->getValueRange(ok));
+        ui->plot->replot();
+    });
      //ui->plot->setBackground(QBrush(Qt::black));
 
-     for(quint8 i=0;i<mMOscp->getSizeOscp();i++)
+    for(quint8 i=0;i<mMOscp->getSizeOscp();i++)
      {
      WLChOscpWidget *chw=new WLChOscpWidget(mMOscp,i,this);
 
@@ -26,22 +39,24 @@ WLOscpWidget::WLOscpWidget(WLModuleOscp *MOscp, QWidget *parent) :
      QPen pen;
      pen.setWidth(3);
 
+     QColor color;
+
      Graph->setPen(pen);
 
      switch (i) {
-       case 0:Graph->setPen(QPen(QColor(250, 120, 0)));  break;
-       case 1:Graph->setPen(QPen(QColor(120, 250, 0)));  break;
-       case 2:Graph->setPen(QPen(QColor(250, 250, 0)));  break;
-       case 3:Graph->setPen(QPen(QColor(120, 120, 250)));break;
+       case 0:color=Qt::red;    break;
+       case 1:color=Qt::blue;   break;
+       case 2:color=Qt::green;  break;
+       case 3:color=Qt::magenta;break;
        }
+
+     Graph->setPen(QPen(color));
+     chw->setColor(color);
 
      mGraphs<<Graph;
      chWidgets<<chw;
 
      ui->layoutChannels->addWidget(chw);
-
-     if(i!=0)
-         chw->setDisabled(true);
      }
 
      ui->cBoxPeriod->addItem("50"+tr("ms"),0.05);
@@ -55,6 +70,11 @@ WLOscpWidget::WLOscpWidget(WLModuleOscp *MOscp, QWidget *parent) :
 
      connect(ui->cBoxPeriod,QOverload<int>::of(&QComboBox::currentIndexChanged),this,[=](){
      period=ui->cBoxPeriod->currentData().toDouble();
+
+     if(!ui->pbRun->isChecked()){
+       horzScrollBarChanged(ui->horizontalScrollBar->value());
+       }
+
      });
 
 
@@ -66,29 +86,47 @@ WLOscpWidget::~WLOscpWidget()
     delete ui;
 }
 
+void WLOscpWidget::initSelectorChannel()
+{
+QHBoxLayout *hlayout=new QHBoxLayout;
+selectChannel = new QButtonGroup(this);
+
+for(quint8 i=0;i<mMOscp->getSizeOscp();i++)
+ {
+ QRadioButton *rbutton=new QRadioButton(this);
+ rbutton->setText(QString("ch%1").arg(i+1));
+
+ selectChannel->addButton(rbutton,i);
+ hlayout->addWidget(rbutton);
+ }
+
+selectChannel->setExclusive(true);
+selectChannel->button(0)->click();
+
+ui->layoutChannels->addLayout(hlayout);
+}
+
 
 void WLOscpWidget::addData(double time, QList<double> values)
 {
 if(values.size()!=mGraphs.size()
- ||!ui->pbRun->isChecked()){
+ ||!ui->pbRun->isChecked()){   
  //ui->plot->xAxis->rescale();
  //ui->plot->xAxis->setRange(0,ui->plot->xAxis->range().size(), Qt::AlignRight);
  //ui->plot->replot();
  return;
  }
 
-for(int i=0;i<mGraphs.size()&&i<values.size();i++){
-  mGraphs[i]->addData(lastTime, values[i]);
-  mGraphs[i]->rescaleAxes(true);
-  }
-
 bool ok;
 
+for(int i=0;i<mGraphs.size()&&i<values.size();i++){
+  mGraphs[i]->addData(lastTime, values[i]);
+  //mGraphs[i]->rescaleAxes(true);
 
-//ui->plot->xAxis->rescale();
-//ui->plot->yAxis->rescale();
+   mGraphs[selectChannel->checkedId()]->rescaleValueAxis(true, false);
+  }
 
-ui->plot->yAxis->setRange(mGraphs.first()->getValueRange(ok));
+
 
 if(lastTime>period*5)
     ui->plot->xAxis->setRange(ui->plot->xAxis->range().upper, period*5, Qt::AlignRight);
@@ -99,7 +137,6 @@ ui->horizontalScrollBar->setRange(0+period*5*100/2,lastTime*100.0-period*5*100/2
 ui->horizontalScrollBar->setValue(lastTime*100.0-period*5*100/2);
 
 ui->plot->replot();
-//qDebug()<<"WLOscpWidget::addData"<<lastTime<<time<<values.first();
 
 lastTime+=time;
 
@@ -114,6 +151,7 @@ if(lastTime>5*60)
 void WLOscpWidget::onPBRun(bool press)
 {
 if(press) {
+
  mMOscp->setRun();
 
  for(int i=0;i<mGraphs.size();i++){
@@ -121,6 +159,8 @@ if(press) {
    }
 
  lastTime=0;
+
+ ui->plot->yAxis->setRange(-0.01,0.01);
  }
  else{
  mMOscp->setRun(false);
