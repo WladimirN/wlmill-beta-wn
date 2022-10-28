@@ -3799,25 +3799,23 @@ case WLElementTraj::arc: {
                             return 0;
                             }
 
-
                           cPosIJ[0]=cPos[I];
                           cPosIJ[1]=cPos[J];
 
                           ePosIJK[0]=ePos[I];
                           ePosIJK[1]=ePos[J];
 
-                          ePos[0]=ePosIJK[0];
-                          ePos[1]=ePosIJK[1];
-
-                          indexs[0]=I;
-                          indexs[1]=J;
-
-
                           if(K!=255){
                            ePosIJK[2]=ePos[K];
                            ePos[2]=ePosIJK[2];
                            indexs[2]=K;
                            }
+
+                          ePos[0]=ePosIJK[0];
+                          ePos[1]=ePosIJK[1];
+
+                          indexs[0]=I;
+                          indexs[1]=J;
 
                          ok=ModulePlanner->addCirc(MASK_abs
                                                  |(ME.data.arc.CCW  ? MASK_ccw:0)
