@@ -558,7 +558,8 @@ if(viewMillF)
 
 void WLVisualWidget::showHMapGrid(WLHeightMap *HMap)
 {
-if(!HMap->isShowGrid())  return;
+if(!HMap->isShowGrid()
+ ||!progOneColor.isLinked())  return;
 
 //QVector <WLShowPointProgram> Points;
 QVector <WL3DPointf> Points;
@@ -640,7 +641,8 @@ for(int i=0;i<HMap->countX();i++)
 
 void WLVisualWidget::showHMap(WLHeightMap *HMap)
 {
-if(!HMap->isShow())  return;
+if(!HMap->isShow()
+ ||!progTraj.isLinked())  return;
 
 QVector <WLShowPointProgram> Points;
 QColor color=Qt::lightGray;
@@ -774,6 +776,8 @@ showBox(((P0+P1)/2).to3D()
 
 void WLVisualWidget::showBox(WL6DPoint showPoint,float dx,float dy,float dz,QVector3D color)
 {
+if(!progOneColor.isLinked()) return;
+
 WL3DPointf Points[8];
 
 dx/=2;
@@ -859,6 +863,8 @@ glDrawArrays(GL_LINE_LOOP, 1,toolPointsSize);
 
 void WLVisualWidget::showHome(WLFrame Fr)
 {
+if(!progOneColor.isLinked()) return;
+
 int vertexLocation;
 QMatrix4x4 matrix;
 
@@ -995,6 +1001,8 @@ matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
 matrix.scale(Zoom);
 
+if(!progOneColor.isLinked()) return;
+
 vGLBufMill.bind();
 vGLBufMill.allocate(showPoints.data(),showPoints.size()*sizeof(WL3DPointf));
 
@@ -1052,6 +1060,7 @@ matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
 matrix.scale(Zoom);
 
+if(!progOneColor.isLinked()) return;
 
 vGLBufTrack.bind();
 vGLBufTrack.write(0,track.data(),track.size()*sizeof(WL3DPointf));
@@ -1376,7 +1385,6 @@ if (!progOneColor.link()
   ||!progOneColor.bind())
     close();
 
-
 if(!progTraj.addShaderFromSourceFile(QOpenGLShader::Vertex,  ":/shader/traj.vsh")
  ||!progTraj.addShaderFromSourceFile(QOpenGLShader::Fragment,":/shader/traj.fsh"))
     close();
@@ -1385,7 +1393,6 @@ if (!progTraj.link()
   ||!progTraj.bind())
     close();
 
-
 if(!progSelect.addShaderFromSourceFile(QOpenGLShader::Vertex,  ":/shader/select.vsh")
  ||!progSelect.addShaderFromSourceFile(QOpenGLShader::Fragment,":/shader/select.fsh"))
    close();
@@ -1393,7 +1400,6 @@ if(!progSelect.addShaderFromSourceFile(QOpenGLShader::Vertex,  ":/shader/select.
 if (!progSelect.link()
   ||!progSelect.bind())
     close();
-
 }
 
 void WLVisualWidget::initGLBuffers()
