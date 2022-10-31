@@ -827,13 +827,15 @@ glDrawElements(GL_LINES,24,GL_UNSIGNED_BYTE,0);
 
 void WLVisualWidget::showTool(WL6DPoint showPoint,bool rot,float scale,QVector3D color)
 {
+if(!progOneColor.isLinked()) return;
+
 int vertexLocation;
 QMatrix4x4 matrix,rotM;
 
 rotM.setToIdentity();
 
 if(rot)
- rotM.rotate(m_rotTool,0,0,1.);
+ rotM.rotate(m_rotTool,0,0,0.3);
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
