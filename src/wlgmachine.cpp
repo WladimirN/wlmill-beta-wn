@@ -1959,44 +1959,31 @@ void WLGMachine::setCurPositionSCT(QString nameCoord,double pos)
 WLGPoint curPosSC=getCurrentPositionActivSC();
 WLGPoint SCG;
 
-int iSC=m_GCode.getActivSC(&SCG);
+int iOT=getGCode()->getOfstTool();
 
-if(nameCoord=="X") getGCode()->setDataCurTool("Xg",curPosSC.x-pos/(getGCode()->isXDiam()? 2.0:1.0)
-                  +getGCode()->getDataCurToolNum("Xg",0));
+if(nameCoord=="X") getGCode()->setDataTool(iOT,"Xg",curPosSC.x-pos/(getGCode()->isXDiam()? 2.0:1.0)
+                  +getGCode()->getDataToolNum(iOT,"Xg",0));
 else
-if(nameCoord=="Y") getGCode()->setDataCurTool("Yg",curPosSC.y-pos+getGCode()->getDataCurToolNum("Yg",0));
+if(nameCoord=="Y") getGCode()->setDataTool(iOT,"Yg",curPosSC.y-pos+getGCode()->getDataCurToolNum("Yg",0));
 else
-if(nameCoord=="Z") getGCode()->setDataCurTool("Zg",curPosSC.z-pos+getGCode()->getDataCurToolNum("Zg",0)+getGCode()->getHToolOfst());
+if(nameCoord=="Z") getGCode()->setDataTool(iOT,"Zg",curPosSC.z-pos+getGCode()->getDataCurToolNum("Zg",0)
+                   +getGCode()->getHToolOfst());
 
 }
 
 double WLGMachine::getCurPositionSCT(QString name)
 {
-WLGPoint GP=getCurrentPositionActivSC();
+double ret=getCurPositionSC(name);
 
 name=name.toUpper();
 
-if(name=="X") return GP.x-getGCode()->getDataCurToolNum("x",0);
+if(name=="X") ret-=getGCode()->getDataCurToolNum("Xg",0);
 else
-if(name=="Y") return GP.y-getGCode()->getDataCurToolNum("y",0);
+if(name=="Y") ret-=getGCode()->getDataCurToolNum("Yg",0);
 else
-if(name=="Z") return GP.z-getGCode()->getDataCurToolNum("z",0)
-                         -getGCode()->getHToolOfst();
-else
-if(name=="A") return GP.a;
-else
-if(name=="B") return GP.b;
-else
-if(name=="C") return GP.c;
-else
-if(name=="U") return GP.u;
-else
-if(name=="V") return GP.v;
-else
-if(name=="W") return GP.w;
+if(name=="Z") ret-=getGCode()->getDataCurToolNum("Zg",0);
 
-
-return 0;
+return ret;
 }
 
 double WLGMachine::getCurPositionSC(QString name)
