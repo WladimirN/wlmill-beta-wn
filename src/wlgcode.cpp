@@ -347,7 +347,17 @@ if(H>0)
 {
  if(isGCode(43)) ret=getDataTool(H,"H",0).toDouble();
    else if(isGCode(44)) ret=-getDataTool(H,"H",0).toDouble();
+
+bool ok;
+
+double w=getDataTool(H,"Hw",0).toDouble(&ok);
+
+if(ok)
+  ret+=w;
 }
+
+
+
 return ret;
 }
 
@@ -358,8 +368,14 @@ double ret=0;
 quint16 D=(quint16)getValue('D');
 
 if(D!=0){
- ret=getDataTool(D,"D",0).toDouble();
- }
+ret=getDataTool(D,"D",0).toDouble();
+
+bool ok;
+double w=getDataTool(D,"Dw",0).toDouble(&ok);
+
+if(ok)
+ ret+=w;
+}
 
 return ret;
 }

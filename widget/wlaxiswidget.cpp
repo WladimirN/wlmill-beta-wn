@@ -77,7 +77,7 @@ WLAxisWidget::WLAxisWidget(WLAxis *_axis,bool _slave,double _offset, QWidget *pa
     ui->editOutENB ->setLabel("outENB");
 
     ui->cbTypePulse->addItems(QString("SD,CW/CCW,AB,ABx2,ABx4,SDx2,CW/CCWx2").split(","));
-    connect(ui->cbTypePulse,SIGNAL(activated(int)),SLOT(updateCBTypePulse(int)));
+   // connect(ui->cbTypePulse,SIGNAL(activated(int)),SLOT(updateCBTypePulse(int)));
 
     ui->cbTypePulse->setCurrentIndex(m_axis->getTypePulse());
 
