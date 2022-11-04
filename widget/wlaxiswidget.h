@@ -37,9 +37,10 @@ public:
     quint8 getIndexOutENB();
     quint8 getIndexOutRALM();
 
-    typeActionInput getActInPEL();
-    typeActionInput getActInMEL();        
-    typeActionInput getActInALM();
+    WLIOPut::typeActionInput getActInPEL();
+    WLIOPut::typeActionInput getActInMEL();
+    WLIOPut::typeActionInput getActInALM();
+    WLIOPut::typeActionInput getActInORG();
 
     void setEditSpindle(bool en);
 

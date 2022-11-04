@@ -375,13 +375,13 @@ if(ikey==-1)
 
 if(data()->iOfstTool!=0)
  {
- ret.x=getDataToolNum(ikey,"Xg",0)
+ ret.x=getDataToolNum(ikey,"Xo",0)
       +getDataToolNum(ikey,"Xw",0);
 
- ret.y=getDataToolNum(ikey,"Yg",0)
+ ret.y=getDataToolNum(ikey,"Yo",0)
       +getDataToolNum(ikey,"Yw",0);
 
- ret.z=getDataToolNum(ikey,"Zg",0)
+ ret.z=getDataToolNum(ikey,"Zo",0)
       +getDataToolNum(ikey,"Zw",0);
  }
 

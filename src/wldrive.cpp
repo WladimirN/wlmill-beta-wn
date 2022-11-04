@@ -10,7 +10,7 @@ m_ModuleAxis=_MAxis;
 
 for(int i=0;i<MAXSLAVEAXIS; i++)  m_ofstSlaveAxis[i]=0;
 
-setLogicFindPos(0);
+setLogicFindPos(WLDrive::noFind);
 
 curKSpeed=1;
 
@@ -754,7 +754,7 @@ if(!stream.attributes().value("orgSize").isEmpty())
        setORGSize(stream.attributes().value("orgSize").toString().toDouble());
 
 if(!stream.attributes().value("logicFindPos").isEmpty()) 
-       setLogicFindPos(stream.attributes().value("logicFindPos").toInt());
+       setLogicFindPos(static_cast<WLDrive::typeLogiFind>(stream.attributes().value("logicFindPos").toInt()));
 
 if(!stream.attributes().value("feedVFind").isEmpty())  //for old style
        setVFind1(stream.attributes().value("feedVFind").toDouble());
@@ -1628,7 +1628,10 @@ if(isAutoDrive()
                 }
 
                 break;
-
+ case onlyPORG:
+ case onlyMORG:
+ case onlyPORGHome:
+ case onlyMORGHome:
  case onlyPELHome:
  case onlyPEL:
  case onlyMELHome:
@@ -1636,17 +1639,38 @@ if(isAutoDrive()
                 typeInputAxis typePM;
 
                 if(logicFindPos==onlyPEL
-                 ||logicFindPos==onlyPELHome)
-                    typePM=AXIS_inPEL;
-                 else
-                    typePM=AXIS_inMEL;
+                 ||logicFindPos==onlyPELHome) {
+                   typePM=AXIS_inPEL;
+                   }
+                else
+                if(logicFindPos==onlyMEL
+                 ||logicFindPos==onlyMELHome) {
+                   typePM=AXIS_inMEL;
+                   }
+                   else {
+                   typePM=AXIS_inORG;
+                   }
 
                 //qDebug()<<"auto PEL/MEL"<<isMotion()<<isMotionSubAxis();
                 if(!isMotion()&&!isMotionSubAxis())
                 switch(autoOperation)
                    {
-                    case 0:if(((typePM==AXIS_inPEL)&&(getInput(AXIS_inPEL)==0))
-                            ||((typePM==AXIS_inMEL)&&(getInput(AXIS_inMEL)==0)))
+                    case 0 :
+                            foreach(WLAxis *Axis,getAxisList()){
+                             if(Axis->getActIn(typePM)==WLIOPut::INPUT_actNo){
+                                 emit sendMessage(getFullName(),tr("no set action")
+                                                               +" Axis:"
+                                                               +QString::number(Axis->getIndex())
+                                                              ,-9);
+                                 reset();
+                                 break;
+                             }
+                            }
+
+
+                          if(((typePM==AXIS_inPEL)&&(getInput(AXIS_inPEL)==0))
+                            ||((typePM==AXIS_inMEL)&&(getInput(AXIS_inMEL)==0))
+                            ||((typePM==AXIS_inORG)&&(getInput(AXIS_inORG)==0)))
     					    {
 							setTruPosition(false);
 
@@ -1657,6 +1681,10 @@ if(isAutoDrive()
                             foreach(WLAxis *Axis,getAxisList())
                              {
                              Axis->setInLatch(Axis->getInput(typePM)->getIndex());
+
+                             if(typePM==AXIS_inORG)
+                                 Axis->setActIn(AXIS_inLATCH,Axis->getActIn(AXIS_inORG));
+
                              Axis->resetLatch();
 
                              if(Axis!=getAxis())
@@ -1665,7 +1693,9 @@ if(isAutoDrive()
                              Axis->setKF(1.0);
 
                              if(logicFindPos==onlyPELHome
-                              ||logicFindPos==onlyPEL)
+                              ||logicFindPos==onlyPEL
+                              ||logicFindPos==onlyPORG
+                              ||logicFindPos==onlyPORGHome)
                                  Axis->movVel(MASK_disubaxis|MASK_dir,m_VFind1/dim.value);
                              else
                                  Axis->movVel(MASK_disubaxis|0,m_VFind1/dim.value);
@@ -1684,6 +1714,7 @@ if(isAutoDrive()
                             emit sendMessage(getFullName(),tr("wrong starting position")
                                                          +(typePM==AXIS_inPEL ? "(inPEL=0)" :"")
                                                          +(typePM==AXIS_inMEL ? "(inMEL=0)" :"")
+                                                         +(typePM==AXIS_inORG ? "(inORG=0)" :"")
                                                          ,-8);
                             reset();
                             }
@@ -1700,7 +1731,7 @@ if(isAutoDrive()
                              foreach(WLAxis *Axis,getAxisList())
                               {
                               Axis->setInLatch(Axis->getInput(typePM)->getIndex());
-                              Axis->setActIn(AXIS_inLATCH,INPUT_actSdStop);
+                              Axis->setActIn(AXIS_inLATCH,WLIOPut::INPUT_actSdStop);
                               Axis->resetLatch();
 
                               //if(Axis!=getAxis())
@@ -1712,7 +1743,9 @@ if(isAutoDrive()
                              foreach(WLAxis *Axis,getAxisList())
                               {                                 
                               if(logicFindPos==onlyPELHome
-                               ||logicFindPos==onlyPEL)
+                               ||logicFindPos==onlyPEL
+                               ||logicFindPos==onlyPORG
+                               ||logicFindPos==onlyPORGHome)
                                  Axis->movPos(MASK_disubaxis
                                              ,-qAbs(getBackDistFind()/dim.value)
                                              ,m_VFind1/dim.value);
@@ -1729,6 +1762,7 @@ if(isAutoDrive()
                              emit sendMessage(getFullName(),tr("no sensor signal")+"(2)"
                                                           +(typePM==AXIS_inPEL ? "(inPEL=0)" :"")
                                                           +(typePM==AXIS_inMEL ? "(inMEL=0)" :"")
+                                                          +(typePM==AXIS_inORG ? "(inORG=0)" :"")
                                                           ,-214);
                              qDebug()<<getName()<<"no sensor signal (2)";
                              reset();
@@ -1737,25 +1771,27 @@ if(isAutoDrive()
                             break;
 
                    case 3:if(((typePM==AXIS_inPEL)&&(getInput(AXIS_inPEL)==0))
-                             ||((typePM==AXIS_inMEL)&&(getInput(AXIS_inMEL)==0)))//второе касание
+                             ||((typePM==AXIS_inMEL)&&(getInput(AXIS_inMEL)==0))
+                             ||((typePM==AXIS_inORG)&&(getInput(AXIS_inORG)==0)))//второе касание
                              {
                              setMainPad();
 
                              foreach(WLAxis *Axis,getAxisList())
                               {
                               Axis->setInLatch(Axis->getInput(typePM)->getIndex());
+
+                              if(typePM==AXIS_inORG)
+                                  Axis->setActIn(AXIS_inLATCH,Axis->getActIn(AXIS_inORG));
+
                               Axis->resetLatch();
-
-                              //if(Axis!=getAxis())
-                              //   Axis->setPos(getAxis()->getNowPos()); //set position subAxis
-
-                              //Axis->setKF(1.0);
                               }
 
                              foreach(WLAxis *Axis,getAxisList())
                               {
                               if(logicFindPos==onlyPELHome
-                               ||logicFindPos==onlyPEL)
+                               ||logicFindPos==onlyPEL
+                               ||logicFindPos==onlyPORGHome
+                               ||logicFindPos==onlyPORG)
                                   Axis->movVel(MASK_disubaxis|MASK_dir,m_VFind2/dim.value);
                               else
                                   Axis->movVel(MASK_disubaxis|0,m_VFind2/dim.value);
@@ -1768,6 +1804,7 @@ if(isAutoDrive()
                              emit sendMessage(getFullName(),tr("no sensor signal")+"(3)"
                                                           +(typePM==AXIS_inPEL ? "(inPEL=0)" :"")
                                                           +(typePM==AXIS_inMEL ? "(inMEL=0)" :"")
+                                                          +(typePM==AXIS_inORG ? "(inORG=0)" :"")
                                                           ,-214);
                              reset();
                              }
@@ -1808,8 +1845,15 @@ if(isAutoDrive()
                                                     DPos.set(getOffsetAxis(i),dim);  //set offset position
                                                     DPos.step-=(getAxis(i)->getNowPos()-getLatch2PosL(i)); //move back to SD distance
 
-                                                    if(((typePM==AXIS_inPEL)&&(Offset<DPos.step))
-                                                     ||((typePM==AXIS_inMEL)&&(Offset>DPos.step))) Offset=DPos.step; // find max/min offset
+                                                    if(((logicFindPos==onlyPEL
+                                                       ||logicFindPos==onlyPELHome
+                                                       ||logicFindPos==onlyPORG
+                                                       ||logicFindPos==onlyPORGHome)&&(Offset<DPos.step))
+                                                       ||
+                                                        ((logicFindPos==onlyMEL
+                                                        ||logicFindPos==onlyMELHome
+                                                        ||logicFindPos==onlyMEL
+                                                        ||logicFindPos==onlyMORGHome)&&(Offset>DPos.step))) Offset=DPos.step; // find max/min offset
 
                                                     }
                                                //qDebug()<<"Offset"<<Offset;
@@ -1858,8 +1902,15 @@ if(isAutoDrive()
                                                     {
                                                     qint32 p=(getAxis(i)->getNowPos()); //move back to SD distance
 
-                                                    if(((typePM==AXIS_inPEL)&&(pos>p)
-                                                     ||((typePM==AXIS_inMEL)&&(pos<p)))) pos=p; // find max/min pos
+                                                    if(((logicFindPos==onlyPEL
+                                                       ||logicFindPos==onlyPELHome
+                                                       ||logicFindPos==onlyPORG
+                                                       ||logicFindPos==onlyPORGHome)&&(pos>p))
+                                                       ||
+                                                       ((logicFindPos==onlyMEL
+                                                       ||logicFindPos==onlyMELHome
+                                                       ||logicFindPos==onlyMORG
+                                                       ||logicFindPos==onlyMORGHome)&&(pos<p))) pos=p; // find max/min pos
                                                     }
 
 
@@ -1885,6 +1936,7 @@ if(isAutoDrive()
                               emit sendMessage(getFullName(),tr("no sensor signal")+"(10)"
                                                            +(typePM==AXIS_inPEL ? "(inPEL=0)" :"")
                                                            +(typePM==AXIS_inMEL ? "(inMEL=0)" :"")
+                                                           +(typePM==AXIS_inORG ? "(inORG=0)" :"")
                                                            ,-214);
                               reset();
     						  }
@@ -1896,14 +1948,18 @@ if(isAutoDrive()
                               setTruPosition(true);
 
                               if(logicFindPos==onlyPELHome
-                               ||logicFindPos==onlyMELHome) {
+                               ||logicFindPos==onlyMELHome
+                               ||logicFindPos==onlyPORGHome
+                               ||logicFindPos==onlyMORGHome) {
                                 if(setMovToHome())
                                     startMotion(0);
                                 }
 
 
                               if(logicFindPos==onlyPEL
-                               ||logicFindPos==onlyMEL)
+                               ||logicFindPos==onlyMEL
+                               ||logicFindPos==onlyPORG
+                               ||logicFindPos==onlyMORG)
                                 {
                                 if(setMovToORG())
                                     startMotion(0);
@@ -1914,7 +1970,7 @@ if(isAutoDrive()
 		            break;
 
 
- default: reset();
+ //default: reset();
  }
 
  }

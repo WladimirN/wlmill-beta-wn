@@ -1189,7 +1189,7 @@ else
 
 WLModulePlanner *ModulePlanner=MillMachine->getMotionDevice()->getModulePlanner();
 
-if(!(MillMachine->isSafeProbe()&&MillMachine->getActSafeProbe()!=INPUT_actNo)){
+if(!(MillMachine->isSafeProbe()&&MillMachine->getActSafeProbe()!=WLIOPut::INPUT_actNo)){
    if(ModulePlanner->getInput(PLANNER_inProbe)->getNow())
        ui.labelInProbe->setPixmap(QPixmap(":/data/icons/ionX.png"));
    else

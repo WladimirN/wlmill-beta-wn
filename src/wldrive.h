@@ -112,6 +112,24 @@ class WLDrive : public QObject
 
 public:
     enum typeDrive {Linear,Rotary};
+    Q_ENUM(typeDrive)
+
+    enum typeLogiFind
+               {
+               noFind,
+               onlyORG,
+               onlyPEL,
+               onlyMEL,
+               onlyORGHome,
+               onlyPELHome,
+               onlyMELHome,
+               onlyPORG,
+               onlyMORG,
+               onlyPORGHome,
+               onlyMORGHome
+               };
+
+  Q_ENUM(typeLogiFind)
 
 private:
     enum autoDrive {
@@ -142,19 +160,9 @@ private:
                fl_infinity=   1<<19 //бесконечная
  			   };
 
-	enum TypeLogiFind
-	           {
-			   noFind,
-			   onlyORG,
-			   onlyPEL,
-			   onlyMEL,
-			   onlyORGHome,
-			   onlyPELHome,
-			   onlyMELHome
- 			   };
 
   WLFlags Flag;
-  TypeLogiFind logicFindPos;
+  typeLogiFind logicFindPos;
 
   QString m_name;
   int autoTypeDrive;
@@ -205,8 +213,8 @@ public:
     void addInResolutionMov(WLIOPut *_inEnableMov,bool _state);
     void removeInResolutionMov(WLIOPut *_inEnableMov);
 
-   void setLogicFindPos(quint8 logic) {if(!isAuto()) logicFindPos=static_cast<TypeLogiFind>(logic);}
- quint8 getLogicFindPos() {return logicFindPos;}
+   void setLogicFindPos(WLDrive::typeLogiFind logic) {if(!isAuto()) logicFindPos=logic;}
+WLDrive::typeLogiFind getLogicFindPos() {return logicFindPos;}
 
    void setVFind1(double Vfind) {if(Vfind>0) m_VFind1=Vfind;}
  double getVFind1() {return m_VFind1;}
@@ -229,10 +237,6 @@ void setInfinity(bool set=true) {Flag.set(fl_infinity,set);}
 bool isInfinity() {return Flag.get(fl_infinity);}
 
 protected slots: 
-
-//  virtual void updateInStop();
-//	virtual void updateInEMGStop();
-//	virtual void updateInEnableMov();
 
     virtual void updateInResolutionMov();
 	virtual void updateInALM();
@@ -589,13 +593,13 @@ signals:
     void changedTruPosition(bool);
 };
 
-
+/*
 class WLDriveContext : public QObject
 {
 Q_OBJECT
 
-Q_PROPERTY(QString name   READ nameDrive /* WRITE setNameDrive */NOTIFY changedNameDrive)
-Q_PROPERTY(double  nowPos READ position /*WRITE setPosition */NOTIFY changedPosition)
+Q_PROPERTY(QString name   READ nameDrive /NOTIFY changedNameDrive)
+Q_PROPERTY(double  nowPos READ position NOTIFY changedPosition)
 //Q_PROPERTY(double  minPos READ minPosition WRITE setMinPosition NOTIFY changedMinPosition)
 //Q_PROPERTY(double  maxPos READ maxPosition WRITE setMaxPosition NOTIFY changedMaxPosition)
 Q_PROPERTY(double  vnow   READ Vnow NOTIFY changedVnow)
@@ -634,5 +638,6 @@ void changedPosition(double);
 void changedVnow(double);
 void changedTruPosition(bool);
 };
+*/
 
 #endif // WLDRIVE_H

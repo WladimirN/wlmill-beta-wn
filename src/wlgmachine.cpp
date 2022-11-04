@@ -9,7 +9,7 @@ double SGProbe::FProbe2=0;
 double SGProbe::backDist=3;
 double SGProbe::headDiam=2;
 bool SGProbe::enDoubleProbe=false;
-typeActionInput SGProbe::typeStop=INPUT_actSdStop;
+WLIOPut::typeActionInput SGProbe::typeStop=WLIOPut::INPUT_actSdStop;
 
 
 double WLGMachine::getDistG1StartAt() const
@@ -603,9 +603,9 @@ void WLGMachine::setSafeProbe(bool enable)
 m_safeProbe=enable;
 
 if(isRunGProbe())
-  getMotionDevice()->getModulePlanner()->setActSafeProbe(INPUT_actNo);
+  getMotionDevice()->getModulePlanner()->setActSafeProbe(WLIOPut::INPUT_actNo);
 else
-  getMotionDevice()->getModulePlanner()->setActSafeProbe(m_safeProbe ? getActSafeProbe() : INPUT_actNo);
+  getMotionDevice()->getModulePlanner()->setActSafeProbe(m_safeProbe ? getActSafeProbe() : WLIOPut::INPUT_actNo);
 }
 
 void WLGMachine::initMScript()
@@ -1181,7 +1181,7 @@ if(FileXML.isOpen())
          setAutoSetSafeProbe(stream.attributes().value("autoSetSafeProbe").toInt());     
 
      if(!stream.attributes().value("actSafeProbe").isEmpty())
-         setActSafeProbe((typeActionInput)stream.attributes().value("actSafeProbe").toString().toInt());
+         setActSafeProbe(static_cast<WLIOPut::typeActionInput>(stream.attributes().value("actSafeProbe").toString().toInt()));
 
      if(!stream.attributes().value("hPause").isEmpty())
         setHPause(stream.attributes().value("hPause").toString().toFloat());
@@ -1961,12 +1961,12 @@ WLGPoint SCG;
 
 int iOT=getGCode()->getOfstTool();
 
-if(nameCoord=="X") getGCode()->setDataTool(iOT,"Xg",curPosSC.x-pos/(getGCode()->isXDiam()? 2.0:1.0)
-                  +getGCode()->getDataToolNum(iOT,"Xg",0));
+if(nameCoord=="X") getGCode()->setDataTool(iOT,"Xo",curPosSC.x-pos/(getGCode()->isXDiam()? 2.0:1.0)
+                  +getGCode()->getDataToolNum(iOT,"Xo",0));
 else
-if(nameCoord=="Y") getGCode()->setDataTool(iOT,"Yg",curPosSC.y-pos+getGCode()->getDataCurToolNum("Yg",0));
+if(nameCoord=="Y") getGCode()->setDataTool(iOT,"Yo",curPosSC.y-pos+getGCode()->getDataCurToolNum("Yo",0));
 else
-if(nameCoord=="Z") getGCode()->setDataTool(iOT,"Zg",curPosSC.z-pos+getGCode()->getDataCurToolNum("Zg",0)
+if(nameCoord=="Z") getGCode()->setDataTool(iOT,"Zo",curPosSC.z-pos+getGCode()->getDataCurToolNum("Zo",0)
                    +getGCode()->getHToolOfst());
 
 }
@@ -1977,11 +1977,11 @@ double ret=getCurPositionSC(name);
 
 name=name.toUpper();
 
-if(name=="X") ret-=getGCode()->getDataCurToolNum("Xg",0);
+if(name=="X") ret-=getGCode()->getDataCurToolNum("Xo",0);
 else
-if(name=="Y") ret-=getGCode()->getDataCurToolNum("Yg",0);
+if(name=="Y") ret-=getGCode()->getDataCurToolNum("Yo",0);
 else
-if(name=="Z") ret-=getGCode()->getDataCurToolNum("Zg",0);
+if(name=="Z") ret-=getGCode()->getDataCurToolNum("Zo",0);
 
 return ret;
 }
@@ -2174,7 +2174,7 @@ if(index>=GProbeList.size()
 
 void WLGMachine::addGProbeXY(double x,double y,double z,double angle,double _dist,double _distA)
 {
-qDebug()<<"WLGMachine::addGProbeXY"<<x<<y<<z<<angle<<_dist<<_distA<<"SD"<<(SGProbe::typeStop==INPUT_actSdStop);;
+qDebug()<<"WLGMachine::addGProbeXY"<<x<<y<<z<<angle<<_dist<<_distA<<"SD"<<(SGProbe::typeStop==WLIOPut::INPUT_actSdStop);;
 
 if(!verifyReadyAutoMotion()) {return;}
 
@@ -2208,7 +2208,7 @@ GProbeList.append(GProbe);
 
 void WLGMachine::addGProbeZ(double x, double y, double z,double _dist,double _distA)
 {
-qDebug()<<"WLGMachine::addGProbeZ"<<x<<y<<z<<_dist<<_distA<<"SD"<<(SGProbe::typeStop==INPUT_actSdStop);
+qDebug()<<"WLGMachine::addGProbeZ"<<x<<y<<z<<_dist<<_distA<<"SD"<<(SGProbe::typeStop==WLIOPut::INPUT_actSdStop);
 
 if(!verifyReadyAutoMotion()) {return;}
 

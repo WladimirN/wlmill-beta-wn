@@ -22,14 +22,17 @@ WLAxisWidget::WLAxisWidget(WLAxis *_axis,bool _slave,double _offset, QWidget *pa
     ui->cbActInALM->addItems(QString("no,SDstop,EMGStop").split(","));
     ui->cbActInPEL->addItems(QString("no,SDstop,EMGStop").split(","));
     ui->cbActInMEL->addItems(QString("no,SDstop,EMGStop").split(","));
+    ui->cbActInORG->addItems(QString("no,SDstop,EMGStop").split(","));
 
     ui->cbActInALM->setCurrentIndex(m_axis->getActIn(AXIS_inALM));
     ui->cbActInPEL->setCurrentIndex(m_axis->getActIn(AXIS_inPEL));
     ui->cbActInMEL->setCurrentIndex(m_axis->getActIn(AXIS_inMEL));
+    ui->cbActInORG->setCurrentIndex(m_axis->getActIn(AXIS_inORG));
 
     connect(ui->editInALM,&WLEditIOWidget::toggle,ui->cbActInALM,&QComboBox::setEnabled);
     connect(ui->editInPEL,&WLEditIOWidget::toggle,ui->cbActInPEL,&QComboBox::setEnabled);
     connect(ui->editInMEL,&WLEditIOWidget::toggle,ui->cbActInMEL,&QComboBox::setEnabled);
+    connect(ui->editInORG,&WLEditIOWidget::toggle,ui->cbActInORG,&QComboBox::setEnabled);
 
     WLModuleIOPut *ModuleIOPut=static_cast<WLModuleIOPut*>(m_axis->getModule()->getDevice()->getModule(WLModule::typeMIOPut));
 
@@ -150,6 +153,7 @@ m_axis->setOutENB(getIndexOutENB());
 m_axis->setActIn(AXIS_inALM,getActInALM());
 m_axis->setActIn(AXIS_inPEL,getActInPEL());
 m_axis->setActIn(AXIS_inMEL,getActInMEL());
+m_axis->setActIn(AXIS_inORG,getActInORG());
 
 m_axis->setTypePulse((typePulseAxis)ui->cbTypePulse->currentIndex()
                     ,(ui->cbInvStep->isChecked()?MAF_invStep:0)
@@ -246,19 +250,25 @@ quint8 WLAxisWidget::getIndexOutRALM()
 return ui->editOutRALM->isChecked() ? ui->editOutRALM->value():0;
 }
 
-typeActionInput WLAxisWidget::getActInPEL()
+WLIOPut::typeActionInput WLAxisWidget::getActInPEL()
 {
-return static_cast<typeActionInput>(ui->cbActInPEL->currentIndex());
+return static_cast<WLIOPut::typeActionInput>(ui->cbActInPEL->currentIndex());
 }
 
-typeActionInput WLAxisWidget::getActInMEL()
+WLIOPut::typeActionInput WLAxisWidget::getActInMEL()
 {
-return static_cast<typeActionInput>(ui->cbActInMEL->currentIndex());
+return static_cast<WLIOPut::typeActionInput>(ui->cbActInMEL->currentIndex());
 }
 
-typeActionInput WLAxisWidget::getActInALM()
+WLIOPut::typeActionInput WLAxisWidget::getActInORG()
 {
-    return static_cast<typeActionInput>(ui->cbActInALM->currentIndex());
+return static_cast<WLIOPut::typeActionInput>(ui->cbActInORG->currentIndex());
+}
+
+
+WLIOPut::typeActionInput WLAxisWidget::getActInALM()
+{
+return static_cast<WLIOPut::typeActionInput>(ui->cbActInALM->currentIndex());
 }
 
 void WLAxisWidget::setEditSpindle(bool en)

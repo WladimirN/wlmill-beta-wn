@@ -11,8 +11,8 @@ QMAKE_LFLAGS = -no-pie
 #           QT_NO_INFO_OUTPUT\
 #           QT_NO_WARNING_OUTPUT\
 
-#DEFINES  += DEF_QML
-#DEFINES  += DEF_CAMERA
+DEFINES  += DEF_QML
+DEFINES  += DEF_CAMERA
 DEFINES  += DEF_PLOT
 DEFINES  += GCODE_MILL
 DEFINES  += DEF_HMAP
@@ -45,8 +45,6 @@ HEADERS +=widget/wlcamera.h \
           widget/wlcameraview.h
 
 FORMS   +=widget/wlcamera.ui
-
-TARGET = wlmill_cam
 }
 
 contains(DEFINES, DEF_QML) {

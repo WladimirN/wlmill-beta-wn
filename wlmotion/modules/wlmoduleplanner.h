@@ -189,7 +189,7 @@ WLIOPut *inProbe;
 WLIOPut *inPause;
 WLIOPut *inStop;
 
-typeActionInput m_actSafeProbe=INPUT_actEmgStop;
+WLIOPut::typeActionInput m_actSafeProbe=WLIOPut::INPUT_actEmgStop;
 
 bool m_ignoreInPause=false;
 bool m_ignoreInStop=false;
@@ -272,8 +272,8 @@ public:
      int getFree()   {return m_free;}
     void setSizeBuf(int value);
 
-    bool setActInProbe(typeActionInput typeAct);
-    bool setActSafeProbe(typeActionInput typeAct);
+    bool setActInProbe(WLIOPut::typeActionInput typeAct);
+    bool setActSafeProbe(WLIOPut::typeActionInput typeAct);
 
     bool setIgnoreInPause(bool ignore) {return setIgnoreInput(PLANNER_inPause,ignore);}
     bool setIgnoreInStop(bool ignore)  {return setIgnoreInput(PLANNER_inStop,ignore);}
@@ -281,7 +281,7 @@ public:
     bool isIgnoreInPause() {return m_ignoreInPause;}
     bool isIgnoreInStop()  {return m_ignoreInStop;}
 
-    typeActionInput  getActSafeProbe(){return m_actSafeProbe;}
+    WLIOPut::typeActionInput  getActSafeProbe(){return m_actSafeProbe;}
 
 statusPlanner getStatus()  const {return m_status;}
 

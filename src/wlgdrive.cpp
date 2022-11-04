@@ -163,9 +163,9 @@ switch(autoOperation)
                        m_Pad.setSpeed(m_Ftouch/60);
 
 					   if(autoTypeMDrive==autoTouchSD)
-                         getAxis()->setActIn(AXIS_inORG,INPUT_actSdStop);
+                         getAxis()->setActIn(AXIS_inORG,WLIOPut::INPUT_actSdStop);
 					   else
-                         getAxis()->setActIn(AXIS_inORG,INPUT_actEmgStop);
+                         getAxis()->setActIn(AXIS_inORG,WLIOPut::INPUT_actEmgStop);
 
                        setMot(autoOperation==1 ? maxPosition():minPosition());
 

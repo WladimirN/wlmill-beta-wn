@@ -411,7 +411,7 @@ WLIOPut *outRALM;
 
 quint8 iEncoder=255;
 
-typeActionInput actIn[4];
+WLIOPut::typeActionInput actIn[4];
 
 bool m_validLatch2;
 bool m_validLatch3;
@@ -466,7 +466,7 @@ enum statusAxis getStatus() {return status;}
 float getDelaySCurve() {return delaySCurve;}
 float getKSTCurve() {return kSTCurve;}
 
-typeActionInput getActIn(quint8 typeIn) {return actIn[typeIn];}
+WLIOPut::typeActionInput getActIn(quint8 typeIn) {return actIn[typeIn];}
           float getKGear() {return kGear;}
 
 WLIOPut*  getInput(typeInputAxis);
@@ -533,7 +533,7 @@ public:
 	bool setDisableLimit(bool dis);
     bool setDisableManual(bool dis);
     bool setInLatch(quint8 index);
-    bool setActIn(typeInputAxis type,typeActionInput typeAct);
+    bool setActIn(typeInputAxis type,WLIOPut::typeActionInput typeAct);
 	bool setTypePulse(typePulseAxis type,quint8 SDinv);
 	bool setKSTCurve(float kSTcurve);
     bool setDelaySCurve(float delayScurve=0,bool save=true);

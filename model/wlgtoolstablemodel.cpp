@@ -31,9 +31,9 @@ if (role == Qt::BackgroundRole
   }
 
 if (role == Qt::BackgroundRole
-  && (m_headers[index.column()]=="Xg"
-    ||m_headers[index.column()]=="Yg"
-    ||m_headers[index.column()]=="Zg")
+  && (m_headers[index.column()]=="Xo"
+    ||m_headers[index.column()]=="Yo"
+    ||m_headers[index.column()]=="Zo")
   &&mGCode->getOfstTool()==mGCode->getDataTool()->getValueAt(index.row(),"index","-1").toInt()){
    return QColor(100,200,100);
    }
@@ -44,7 +44,7 @@ return WLGDataTableModel::data(index,role);
 void WLGToolsTableModel::setHeaders(QString strheaders)
 {
 if(strheaders.isEmpty())
-   strheaders=QString("GCode,Diam,D,H,Xg,Yg,Zg,all");
+   strheaders=QString("GCode,Diam,D,H,Xo,Yo,Zo,all");
 
 WLGDataTableModel::setHeaders(strheaders);
 

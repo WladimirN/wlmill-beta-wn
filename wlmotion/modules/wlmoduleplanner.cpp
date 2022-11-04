@@ -196,7 +196,7 @@ void WLModulePlanner::setSizeBuf(int value)
     m_sizeBuf = value;
 }
 
-bool WLModulePlanner::setActInProbe(typeActionInput typeAct)
+bool WLModulePlanner::setActInProbe(WLIOPut::typeActionInput typeAct)
 {
 QByteArray data;
 QDataStream Stream(&data,QIODevice::WriteOnly);
@@ -212,7 +212,7 @@ emit sendCommand(data);
 return true;
 }
 
-bool WLModulePlanner::setActSafeProbe(typeActionInput typeAct)
+bool WLModulePlanner::setActSafeProbe(WLIOPut::typeActionInput typeAct)
 {
 m_actSafeProbe=typeAct;
 

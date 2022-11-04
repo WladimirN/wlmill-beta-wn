@@ -59,8 +59,6 @@
 #define IOPF_invalid   1<<7
 
 
-enum typeActionInput{INPUT_actNo,INPUT_actSdStop,INPUT_actEmgStop};
-
 const QString errorIOPut("0,no error\
 ,1,add connect ioput\
 ,1,add pulse output");
@@ -72,6 +70,11 @@ class WLIOPut: public WLElement
 Q_OBJECT
 
 public:
+
+enum typeActionInput
+    {INPUT_actNo
+    ,INPUT_actSdStop
+    ,INPUT_actEmgStop};
 
 enum typeDataIOPut{
      dataIOPut_now=0,

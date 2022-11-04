@@ -42,9 +42,10 @@ inALM=&WLIOPut::In0;
 outRALM=&WLIOPut::Out;
 outENB=&WLIOPut::Out;
 
-actIn[AXIS_inALM]=INPUT_actNo;
-actIn[AXIS_inPEL]=INPUT_actNo;
-actIn[AXIS_inMEL]=INPUT_actNo;
+actIn[AXIS_inALM]=WLIOPut::INPUT_actNo;
+actIn[AXIS_inPEL]=WLIOPut::INPUT_actNo;
+actIn[AXIS_inMEL]=WLIOPut::INPUT_actNo;
+actIn[AXIS_inORG]=WLIOPut::INPUT_actNo;
 
 resetLatch();
 }
@@ -473,7 +474,7 @@ emit sendCommand(data);
 return true;
 }
 
-bool WLAxis::setActIn(typeInputAxis type,typeActionInput typeAct)
+bool WLAxis::setActIn(typeInputAxis type,WLIOPut::typeActionInput typeAct)
 {
 actIn[type]=typeAct;
 
@@ -878,9 +879,11 @@ if(!stream.attributes().value("inALM").isEmpty()) setInALM(stream.attributes().v
 if(!stream.attributes().value("inPEL").isEmpty()) setInPEL(stream.attributes().value("inPEL").toString().toInt());
 if(!stream.attributes().value("inMEL").isEmpty()) setInMEL(stream.attributes().value("inMEL").toString().toInt());
 
-if(!stream.attributes().value("actInALM").isEmpty()) setActIn(AXIS_inALM,static_cast<typeActionInput>(stream.attributes().value("actInALM").toString().toInt()));
-if(!stream.attributes().value("actInPEL").isEmpty()) setActIn(AXIS_inPEL,static_cast<typeActionInput>(stream.attributes().value("actInPEL").toString().toInt()));
-if(!stream.attributes().value("actInMEL").isEmpty()) setActIn(AXIS_inMEL,static_cast<typeActionInput>(stream.attributes().value("actInMEL").toString().toInt()));
+if(!stream.attributes().value("actInORG").isEmpty()) setActIn(AXIS_inORG,static_cast<WLIOPut::typeActionInput>(stream.attributes().value("actInORG").toString().toInt()));
+
+if(!stream.attributes().value("actInALM").isEmpty()) setActIn(AXIS_inALM,static_cast<WLIOPut::typeActionInput>(stream.attributes().value("actInALM").toString().toInt()));
+if(!stream.attributes().value("actInPEL").isEmpty()) setActIn(AXIS_inPEL,static_cast<WLIOPut::typeActionInput>(stream.attributes().value("actInPEL").toString().toInt()));
+if(!stream.attributes().value("actInMEL").isEmpty()) setActIn(AXIS_inMEL,static_cast<WLIOPut::typeActionInput>(stream.attributes().value("actInMEL").toString().toInt()));
 
 if(!stream.attributes().value("outRALM").isEmpty())	setOutRALM(stream.attributes().value("outRALM").toString().toInt());
 if(!stream.attributes().value("outENB").isEmpty())	setOutENB(stream.attributes().value("outENB").toString().toInt());
@@ -931,6 +934,7 @@ stream.writeAttribute("typePulse",QString::number(typePulse));
 stream.writeAttribute("outSDinv", QString::number(outSDinv));
 
 stream.writeAttribute("inORG",QString::number(inORG->getIndex()));
+stream.writeAttribute("actInORG",QString::number(actIn[AXIS_inORG]));
 
 stream.writeAttribute("inPEL",QString::number(inPEL->getIndex()));
 stream.writeAttribute("actInPEL",QString::number(actIn[AXIS_inPEL]));

@@ -53,7 +53,7 @@ static double FProbe2;
 static double backDist;
 static double headDiam;
 static bool   enDoubleProbe;
-static typeActionInput typeStop;
+static WLIOPut::typeActionInput typeStop;
 
 enum typeProbe type=probeXY;
 
@@ -124,7 +124,7 @@ private:
     double m_distG1StartAt=10;
     double m_feedG1StartAt=0;
 
-    typeActionInput m_actSafeProbe=INPUT_actEmgStop;
+    WLIOPut::typeActionInput m_actSafeProbe=WLIOPut::INPUT_actEmgStop;
 
     QStringList preRunProgramList;
 
@@ -387,8 +387,8 @@ Q_INVOKABLE void setSafeProbe(bool enable=true);
 Q_INVOKABLE void resetSafeProbe() {setSafeProbe(false);}
 Q_INVOKABLE bool isSafeProbe() {return m_safeProbe;}
 
-void setActSafeProbe(typeActionInput act) {m_actSafeProbe=act;}
-typeActionInput getActSafeProbe() {return m_actSafeProbe;}
+void setActSafeProbe(WLIOPut::typeActionInput act) {m_actSafeProbe=act;}
+WLIOPut::typeActionInput getActSafeProbe() {return m_actSafeProbe;}
 
 private:
   int updateMovPlanner();
@@ -437,7 +437,7 @@ Q_INVOKABLE float getAIn(int index) {return getMotionDevice()->getAIn(index);}
 
 Q_INVOKABLE void resetProbe() {if(getMotionDevice()->getModulePlanner()) getMotionDevice()->getModulePlanner()->resetProbe();}
 
-Q_INVOKABLE void setActProbe(int act) {if(getMotionDevice()->getModulePlanner())  getMotionDevice()->getModulePlanner()->setActInProbe((typeActionInput)act);}
+Q_INVOKABLE void setActProbe(int act) {if(getMotionDevice()->getModulePlanner())  getMotionDevice()->getModulePlanner()->setActInProbe((WLIOPut::typeActionInput)act);}
 Q_INVOKABLE bool isProbe();
 
 Q_INVOKABLE double getProbe(QString name);
@@ -573,7 +573,7 @@ Q_INVOKABLE double getBackDistGProbe() {return SGProbe::backDist;}
 Q_INVOKABLE void   setHeadDiamGProbe(double _headDiam) {if(_headDiam>=0) SGProbe::headDiam=_headDiam;}
 Q_INVOKABLE double getHeadDiamGProbe() {return SGProbe::headDiam;}
 
-Q_INVOKABLE void setSDStopGProbe(bool sd) {SGProbe::typeStop = sd ? INPUT_actSdStop:INPUT_actEmgStop;}
+Q_INVOKABLE void setSDStopGProbe(bool sd) {SGProbe::typeStop = sd ? WLIOPut::INPUT_actSdStop:WLIOPut::INPUT_actEmgStop;}
 
 Q_INVOKABLE void enableDoubleGProbe(bool en) {SGProbe::enDoubleProbe=en;}
 

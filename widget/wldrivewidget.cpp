@@ -31,11 +31,29 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
     ui.sbPLIM->setValue(m_Drive->maxPosition());
     ui.sbMLIM->setValue(m_Drive->minPosition());
 
-	ui.comboBoxLogicFind->addItems(QString(tr("no Find,only ORG,only PEL,only MEL,only ORG back,only PEL back,only MEL back")).split(","));
+    ui.comboBoxLogicFind->addItem(tr("no Find"),WLDrive::noFind);
+    ui.comboBoxLogicFind->addItem(tr("only ORG"),WLDrive::onlyORG);
+    ui.comboBoxLogicFind->addItem(tr("only PORG"),WLDrive::onlyPORG);
+    ui.comboBoxLogicFind->addItem(tr("only MORG"),WLDrive::onlyMORG);
+    ui.comboBoxLogicFind->addItem(tr("only PORG back"),WLDrive::onlyPORGHome);
+    ui.comboBoxLogicFind->addItem(tr("only MORG back"),WLDrive::onlyMORGHome);
+    ui.comboBoxLogicFind->addItem(tr("only PEL"),WLDrive::onlyPEL);
+    ui.comboBoxLogicFind->addItem(tr("only MEL"),WLDrive::onlyMEL);
+    ui.comboBoxLogicFind->addItem(tr("only PEL back"),WLDrive::onlyPELHome);
+    ui.comboBoxLogicFind->addItem(tr("only MEL back"),WLDrive::onlyMORGHome);
 
     connect(ui.comboBoxLogicFind,SIGNAL(currentIndexChanged(int)),SLOT(updateFindLogic(int)));
 
-    ui.comboBoxLogicFind->setCurrentIndex(m_Drive->getLogicFindPos());
+    ui.comboBoxLogicFind->setCurrentIndex(0);
+
+    for(int i=0;i<ui.comboBoxLogicFind->count();i++) {
+      WLDrive::typeLogiFind curType=m_Drive->getLogicFindPos();
+
+      if(ui.comboBoxLogicFind->itemData(i).toInt()==curType){
+         ui.comboBoxLogicFind->setCurrentIndex(i);
+         break;
+         }
+      }
 
     connect(ui.pbCorrectStepSize,&QPushButton::clicked,this,&WLDriveWidget::onCorrectStepSize);
 
@@ -117,48 +135,77 @@ else
   str+=tr("invalid base position")+"\n";
  }
 
-switch(ui.comboBoxLogicFind->currentIndex())
+WLDrive::typeLogiFind curTypeLF=static_cast<WLDrive::typeLogiFind>(ui.comboBoxLogicFind->currentData().toInt());
+
+const QString noAction=tr("no sensor installed action");
+const QString noInput=tr("no sensor installed");
+
+switch(curTypeLF)
 {
-case 4: //ORG
-case 1: foreach(WLAxisWidget *AW,axisWidgetList)
-          {
-          if(AW->getIndexInORG()<2)
-              str+=tr("no sensor installed to search")+" (inORG)"+QString("(Axis-%1").arg(AW->getAxis()->getIndex())+")\n";
-          }
+case WLDrive::onlyPORG:
+case WLDrive::onlyMORG:
+case WLDrive::onlyPORGHome:
+case WLDrive::onlyMORGHome:
+           foreach(WLAxisWidget *AW,axisWidgetList)
+               {
+               if(AW->getActInORG()==WLIOPut::INPUT_actNo)
+                   str+=tr("no sensor installed action")+" (inORG)"+QString("(Axis-%1").arg(AW->getAxis()->getIndex())+")\n";
+               }
 
-        if(ui.sbOrgSize->value()>0)
-        {}
-        else
-        str+=tr("not specified size ORG")+"\n";
-        break;
 
-case 2:  //PEL
-case 5: foreach(WLAxisWidget *AW,axisWidgetList)
+
+case  WLDrive::onlyORG:  //ORG
+         foreach(WLAxisWidget *AW,axisWidgetList)
+             {
+             if(AW->getIndexInORG()<2)
+                 str+=tr("no sensor installed to search")+" (inORG)"+QString("(Axis-%1").arg(AW->getAxis()->getIndex())+")\n";
+             }
+
+           if(ui.sbOrgSize->value()==0&&curTypeLF==WLDrive::onlyORG)
+           str+=tr("not specified size ORG")+"\n";
+           break;
+
+
+case WLDrive::onlyPEL:    //PEL
+case WLDrive::onlyPELHome:
+       foreach(WLAxisWidget *AW,axisWidgetList)
          {
          if(AW->getIndexInPEL()<2)
              str+=tr("no sensor installed to search")+" (inPEL)"+QString("(Axis-%1").arg(AW->getAxis()->getIndex())+")\n";
 
-         if(AW->getActInPEL()==typeActionInput::INPUT_actNo)
-             str+=tr("no sensor installed to search or action")+" (inPEL)"+QString("(Axis-%1").arg(AW->getAxis()->getIndex())+")\n";
+         if(AW->getActInPEL()==WLIOPut::INPUT_actNo)
+             str+=tr("no sensor installed action")+" (inPEL)"+QString("(Axis-%1").arg(AW->getAxis()->getIndex())+")\n";
          }
 
         break;
 
-case 3: //MEL
-case 6: foreach(WLAxisWidget *AW,axisWidgetList)
+case WLDrive::onlyMEL:     //MEL
+case WLDrive::onlyMELHome:
+       foreach(WLAxisWidget *AW,axisWidgetList)
         {
         if(AW->getIndexInMEL()<2)
             str+=tr("no sensor installed to search")+" (inMEL)"+QString("(Axis-%1").arg(AW->getAxis()->getIndex())+")\n";
 
-        if(AW->getActInMEL()==typeActionInput::INPUT_actNo)
-            str+=tr("no sensor installed to search or action")+" (inMEL)"+QString("(Axis-%1").arg(AW->getAxis()->getIndex())+")\n";
+        if(AW->getActInMEL()==WLIOPut::INPUT_actNo)
+            str+=tr("no sensor installed action")+" (inMEL)"+QString("(Axis-%1").arg(AW->getAxis()->getIndex())+")\n";
         }
 
         break;
 }
 
-if((ui.comboBoxLogicFind->currentIndex()>0&&ui.sbVfind1->value()<=0)
- ||(ui.comboBoxLogicFind->currentIndex()>2&&ui.sbVfind1->value()<=0))
+if(curTypeLF!=WLDrive::noFind&&ui.sbVfind1->value()<=0)
+    str+=tr("search speed not set")+" V1"+"\n";
+
+if((curTypeLF==WLDrive::onlyPEL
+  ||curTypeLF==WLDrive::onlyMEL
+  ||curTypeLF==WLDrive::onlyPELHome
+  ||curTypeLF==WLDrive::onlyMELHome
+  ||curTypeLF==WLDrive::onlyPORG
+  ||curTypeLF==WLDrive::onlyMORG
+  ||curTypeLF==WLDrive::onlyPORGHome
+  ||curTypeLF==WLDrive::onlyMORGHome)
+    &&
+   ui.sbVfind1->value()<=0)
 str+=tr("search speed not set")+"\n";
 
 return str;
@@ -293,33 +340,53 @@ void WLDriveWidget::updateCBTypePulse(int index)
 
 void WLDriveWidget::updateFindLogic(int index)
 {
-if(index==1
- ||index==4)    
+WLDrive::typeLogiFind type=static_cast<WLDrive::typeLogiFind>(ui.comboBoxLogicFind->currentData().toInt());
+
+if(type==WLDrive::onlyORG
+ ||type==WLDrive::onlyORGHome
+ ||type==WLDrive::onlyPORG
+ ||type==WLDrive::onlyMORG
+ ||type==WLDrive::onlyPORGHome
+ ||type==WLDrive::onlyMORGHome)
     ui.sbOrgSize->setEnabled(true);
 else
     ui.sbOrgSize->setEnabled(false);
 
 
-if(index==4
- ||index==5
- ||index==6)
+if(type==WLDrive::onlyPORGHome
+ ||type==WLDrive::onlyMORGHome
+ ||type==WLDrive::onlyPELHome
+ ||type==WLDrive::onlyMELHome)
      ui.sbBackFindPosition->setEnabled(true);
    else
      ui.sbBackFindPosition->setEnabled(false);
 
-ui.sbVfind1->setEnabled(index>0);
-ui.sbVfind2->setEnabled(index>1);
-ui.sbBackDist->setEnabled(index>1);
+ui.sbVfind1->setEnabled(type!=WLDrive::noFind);
 
-switch(index)
+ui.sbVfind2->setEnabled(type!=WLDrive::noFind
+                      &&type!=WLDrive::onlyORG
+                      &&type!=WLDrive::onlyORGHome);
+
+ui.sbBackDist->setEnabled(type!=WLDrive::noFind
+                        &&type!=WLDrive::onlyORG
+                        &&type!=WLDrive::onlyORGHome);
+
+switch(type)
 {
-case 0:  ui.labelOrgPosition->setText(tr("position"));break;
-case 1:
-case 4:  ui.labelOrgPosition->setText("inORG "+tr("position"));break;
-case 2:
-case 5:  ui.labelOrgPosition->setText("inPEL "+tr("position"));break;
-case 3:
-case 6:  ui.labelOrgPosition->setText("inMEL "+tr("position"));break;
+case WLDrive::noFind:  ui.labelOrgPosition->setText(tr("position"));break;
+
+case WLDrive::onlyORG:
+case WLDrive::onlyORGHome:
+case WLDrive::onlyPORG:
+case WLDrive::onlyMORG:
+case WLDrive::onlyPORGHome:
+case WLDrive::onlyMORGHome: ui.labelOrgPosition->setText("inORG "+tr("position"));break;
+
+case WLDrive::onlyPEL:
+case WLDrive::onlyPELHome: ui.labelOrgPosition->setText("inPEL "+tr("position"));break;
+
+case WLDrive::onlyMEL:
+case WLDrive::onlyMELHome: ui.labelOrgPosition->setText("inMEL "+tr("position"));break;
 }
 
 
@@ -333,7 +400,7 @@ m_Drive->setDimension(static_cast<WLDriveDim::typeDim>(ui.cbTypeDim->currentInde
                      ,ui.sbDimA->value()
                      ,ui.sbDimB->value());
 
-m_Drive->setLogicFindPos(ui.comboBoxLogicFind->currentIndex());
+m_Drive->setLogicFindPos(static_cast<WLDrive::typeLogiFind>(ui.comboBoxLogicFind->currentData().toInt()));
 
 m_Drive->setORGSize(ui.sbOrgSize->value());
 m_Drive->setHomePosition(ui.sbBackFindPosition->value());

@@ -137,7 +137,7 @@ bool ret=false;
 WLModuleAxis    *ModuleAxis   =MillMachine->getMotionDevice()->getModuleAxis();
 WLModulePlanner *ModulePlanner=MillMachine->getMotionDevice()->getModulePlanner();
 
-MillMachine->setActSafeProbe(static_cast<typeActionInput>(ui.cbActSafeProbe->currentIndex()));
+MillMachine->setActSafeProbe(static_cast<WLIOPut::typeActionInput>(ui.cbActSafeProbe->currentIndex()));
 
 MillMachine->setHPause(ui.sbHPause->value());
 
