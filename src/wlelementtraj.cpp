@@ -18,7 +18,7 @@ void WLElementTraj::reset(bool all)
 {
 index=0;
 
-movDistanceIJ=movDistanceK=movDistance=0;
+movDistanceIJ=movDistanceK=movDistanceXYZ=0;
 
 str.clear();
 
@@ -205,11 +205,11 @@ if(!isLine()
 return Points;
 }
 
-    movDistance=(GModel->getFrame(data.line.endPoint).to3D()
+    movDistanceXYZ=(GModel->getFrame(data.line.endPoint).to3D()
                 -GModel->getFrame(data.line.startPoint).to3D()).r();
 
 
-if(delta==0.0f||movDistance==0.0f)
+if(delta==0.0f||movDistanceXYZ==0.0f)
  {
  Points+=GModel->getFrame(data.line.startPoint).to6D();
  Points+=GModel->getFrame(data.line.endPoint).to6D();
@@ -402,11 +402,11 @@ for(float d=dt;d<1;d+=dt)
 
 Points+=endPoint;
 
-movDistance=0;
+movDistanceXYZ=0;
 
 for(int i=1;i<Points.size();i++)
  {
- movDistance+=(Points[i]-Points[i-1]).to3D().r();
+ movDistanceXYZ+=(Points[i]-Points[i-1]).to3D().r();
  }
 
 startV.x=ax[1];
@@ -548,7 +548,7 @@ if((!data.arc.CCW)&&(A_en>=A_st)) A_en-=2*M_PI;
 
 movDistanceIJ=qAbs((A_en-A_st)*R);
 movDistanceK =qAbs(endPoint.z-startPoint.z);
-movDistance  =hypot(movDistanceIJ,movDistanceK);
+movDistanceXYZ=hypot(movDistanceIJ,movDistanceK);
 
 int n=1;
 
@@ -619,11 +619,11 @@ Points+=endPoint.to3D();
 
  if(data.arc.spiral)
   {
-  float k=movDistanceIJ/movDistance;
+  float k=movDistanceIJ/movDistanceXYZ;
 
   sV.x*=k;
   sV.y*=k;
-  sV.z =(endPoint.to3D().z-startPoint.to3D().z)/movDistance;
+  sV.z =(endPoint.to3D().z-startPoint.to3D().z)/movDistanceXYZ;
 
   eV.x*=k;
   eV.y*=k;

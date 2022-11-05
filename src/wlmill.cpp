@@ -728,7 +728,8 @@ LScript->wait();
 MScript->quit();
 MScript->wait();
 
-saveConfigINI();
+if(MillMachine->isReady())
+          saveConfigINI();
 
 delete VisualWidget;
 delete Program;
@@ -1087,6 +1088,7 @@ switch(QMessageBox::question(this, tr("Confirmation:"),
 	    {
 		
         case QMessageBox::Yes:     MillMachine->setEnable(false);
+
                                    saveDataState();
                                    qDebug()<<"WLMill close";
 			                       break;
@@ -1372,6 +1374,7 @@ SCWidget->setHeadersTable(setting.value("SC/showColumn","").toString());
 
 return true;
 }
+
 void WLMill::saveConfigINI()
 {
 QSettings setting(iniconfigWLMill,QSettings::IniFormat);

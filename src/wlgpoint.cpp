@@ -177,6 +177,19 @@ ret.c=c;
 return ret;
 }
 
+double WLGPoint::getR()
+{
+return sqrt(x*x
+           +y*y
+           +z*z
+           +a*a
+           +b*b
+           +c*c
+           +v*v
+           +u*u
+           +w*w);
+}
+
 bool  WLGPoint::operator==(WLGPoint A)
 {
 return x==A.x

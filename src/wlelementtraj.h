@@ -145,7 +145,7 @@ inline bool isULine() {return type==uline;}
 inline bool isScript(){return type==script;}
 inline bool isEmpty() {return type==empty;}
 
-float movDistance;
+float movDistanceXYZ;
 
 float movDistanceIJ;
 float movDistanceK;

@@ -49,7 +49,6 @@ return 1;
 function M4()
 {
 MACHINE.setStateSpindle(-1)
-return 1;
 }
 
 //функция выключения шпинделя
@@ -57,7 +56,6 @@ function M5()
 {
 MACHINE.setStateSpindle(0)	
 //DIALOG.message("M5 шпиндель выключен!",0);	
-return 1;
 }
 
 

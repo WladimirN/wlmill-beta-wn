@@ -38,6 +38,7 @@ void set(double _val) {value=_val; valid=true;}
 
 #define GPointNames "X,Y,Z,A,B,C,U,V,W"
 
+
 struct WLGCodeData
 {
  WLData  dataTools;

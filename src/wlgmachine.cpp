@@ -1506,6 +1506,7 @@ if(FileXML.isOpen())
   setSOut(m_GCode.getValue('S'));
 
   ModulePlanner->setModeRun(PLANNER_normal);  
+
   ModulePlanner->setEnableSOut(false);  
   ModulePlanner->stopMov();
   }
@@ -3273,7 +3274,7 @@ for(int i=1;i<addTraj.size();i++)
 
    //qDebug()<<addTraj[i-1].startV.to3D().toString()<<" "<<addTraj[i-1].startV.to3D().toString();
 
-   V=qMin((float)V,qMin(addTraj[i-1].movDistance*0.95f,addTraj[i].movDistance)/2.0f);
+   V=qMin((float)V,qMin(addTraj[i-1].movDistanceXYZ*0.95f,addTraj[i].movDistanceXYZ)/2.0f);
 
    L=V*sin(B/180.0*M_PI)/2.0;
 
@@ -3514,7 +3515,11 @@ else  if(!deltaBL.isNull()) { //add line backlash
             if(!lastBL.isNull()) //что то перенесли
             {
             qDebug()<<"release preview backlash";
+            double k=((Traj[i-1].getEndPoint()+lastBL)-Traj[i-1].getStartPoint()).getR()
+                             /(Traj[i-1].getEndPoint()-Traj[i-1].getStartPoint()).getR();
+
             Traj[i-1].setEndPoint(Traj[i-1].getEndPoint()+lastBL);
+            Traj[i-1].setF(k*Traj[i-1].F);
             Traj[i-1].calcPoints(&ok,getGModel());
             }
           }

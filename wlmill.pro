@@ -56,6 +56,7 @@ HEADERS +=src/wlfile.h
 VERSION = 1.1.2.1
 #1.1.2.1 - отображение испотзуемых данных в таблице
 
+
 QMAKE_TARGET_COMPANY = WLDEV
 QMAKE_TARGET_PRODUCT = WLMill
 #QMAKE_TARGET_DESCRIPTION = Long thoughtful description

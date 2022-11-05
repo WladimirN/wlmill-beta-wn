@@ -35,6 +35,8 @@ WL3DPoint to3D();
 void from6D(WL6DPoint A);
 WL6DPoint to6D();
 
+double getR();
+
 bool operator==(WLGPoint A);
 bool operator!=(WLGPoint A);
 
