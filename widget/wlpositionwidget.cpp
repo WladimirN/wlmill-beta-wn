@@ -71,7 +71,7 @@ WLPositionWidget::WLPositionWidget(WLGMachine *_MillMachine,WLGProgram *_Program
 	QMenu *menuPBRot = new QMenu();
 	menuPBRot->addAction((tr("set base postion")),this,SLOT(onPBsetP0()));
 	menuPBRot->addAction((tr("set verify postion")),this,SLOT(onPBsetP1()));
-	menuPBRot->addAction((tr("rotation correction")),this,SLOT(onPBRotSK()));
+    menuPBRot->addAction((tr("rotation correction")),this,SLOT(onPBRotSCRef()));
     ui.pbRotSC->setMenu(menuPBRot);	
 
     connect(ui.cbExGCode->lineEdit(),&QLineEdit::returnPressed,this,&WLPositionWidget::onExGCode);
@@ -1068,7 +1068,7 @@ void WLPositionWidget::onExGCode()
 MillMachine->runGCode(ui.cbExGCode->currentText());
 }
 
-void WLPositionWidget::onPBRotSK()
+void WLPositionWidget::onPBRotSCRef()
 {
 WL3DPoint refP0(MillMachine->m_GCode.getRefPoint0SC(MillMachine->m_GCode.getActivSC()).to3D());
 WL3DPoint curPos(MillMachine->getCurrentPositionActivSC().to3D());
@@ -1078,10 +1078,7 @@ curPos.z=0;
 
 double a=(curPos.getAxy(refP0)-refP1.getAxy(refP0))*180.0/M_PI;
 
-//qDebug()<<"calc A"<<a;
-
-MillMachine->rotAboutRotPointSC(MillMachine->m_GCode.getActivSC()
-                               ,MillMachine->m_GCode.getRefPoint0SC(MillMachine->m_GCode.getActivSC()).a+a);
+MillMachine->getGCode()->setRotCurSC(MillMachine->getGCode()->getRotCurSC()+a);
 }
 
 void WLPositionWidget::updateEnableMoved(bool en)
@@ -1171,7 +1168,7 @@ gALabelZ->update();
 gALabelA->update();
 gALabelB->update();
 
-ui.pbRotSC->setText(QString::number(MillMachine->m_GCode.getRefPoint0SC(MillMachine->m_GCode.getActivSC()).a,'f',2));
+ui.pbRotSC->setText(QString::number(MillMachine->m_GCode.getRotCurSC(),'f',2));
 
 labelActivGCode->setText(MillMachine->m_GCode.getActivGCodeString());
 
@@ -1414,21 +1411,16 @@ void WLPositionWidget::onPBRotSC()
 if(disButton) return;
 
 WLEnterNum  EnterNum (this);
-EnterNum.setLabel("A=");
+EnterNum.setLabel("Rxy=");
 EnterNum.setSuffix(tr("gr"));
 
-if(EnterNum.exec())  
- {
- MillMachine->rotAboutRotPointSC(MillMachine->m_GCode.getActivSC(),EnterNum.getNow());
+EnterNum.show();
+
+if(EnterNum.exec()){
+ MillMachine->getGCode()->setRotCurSC(EnterNum.getNow());
  }
 
 }
-
-
-
-
-
-
 
 void WLPositionWidget::onPBsetP0()
 {

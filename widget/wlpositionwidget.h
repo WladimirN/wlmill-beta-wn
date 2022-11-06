@@ -325,7 +325,7 @@ private slots:
 
      void updateEnableMoved(bool);
 	 
-     void onPBRotSK();
+     void onPBRotSCRef();
      void onPBsetG28();
      void onPBgetG28();
 	 void onPBsetP0();

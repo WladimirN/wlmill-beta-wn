@@ -1927,21 +1927,22 @@ WLFrame    OffsetSC;
 WLFrame newOffsetSC;
 WLFrame    newPosFr;
 WLFrame    curPosFr;
+double rSC=m_GCode.getRotCurSC();
 
 curPosFr.x=curPosSC.x;
 curPosFr.y=curPosSC.y;
 curPosFr.z=curPosSC.z;
-curPosFr.a=-m_GCode.getRefPoint0SC(iSC).a;
+curPosFr.a=-rSC;
 
 newPosFr.x=newPos.x;
 newPosFr.y=newPos.y;
 newPosFr.z=newPos.z;
-newPosFr.a=-m_GCode.getRefPoint0SC(iSC).a;
+newPosFr.a=-rSC;
 
 OffsetSC.x=SCG.x;
 OffsetSC.y=SCG.y;
 OffsetSC.z=SCG.z;
-OffsetSC.a=m_GCode.getRefPoint0SC(iSC).a;
+OffsetSC.a=rSC;
 
 newOffsetSC.fromM(newPosFr.toM().inverted()*curPosFr.toM()*OffsetSC.toM());
 
@@ -2063,12 +2064,6 @@ if(getDrive("W")) ret+="W"+QString::number(GP.w);
 
 return ret;
 }
-
-void  WLGMachine::rotAboutRotPointSC(int i,float a)
-{
-m_GCode.rotAboutRotPointSC(i,a);
-}
-
 
 void WLGMachine::setDriveManualWhell(QString nameDrive,quint8 X1,bool vmode)
 {

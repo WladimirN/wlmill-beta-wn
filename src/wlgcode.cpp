@@ -1070,7 +1070,9 @@ WLGPoint WLGCode::getPointSC(int iSC,WLGPoint GPoint,bool back)
 {
 WLGPoint SC=getOffsetSC(iSC);
 
-if(getRefPoint0SC(iSC).a!=0)
+double rotSC=getRotCurSC();
+
+if(rotSC!=0.0)
 {
 WLFrame Fr;
 WLFrame frP0(getRefPoint0SC(iSC).to3D());
@@ -1082,10 +1084,10 @@ Fr.y=GPoint.y;
 Fr.z=GPoint.z;
 
 if(back) {
- Fr.fromM(frP0.toM()*getRotMatrix(0,0,-getRefPoint0SC(iSC).a)*frP0.toM().inverted()*Fr.toM());
+ Fr.fromM(frP0.toM()*getRotMatrix(0,0,-rotSC)*frP0.toM().inverted()*Fr.toM());
  }
  else{
- Fr.fromM(frP0.toM()*getRotMatrix(0,0,getRefPoint0SC(iSC).a)*frP0.toM().inverted()*Fr.toM());
+ Fr.fromM(frP0.toM()*getRotMatrix(0,0,rotSC)*frP0.toM().inverted()*Fr.toM());
  }
 
 GPoint.x=Fr.x;
@@ -1211,19 +1213,6 @@ if(isGCode(90)
 
 return getPointActivSC(newPoint,true);
 }
-
-
-
-void  WLGCode::rotAboutRotPointSC(int i,float a)
-{
-if(i>0){
- WLEData eSC=getSC(i);
- eSC.insert("a",a);
- setSC(i,eSC);
- }
-}
-
-
 
 WLGPoint  WLGCode::getOffsetSC(int i,bool *ok)
 {    

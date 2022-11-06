@@ -282,9 +282,8 @@ WLEnterNum  EnterNum (this);
 EnterNum.setLabel("A=");
 EnterNum.setSuffix(tr("gr"));
 
-if(EnterNum.exec())
- {
- MillMachine->rotAboutRotPointSC(MillMachine->getGCode()->getActivSC(),EnterNum.getNow());
+if(EnterNum.exec()) {
+ MillMachine->getGCode()->setRotCurSC(EnterNum.getNow());
  }
 
 }

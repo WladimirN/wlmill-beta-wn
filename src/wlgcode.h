@@ -195,8 +195,6 @@ public:
    bool setRefPoint0SC(int i,WLGPoint P){return setRefPointSC(i,0,P);}
    bool setRefPoint1SC(int i,WLGPoint P){return setRefPointSC(i,1,P);}
 
-   void rotAboutRotPointSC(int i,float a);
-
    bool calcCenterPointR(WLGPoint startPoint,WLGPoint endPoint);
 
     int setGCode(QString val);
@@ -288,6 +286,18 @@ public:
 
     Q_INVOKABLE double  getDataCurToolNum(QString key,double  defvalue) {return getDataTool(getT(),key,defvalue).toDouble();}
     Q_INVOKABLE QString getDataCurToolStr(QString key,QString defvalue) {return getDataTool(getT(),key,defvalue).toString();}
+
+    Q_INVOKABLE double  getDataSCNum(int ikey,QString key,double  defvalue) {return getDataSC(ikey,key,defvalue).toDouble();}
+    Q_INVOKABLE QString getDataSCStr(int ikey,QString key,QString defvalue) {return getDataSC(ikey,key,defvalue).toString();}
+
+    Q_INVOKABLE double  getDataCurSCNum(QString key,double  defvalue) {return getDataSC(getSC(),key,defvalue).toDouble();}
+    Q_INVOKABLE QString getDataCurSCStr(QString key,QString defvalue) {return getDataSC(getSC(),key,defvalue).toString();}
+
+    Q_INVOKABLE void setRotSC(int iSC,double rot,bool send=true) {setDataSC(iSC,"Rot",rot,send);}
+    Q_INVOKABLE void setRotCurSC(double rot,bool send=true) {setRotSC(getSC(),rot,send);}
+
+    Q_INVOKABLE double getRotSC(int iSC) {return getDataSCNum(iSC,"Rot",0);}
+    Q_INVOKABLE double getRotCurSC() { return getRotSC(getSC());}
 
     Q_INVOKABLE void setHTool(int i,float h);
     Q_INVOKABLE void setDTool(int i,float d);

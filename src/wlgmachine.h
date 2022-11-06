@@ -460,9 +460,6 @@ Q_INVOKABLE  void enableSOut(int state) {setStateSpindle(state);}
 //Q_INVOKABLE bool isTryProbe(bool dir);
 //Q_INVOKABLE double getProbePosition(QString nameDrive,bool dir);
 
-Q_INVOKABLE void rotAboutRotPointSC(int i,float a);
-
-
 Q_INVOKABLE bool isActiv() {
                            WLModulePlanner *ModulePlanner=motDevice->getModulePlanner();
 
