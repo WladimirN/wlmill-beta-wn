@@ -1070,9 +1070,9 @@ MillMachine->runGCode(ui.cbExGCode->currentText());
 
 void WLPositionWidget::onPBRotSCRef()
 {
-WL3DPoint refP0(MillMachine->m_GCode.getRefPoint0SC(MillMachine->m_GCode.getActivSC()).to3D());
+WL3DPoint refP0(MillMachine->m_GCode.getRotPoint0SC(MillMachine->m_GCode.getActivSC()).to3D());
 WL3DPoint curPos(MillMachine->getCurrentPositionActivSC().to3D());
-WL3DPoint refP1(MillMachine->m_GCode.getRefPoint1SC(MillMachine->m_GCode.getActivSC()).to3D());
+WL3DPoint refP1(MillMachine->m_GCode.getRotPoint1SC(MillMachine->m_GCode.getActivSC()).to3D());
 
 curPos.z=0;
 
@@ -1426,7 +1426,7 @@ void WLPositionWidget::onPBsetP0()
 {
 WLEditPoint EP;
 
-WLGPoint  GP=MillMachine->m_GCode.getRefPoint0SC(MillMachine->m_GCode.getActivSC(),0);
+WLGPoint  GP=MillMachine->m_GCode.getRotPoint0SC(MillMachine->m_GCode.getActivSC(),0);
 
 EP.setNameData("X,Y,Z");
 EP.setValueStr(GP.toString());
@@ -1437,7 +1437,7 @@ if(EP.exec())
     {
     qDebug("update rotPoint");
     GP.fromString(EP.getValueStr());
-    MillMachine->m_GCode.setRefPoint0SC(MillMachine->m_GCode.getActivSC(),GP);
+    MillMachine->m_GCode.setRotPoint0SC(MillMachine->m_GCode.getActivSC(),GP);
     }
 };
 
@@ -1445,7 +1445,7 @@ void WLPositionWidget::onPBsetP1()
 {
 WLEditPoint EP;
 
-WLGPoint  GP=MillMachine->m_GCode.getRefPoint1SC(MillMachine->m_GCode.getActivSC());
+WLGPoint  GP=MillMachine->m_GCode.getRotPoint1SC(MillMachine->m_GCode.getActivSC());
 
 EP.setNameData("X,Y,Z");
 EP.setValueStr(GP.toString());
@@ -1456,7 +1456,7 @@ if(EP.exec())
     {
     qDebug("update rotPoint");
     GP.fromString(EP.getValueStr());
-    MillMachine->m_GCode.setRefPoint1SC(MillMachine->m_GCode.getActivSC(),GP);
+    MillMachine->m_GCode.setRotPoint1SC(MillMachine->m_GCode.getActivSC(),GP);
     }
 };
 

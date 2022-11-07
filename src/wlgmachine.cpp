@@ -1398,13 +1398,13 @@ if(FileXML.isOpen())
            GP.x=Fr.x;
            GP.y=Fr.y;
            GP.z=Fr.z;
-           m_GCode.setRefPoint0SC(i,GP);
+           m_GCode.setRotPoint0SC(i,GP);
 
            Fr.fromString(stream.attributes().value("refPoint1").toString());
            GP.x=Fr.x;
            GP.y=Fr.y;
            GP.z=Fr.z;
-           m_GCode.setRefPoint1SC(i,GP);
+           m_GCode.setRotPoint1SC(i,GP);
            }
            else
            {
@@ -1412,10 +1412,10 @@ if(FileXML.isOpen())
            m_GCode.setOffsetSC(i,GP,false);
 
            GP.fromString(stream.attributes().value("refPoint0").toString());
-           m_GCode.setRefPoint0SC(i,GP);
+           m_GCode.setRotPoint0SC(i,GP);
 
            GP.fromString(stream.attributes().value("refPoint1").toString());
-           m_GCode.setRefPoint1SC(i,GP);
+           m_GCode.setRotPoint1SC(i,GP);
            continue;
            }
 	     }

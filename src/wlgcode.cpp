@@ -185,7 +185,6 @@ if(isValidGCode("G81")
   qDebug()<<"Drill Pms="<<m_data.drillPms;
 }
 
-
 if(isValidGCode("G4")){
   m_data.G4Pms=Pms;
   qDebug()<<"G4 Pms="<<m_data.G4Pms;
@@ -195,7 +194,9 @@ if(isValidGCode("G64")
 &&(isValidValue('P')||isValidValue('Q')))
  {
   setG64PQ(isValidValue('P') ? getValue('P'):0
-          ,isValidValue('Q') ? getValue('Q'):0);
+          ,isValidValue('Q') ? getValue('Q'):0);  
+
+  resetValid();
  }
 
 if((isValidGCode("G154")||isValidGCode("G54.1"))
@@ -209,7 +210,29 @@ if((isValidGCode("G154")||isValidGCode("G54.1"))
    else {
     qDebug()<<"error G154 P"<<isc;
    }
+
+ resetValid();
  }
+
+if(isValidGCode("G68")
+ &&isValidValue('X')
+ &&isValidValue('Y')
+ &&isValidValue('R'))
+ {
+ WLGPoint Prot;
+
+ Prot.x=getValue('X');
+ Prot.y=getValue('Y');
+
+ setRotPoint0SC(getSC(),Prot);
+ setRotCurSC(getValue('R'));
+
+ resetValid();
+ }
+ else if (isValidGCode("G69")) {
+ setRotCurSC(0);
+ }
+
 
 return MList;
 }
@@ -795,6 +818,11 @@ switch(code)
            m_data.GCode[64]=1;
            m_data.stopMode=false;
            break;
+   //root 68-on 69-off
+   case 68:m_data.GCode[68]=1;
+           break;
+   case 69:m_data.GCode[68]=0;
+           break;
    //**13
    case 80:m_data.GCode[80]=1;
            m_data.GCode[81]=0; //"Off Drill";
@@ -1075,7 +1103,7 @@ double rotSC=getRotCurSC();
 if(rotSC!=0.0)
 {
 WLFrame Fr;
-WLFrame frP0(getRefPoint0SC(iSC).to3D());
+WLFrame frP0(getRotPoint0SC(iSC).to3D());
 
 if(back) GPoint=GPoint-SC-getGToolOfst();
 
@@ -1237,19 +1265,15 @@ if(ok) *ok=false;
 return ret;
 }
 
-WLGPoint  WLGCode::getRefPointSC(int i,int iref,bool *ok)
+WLGPoint  WLGCode::getRotPointSC(int i,int iref,bool *ok)
 {
 WLGPoint  ret;
 
 if(i>=0) {
 WLEData eSC=getSC(i);
 
-ret.x=eSC.value("Xref"+QString::number(iref),0).toDouble();
-ret.y=eSC.value("Yref"+QString::number(iref),0).toDouble();
-ret.z=eSC.value("Zref"+QString::number(iref),0).toDouble();
-ret.a=eSC.value("Aref"+QString::number(iref),0).toDouble();
-ret.b=eSC.value("Bref"+QString::number(iref),0).toDouble();
-ret.c=eSC.value("Cref"+QString::number(iref),0).toDouble();
+ret.x=eSC.value("Xrot"+QString::number(iref),0).toDouble();
+ret.y=eSC.value("Yrot"+QString::number(iref),0).toDouble();
 
 if(ok) *ok=true;
 }
@@ -1285,18 +1309,14 @@ if(i>0)
 return false;
 }
 
-bool WLGCode::setRefPointSC(int i,int iref, WLGPoint P)
+bool WLGCode::setRotPointSC(int i,int iref, WLGPoint P)
 {
 if(i<=0) return false;
 
 WLEData eSC=getSC(i);
 
-eSC.insert("Xref"+QString::number(iref),P.x);
-eSC.insert("Yref"+QString::number(iref),P.y);
-eSC.insert("Zref"+QString::number(iref),P.z);
-eSC.insert("Aref"+QString::number(iref),P.a);
-eSC.insert("Bref"+QString::number(iref),P.b);
-eSC.insert("Cref"+QString::number(iref),P.c);
+eSC.insert("Xrot"+QString::number(iref),P.x);
+eSC.insert("Yrot"+QString::number(iref),P.y);
 
 setSC(i,eSC);
 

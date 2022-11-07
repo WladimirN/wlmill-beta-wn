@@ -184,16 +184,17 @@ public:
 
    WLGPoint getOffsetSC(int i,bool *ok=nullptr);
    WLGPoint getOffsetActivSC(bool *ok=nullptr) {return getOffsetSC(m_data.iSC,ok);}
-   WLGPoint getRefPointSC(int i,int iref,bool *ok=nullptr);
-   WLGPoint getRefPoint0SC(int i,bool *ok=nullptr){return getRefPointSC(i,0,ok);}
-   WLGPoint getRefPoint1SC(int i,bool *ok=nullptr){return getRefPointSC(i,1,ok);}
+
+   WLGPoint getRotPointSC(int i,int iref,bool *ok=nullptr);
+   WLGPoint getRotPoint0SC(int i,bool *ok=nullptr){return getRotPointSC(i,0,ok);}
+   WLGPoint getRotPoint1SC(int i,bool *ok=nullptr){return getRotPointSC(i,1,ok);}
 
    bool setOffsetActivSC(WLGPoint P)    {return setOffsetSC(m_data.iSC,P);}
    bool setOffsetSC(int i,WLGPoint P,bool send=true);
 
-   bool setRefPointSC(int i,int iref, WLGPoint P);
-   bool setRefPoint0SC(int i,WLGPoint P){return setRefPointSC(i,0,P);}
-   bool setRefPoint1SC(int i,WLGPoint P){return setRefPointSC(i,1,P);}
+   bool setRotPointSC(int i,int iref, WLGPoint P);
+   bool setRotPoint0SC(int i,WLGPoint P){return setRotPointSC(i,0,P);}
+   bool setRotPoint1SC(int i,WLGPoint P){return setRotPointSC(i,1,P);}
 
    bool calcCenterPointR(WLGPoint startPoint,WLGPoint endPoint);
 

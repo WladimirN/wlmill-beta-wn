@@ -374,7 +374,7 @@ void WLVisualWidget::paintGL()
 
     WL6DPoint  SC=m_MillMachine->getGCode()->getOffsetSC(activSC).to6D();
 
-    SC.a=m_MillMachine->getGCode()->getRefPoint0SC(activSC).a;
+    SC.a=m_MillMachine->getGCode()->getRotPoint0SC(activSC).a;
 
     showSC("G"+QString::number(activSC+53),SC.toM());
     showSC("G53",WL6DPoint().toM(),1.5);
@@ -1090,14 +1090,14 @@ WL6DPoint SCPoint;
 int activSC=m_MillMachine->getGCode()->getActivSC();
 
 SCPoint=m_MillMachine->getGCode()->getOffsetSC(activSC).to3D();
-frRefP0.fromM(SCPoint.toM()*m_MillMachine->getGCode()->getRefPoint0SC(activSC).to3D().toM());
+frRefP0.fromM(SCPoint.toM()*m_MillMachine->getGCode()->getRotPoint0SC(activSC).to3D().toM());
 showTool(frRefP0.to6D(),false,5,QVector3D(0.8f,0.8f,0.0f));
 
-SCPoint.a=m_MillMachine->getGCode()->getRefPoint0SC(activSC).a;
+SCPoint.a=m_MillMachine->getGCode()->getRotPoint0SC(activSC).a;
 
-frRefP0=m_MillMachine->getGCode()->getRefPoint0SC(activSC).to3D();
+frRefP0=m_MillMachine->getGCode()->getRotPoint0SC(activSC).to3D();
 
-frRefP1.fromM(frRefP0.toM()*SCPoint.toM()*frRefP0.toM().inverted()*m_MillMachine->getGCode()->getRefPoint1SC(activSC).to3D().toM());
+frRefP1.fromM(frRefP0.toM()*SCPoint.toM()*frRefP0.toM().inverted()*m_MillMachine->getGCode()->getRotPoint1SC(activSC).to3D().toM());
 showTool(frRefP1.to6D(),false,2,QVector3D(0.8f,0.8f,0.0f));
 }
 

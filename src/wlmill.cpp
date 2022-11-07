@@ -293,7 +293,7 @@ void WLMill::onPBSetP0()
 {
 WLEditPoint EP;
 
-WLGPoint  GP=MillMachine->getGCode()->getRefPoint0SC(MillMachine->getGCode()->getActivSC(),0);
+WLGPoint  GP=MillMachine->getGCode()->getRotPoint0SC(MillMachine->getGCode()->getActivSC(),0);
 
 EP.setNameData("X,Y,Z");
 EP.setValueStr(GP.toString());
@@ -304,7 +304,7 @@ if(EP.exec())
     {
     qDebug("update rotPoint");
     GP.fromString(EP.getValueStr());
-    MillMachine->getGCode()->setRefPoint0SC(MillMachine->getGCode()->getActivSC(),GP);
+    MillMachine->getGCode()->setRotPoint0SC(MillMachine->getGCode()->getActivSC(),GP);
     }
 };
 
@@ -312,7 +312,7 @@ void WLMill::onPBSetP1()
 {
 WLEditPoint EP;
 
-WLGPoint  GP=MillMachine->getGCode()->getRefPoint1SC(MillMachine->getGCode()->getActivSC());
+WLGPoint  GP=MillMachine->getGCode()->getRotPoint1SC(MillMachine->getGCode()->getActivSC());
 
 EP.setNameData("X,Y,Z");
 EP.setValueStr(GP.toString());
@@ -323,7 +323,7 @@ if(EP.exec())
     {
     qDebug("update rotPoint");
     GP.fromString(EP.getValueStr());
-    MillMachine->getGCode()->setRefPoint1SC(MillMachine->getGCode()->getActivSC(),GP);
+    MillMachine->getGCode()->setRotPoint1SC(MillMachine->getGCode()->getActivSC(),GP);
 }
 }
 
@@ -815,8 +815,8 @@ if(fi.suffix()==("scxml"))
    stream.writeAttribute("i",QString::number(i));
 
    stream.writeAttribute("GPoint",MillMachine->getGCode()->getOffsetSC(i).toString());
-   stream.writeAttribute("refPoint0",MillMachine->getGCode()->getRefPoint0SC(i).toString());
-   stream.writeAttribute("refPoint1",MillMachine->getGCode()->getRefPoint1SC(i).toString());
+   stream.writeAttribute("refPoint0",MillMachine->getGCode()->getRotPoint0SC(i).toString());
+   stream.writeAttribute("refPoint1",MillMachine->getGCode()->getRotPoint1SC(i).toString());
    stream.writeEndElement();
    }
 
@@ -921,10 +921,10 @@ if(fi.suffix()==("scxml")){
              MillMachine->getGCode()->setOffsetSC(i,Gp);
 
              Gp.fromString(stream.attributes().value("refPoint0").toString());
-             MillMachine->getGCode()->setRefPoint0SC(i,Gp);
+             MillMachine->getGCode()->setRotPoint0SC(i,Gp);
 
              Gp.fromString(stream.attributes().value("refPoint1").toString());
-             MillMachine->getGCode()->setRefPoint1SC(i,Gp);
+             MillMachine->getGCode()->setRotPoint1SC(i,Gp);
              continue;
              }
          }
