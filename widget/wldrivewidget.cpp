@@ -40,7 +40,7 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
     ui.comboBoxLogicFind->addItem(tr("only PEL"),WLDrive::onlyPEL);
     ui.comboBoxLogicFind->addItem(tr("only MEL"),WLDrive::onlyMEL);
     ui.comboBoxLogicFind->addItem(tr("only PEL back"),WLDrive::onlyPELHome);
-    ui.comboBoxLogicFind->addItem(tr("only MEL back"),WLDrive::onlyMORGHome);
+    ui.comboBoxLogicFind->addItem(tr("only MEL back"),WLDrive::onlyMELHome);
 
     connect(ui.comboBoxLogicFind,SIGNAL(currentIndexChanged(int)),SLOT(updateFindLogic(int)));
 
