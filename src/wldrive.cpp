@@ -617,6 +617,41 @@ if(data.IOput==_inEnableMov)
 }
 }
 
+WLDrive::typeLogiFind WLDrive::addHomeLogicFindPos(WLDrive::typeLogiFind logic)
+{
+switch(logic)
+{
+case onlyMEL: return onlyMELHome;
+case onlyPEL: return onlyPELHome;
+case onlyMORG: return onlyMORGHome;
+case onlyPORG: return onlyPORGHome;
+
+default: return logic;
+}
+
+}
+
+WLDrive::typeLogiFind WLDrive::removeHomeLogicFindPos(WLDrive::typeLogiFind logic)
+{
+switch(logic)
+{
+case onlyMELHome: return onlyMEL;
+case onlyPELHome: return onlyPEL;
+case onlyMORGHome:return onlyMORG;
+case onlyPORGHome:return onlyPORG;
+
+default: return logic;
+}
+}
+
+bool WLDrive::isHomeLogicFindPos(WLDrive::typeLogiFind logic)
+{
+return   logic==onlyMELHome
+       ||logic==onlyPELHome
+       ||logic==onlyMORGHome
+       ||logic==onlyPORGHome;
+}
+
 double WLDrive::calcRotaryInfEndPosition(double startPos, double endPos)
 {
 double sP,sPC,eP,ePC;

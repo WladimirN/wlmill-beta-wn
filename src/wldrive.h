@@ -214,7 +214,11 @@ public:
     void removeInResolutionMov(WLIOPut *_inEnableMov);
 
    void setLogicFindPos(WLDrive::typeLogiFind logic) {if(!isAuto()) logicFindPos=logic;}
-WLDrive::typeLogiFind getLogicFindPos() {return logicFindPos;}
+   WLDrive::typeLogiFind getLogicFindPos() {return logicFindPos;}
+
+static  WLDrive::typeLogiFind addHomeLogicFindPos(WLDrive::typeLogiFind logic);
+static  WLDrive::typeLogiFind removeHomeLogicFindPos(WLDrive::typeLogiFind logic);
+static  bool                  isHomeLogicFindPos(WLDrive::typeLogiFind logic);
 
    void setVFind1(double Vfind) {if(Vfind>0) m_VFind1=Vfind;}
  double getVFind1() {return m_VFind1;}

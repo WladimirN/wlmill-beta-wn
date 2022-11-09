@@ -54,7 +54,8 @@ private slots:
 	void updateCBDimm(int);
 	void updateCBTypePulse(int);
 
-    void updateFindLogic(int);
+    void updateFindLogic();
+    void updateItemsFindLogic();
 
     void updateLabelSDDist();
 	void onVerifyError();

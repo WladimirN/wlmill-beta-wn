@@ -31,29 +31,9 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
     ui.sbPLIM->setValue(m_Drive->maxPosition());
     ui.sbMLIM->setValue(m_Drive->minPosition());
 
-    ui.comboBoxLogicFind->addItem(tr("no Find"),WLDrive::noFind);
-    ui.comboBoxLogicFind->addItem(tr("only ORG"),WLDrive::onlyORG);
-    ui.comboBoxLogicFind->addItem(tr("only PORG"),WLDrive::onlyPORG);
-    ui.comboBoxLogicFind->addItem(tr("only MORG"),WLDrive::onlyMORG);
-    ui.comboBoxLogicFind->addItem(tr("only PORG back"),WLDrive::onlyPORGHome);
-    ui.comboBoxLogicFind->addItem(tr("only MORG back"),WLDrive::onlyMORGHome);
-    ui.comboBoxLogicFind->addItem(tr("only PEL"),WLDrive::onlyPEL);
-    ui.comboBoxLogicFind->addItem(tr("only MEL"),WLDrive::onlyMEL);
-    ui.comboBoxLogicFind->addItem(tr("only PEL back"),WLDrive::onlyPELHome);
-    ui.comboBoxLogicFind->addItem(tr("only MEL back"),WLDrive::onlyMELHome);
-
-    connect(ui.comboBoxLogicFind,SIGNAL(currentIndexChanged(int)),SLOT(updateFindLogic(int)));
+    connect(ui.comboBoxLogicFind,SIGNAL(currentIndexChanged(int)),SLOT(updateFindLogic()));
 
     ui.comboBoxLogicFind->setCurrentIndex(0);
-
-    for(int i=0;i<ui.comboBoxLogicFind->count();i++) {
-      WLDrive::typeLogiFind curType=m_Drive->getLogicFindPos();
-
-      if(ui.comboBoxLogicFind->itemData(i).toInt()==curType){
-         ui.comboBoxLogicFind->setCurrentIndex(i);
-         break;
-         }
-      }
 
     connect(ui.pbCorrectStepSize,&QPushButton::clicked,this,&WLDriveWidget::onCorrectStepSize);
 
@@ -65,6 +45,7 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
     //ui.sbVfind->setRange(0.0001,Drive->Pad->getData("main").Vma);
     connect(ui.sbVfind1,SIGNAL(valueChanged(double)),SLOT(updateLabelSDDist()));
     connect(ui.tabWidget,SIGNAL(currentChanged(int)),SLOT(updateLabelSDDist()));
+    connect(ui.tabWidget,SIGNAL(currentChanged(int)),SLOT(updateItemsFindLogic()));
 
     ui.sbVfind1->setValue(m_Drive->getVFind1());
     ui.sbVfind2->setValue(m_Drive->getVFind2());
@@ -83,6 +64,7 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
 
     connect(ui.sbBackDist,QOverload<double>::of(&QDoubleSpinBox::valueChanged),this,&WLDriveWidget::updateF2);
 
+    connect(ui.cbBackFind,&QCheckBox::toggled,ui.sbBackFindPosition,&QSpinBox::setEnabled);
     setModal(true);
 
     setWindowTitle(windowTitle()+" "+m_Drive->getName());
@@ -90,9 +72,23 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
     setWindowTitle(tr("Edit Drive: ")+m_Drive->getName());
 
     updateF2();
-    updateFindLogic(m_Drive->getLogicFindPos());
     updateUnit();
     updateTabAxis();
+    updateItemsFindLogic();
+    updateFindLogic();
+
+    for(int i=0;i<ui.comboBoxLogicFind->count();i++) {
+      WLDrive::typeLogiFind curType=m_Drive->getLogicFindPos();
+      WLDrive::typeLogiFind cbType=static_cast<WLDrive::typeLogiFind>(ui.comboBoxLogicFind->itemData(i).toInt());
+
+      if(cbType==curType
+       ||cbType==WLDrive::removeHomeLogicFindPos(curType)){
+         ui.comboBoxLogicFind->setCurrentIndex(i);
+         ui.cbBackFind->setChecked(WLDrive::isHomeLogicFindPos(curType));
+         break;
+         }
+      }
+
 }
 
 WLDriveWidget::~WLDriveWidget()
@@ -148,6 +144,9 @@ case WLDrive::onlyPORGHome:
 case WLDrive::onlyMORGHome:
            foreach(WLAxisWidget *AW,axisWidgetList)
                {
+               if(AW->getIndexInORG()<2)
+                   str+=tr("no sensor installed to search")+" (inORG)"+QString("(Axis-%1").arg(AW->getAxis()->getIndex())+")\n";
+
                if(AW->getActInORG()==WLIOPut::INPUT_actNo)
                    str+=tr("no sensor installed action")+" (inORG)"+QString("(Axis-%1").arg(AW->getAxis()->getIndex())+")\n";
                }
@@ -338,7 +337,7 @@ void WLDriveWidget::updateCBTypePulse(int index)
 
 }
 
-void WLDriveWidget::updateFindLogic(int index)
+void WLDriveWidget::updateFindLogic()
 {
 WLDrive::typeLogiFind type=static_cast<WLDrive::typeLogiFind>(ui.comboBoxLogicFind->currentData().toInt());
 
@@ -353,13 +352,10 @@ else
     ui.sbOrgSize->setEnabled(false);
 
 
-if(type==WLDrive::onlyPORGHome
- ||type==WLDrive::onlyMORGHome
- ||type==WLDrive::onlyPELHome
- ||type==WLDrive::onlyMELHome)
-     ui.sbBackFindPosition->setEnabled(true);
-   else
-     ui.sbBackFindPosition->setEnabled(false);
+ui.cbBackFind->setEnabled(type!=WLDrive::noFind);
+
+ui.sbBackFindPosition->setEnabled(ui.cbBackFind->isEnabled()
+                                &&ui.cbBackFind->isChecked());
 
 ui.sbVfind1->setEnabled(type!=WLDrive::noFind);
 
@@ -392,6 +388,69 @@ case WLDrive::onlyMELHome: ui.labelOrgPosition->setText("inMEL "+tr("position"))
 
 }
 
+void WLDriveWidget::updateItemsFindLogic()
+{
+bool initORG=true;
+bool initPEL=true;
+bool initMEL=true;
+
+foreach(WLAxisWidget *AW,axisWidgetList)
+    {
+    if(AW->getActInORG()==WLIOPut::INPUT_actNo
+     ||AW->getIndexInORG()<2){
+       initORG=false;
+       break;
+       }
+    }
+
+foreach(WLAxisWidget *AW,axisWidgetList)
+    {
+    if(AW->getActInMEL()==WLIOPut::INPUT_actNo
+     ||AW->getIndexInMEL()<2){
+       initMEL=false;
+       break;
+       }
+    }
+
+foreach(WLAxisWidget *AW,axisWidgetList)
+    {
+    if(AW->getActInPEL()==WLIOPut::INPUT_actNo
+     ||AW->getIndexInPEL()<2){
+       initPEL=false;
+       break;
+       }
+    }
+
+WLDrive::typeLogiFind curType=static_cast<WLDrive::typeLogiFind>(ui.comboBoxLogicFind->currentData().toInt());
+
+ui.comboBoxLogicFind->clear();
+
+ui.comboBoxLogicFind->addItem(tr("no Find"),WLDrive::noFind);
+
+if(initORG){
+ui.comboBoxLogicFind->addItem(tr("only ORG"),WLDrive::onlyORG);
+ui.comboBoxLogicFind->addItem(tr("only PORG"),WLDrive::onlyPORG);
+ui.comboBoxLogicFind->addItem(tr("only MORG"),WLDrive::onlyMORG);
+}
+
+if(initPEL){
+ui.comboBoxLogicFind->addItem(tr("only PEL"),WLDrive::onlyPEL);
+}
+
+if(initMEL){
+ui.comboBoxLogicFind->addItem(tr("only MEL"),WLDrive::onlyMEL);
+}
+
+for(int i=0;i<ui.comboBoxLogicFind->count();i++) {
+  WLDrive::typeLogiFind type=static_cast<WLDrive::typeLogiFind>(ui.comboBoxLogicFind->itemData(i).toInt());
+
+  if(type==curType||type==WLDrive::addHomeLogicFindPos(curType)){
+     ui.comboBoxLogicFind->setCurrentIndex(i);
+     break;
+     }
+  }
+}
+
 void WLDriveWidget::saveDataDrive()
 {
 m_Drive->setKGear(1);
@@ -400,7 +459,11 @@ m_Drive->setDimension(static_cast<WLDriveDim::typeDim>(ui.cbTypeDim->currentInde
                      ,ui.sbDimA->value()
                      ,ui.sbDimB->value());
 
-m_Drive->setLogicFindPos(static_cast<WLDrive::typeLogiFind>(ui.comboBoxLogicFind->currentData().toInt()));
+auto logic = static_cast<WLDrive::typeLogiFind>(ui.comboBoxLogicFind->currentData().toInt());
+
+m_Drive->setLogicFindPos(ui.sbBackFindPosition->isEnabled() ?
+                         WLDrive::addHomeLogicFindPos(logic)
+                        :logic);
 
 m_Drive->setORGSize(ui.sbOrgSize->value());
 m_Drive->setHomePosition(ui.sbBackFindPosition->value());
