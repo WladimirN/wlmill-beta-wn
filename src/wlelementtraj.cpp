@@ -747,8 +747,8 @@ if(indexs.size()>=2)
 
   if(!baseTraj[indexs.first()].isEqFS(baseTraj[indexs.last()])) goto endpack;
 
-  if((calcACos(baseTraj[indexs.last()].data.line.endPoint.to3D()-baseTraj[indexs.size()-2].data.line.endPoint.to3D(),
-            (baseTraj[indexs.size()-2].data.line.endPoint.to3D()-baseTraj[indexs.first()].data.line.startPoint.to3D()))<(-0.707)))goto endpack;
+  if((calcACos(baseTraj[indexs.last()].data.line.endPoint.to3D()-baseTraj[indexs.at(indexs.size()-2)].data.line.endPoint.to3D(),
+            (baseTraj[indexs.at(indexs.size()-2)].data.line.endPoint.to3D()-baseTraj[indexs.first()].data.line.startPoint.to3D()))<(-0.707)))goto endpack;
 
   B=baseTraj[indexs.last()].data.line.endPoint.to6D();//последн€€ точка текущей пачки
 
