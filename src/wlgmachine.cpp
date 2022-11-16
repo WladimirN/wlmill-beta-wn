@@ -3238,10 +3238,10 @@ for(int i= add ? 1 : 0;i<Traj.size();i++)
 if(Traj[i].getType()!=WLElementTraj::line
  &&Traj[i].getType()!=WLElementTraj::arc)  continue;
 
-movV=Traj[i].isCirc() ? Traj[i].startV+Traj[i].endV : Traj[i].startV;
+movV=Traj[i].isArc() ? Traj[i].startV+Traj[i].endV : Traj[i].startV;
 
 if((i+1)<Traj.size())
- movNV=Traj[i+1].isCirc() ? Traj[i+1].startV+Traj[i+1].endV : Traj[i+1].startV;
+ movNV=Traj[i+1].isArc() ? Traj[i+1].startV+Traj[i+1].endV : Traj[i+1].startV;
 else
  movNV=movV;
 
@@ -3320,7 +3320,7 @@ else  if(!deltaBL.isNull()) { //add line backlash
          else
            i--; //так как мы не добавляем элемент а всё перенесли впредыдущий
         }
-        else if(Traj[i].isCirc()){ //circ corr
+        else if(Traj[i].isArc()){ //circ corr
                Traj[i].setArc(Traj[i].data.arc.startPoint+m_nowBL
                              ,Traj[i].data.arc.centerPoint+m_nowBL
                              ,Traj[i].data.arc.endPoint+m_nowBL
@@ -3637,7 +3637,7 @@ getHeightMap()->addHeighMapPoints(ListTraj);
 while(!ListTraj.isEmpty()){
     ETraj=ListTraj.takeFirst();
 
-    if(ETraj.isCirc())
+    if(ETraj.isArc())
         addTraj+=addCirclePoints(ETraj);
       else
         addTraj+=ETraj;
@@ -3738,7 +3738,7 @@ case 19: addPointXAxis=Yd->getBacklash()!=0;
 default: addPointXAxis=addPointYAxis=false;
 }
 
-if(ETraj.isCirc())
+if(ETraj.isArc())
    {
    double Ast=ETraj.data.arc.startPoint.to3D().getAxy(ETraj.data.arc.centerPoint.to3D());
    double Aen=ETraj.data.arc.endPoint.to3D()  .getAxy(ETraj.data.arc.centerPoint.to3D());

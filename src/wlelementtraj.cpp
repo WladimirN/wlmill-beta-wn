@@ -477,7 +477,7 @@ Q_UNUSED(GModel);
 
 QList <WL6DPoint> Points;
 
-if(!isCirc()
+if(!isArc()
  ||!data.arc.startPoint.isValid()
  ||!data.arc.centerPoint.isValid()
  ||!data.arc.endPoint.isValid())

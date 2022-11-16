@@ -193,6 +193,14 @@ while(!Traj.isEmpty())
 {
 WLElementTraj ET=Traj.takeFirst();
 
+if(ET.isLine()
+ ||ET.isArc()) { //если есть движения то просто пробрасываем...
+  }
+  else {
+  newTraj+=ET;
+  continue;
+  }
+
 bool enable=ET.useHMap && isEnable();
 
 WLHeightMap::stateHMap lastState=m_state;
