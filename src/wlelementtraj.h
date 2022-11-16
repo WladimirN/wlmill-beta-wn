@@ -139,7 +139,7 @@ TypeElement getType() {return type;}
 
 void reset(bool all=true);
 
-inline bool isCirc()  {return type==arc;}
+inline bool isArc()  {return type==arc;}
 inline bool isLine()  {return type==line;}
 inline bool isULine() {return type==uline;}
 inline bool isScript(){return type==script;}
