@@ -445,7 +445,6 @@ if(!data.contains("G"))
 #ifdef GCODE_TURN
 if(lastT!=GCode->getT())
   ElementTraj.setScript(GCode->getPointActivSC(GCode->data()->curGPoint),QString("changeTool(%1,%2)").arg(GCode->getT()).arg(lastT));
-break;
 #endif
 
 if(GCode->isValidValue('P'))

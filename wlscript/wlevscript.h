@@ -99,8 +99,8 @@ public:
 
 Q_INVOKABLE bool runFunction(QString _func,bool _chError=true);
 Q_INVOKABLE bool runScript(QString _script,bool _chError=true);
-Q_INVOKABLE QVariant getValue(QString name,QVariant def = QVariant());
-Q_INVOKABLE bool setValue(QString name,QVariant);
+Q_INVOKABLE QVariant getValue(QString name,QVariant def = QVariant(),double timeout=0);
+Q_INVOKABLE bool setValue(QString name,QVariant,double timeout=0);
 Q_INVOKABLE bool isFuncDefined(QString name);
 
     bool setProperty(QString name,QScriptValue value);

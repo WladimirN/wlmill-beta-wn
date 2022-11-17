@@ -109,15 +109,18 @@ if(m_enable)
 return ret;
 }
 
-bool WLEVScript::setValue(QString name, QVariant value)
+bool WLEVScript::setValue(QString name, QVariant value,double timeout)
 {
-QMutexLocker locker(&Mutex);
-
+if(MutexTask.tryLock(timeout))
+{
 if(engine)
   {
-  engine->globalObject().setProperty(name,engine->toScriptValue(value));
-  return true;
+  engine->globalObject().setProperty(name,engine->toScriptValue(value));  
   }
+
+MutexTask.unlock();
+return true;
+}
 
 return false;
 }
@@ -127,15 +130,20 @@ bool WLEVScript::isFuncDefined(QString name)
 return allCode.contains(QRegExp("function[\\s]+"+name+"[(][^(]*[)][\\s]*[/]*"));
 }
 
-QVariant WLEVScript::getValue(QString name,QVariant def)
+QVariant WLEVScript::getValue(QString name,QVariant def,double timeout)
 {
+if(MutexTask.tryLock(timeout)){
+
 QScriptValue svalue=engine->globalObject().property(name);
+
+MutexTask.unlock();
 
 if(svalue.isValid()){
     return svalue.toVariant();
-    }else {
-    return def;
     }
+}
+
+return def;
 }
 
 bool WLEVScript::addObject(QObject *obj, QString name)
