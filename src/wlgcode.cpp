@@ -144,6 +144,9 @@ switch(a)
 
 #ifdef GCODE_TURN
 case 'T': str>>buf;
+
+          buf=buf.remove(QRegExp("\\D.*"));
+
           if(buf.length()<=2) {
           setValue(a,buf.toInt());
           }

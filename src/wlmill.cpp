@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QTime>
 #include <QString>
+#include <QSound>
 
 #include <QMessageBox>
 #include <QTextCursor>
@@ -1185,6 +1186,18 @@ if(view) {
 #else
 qDebug()<<"no addQMLFile"<<file;
 #endif
+}
+
+void WLMill::playSoundFile(QString file)
+{
+qDebug()<<"play sound file:"<<file;
+QSound::play(file);
+}
+
+void WLMill::runFile(QString file)
+{
+QProcess *vec = new QProcess(this);
+vec->startDetached(file);
 }
 
 void WLMill::readyMachine()

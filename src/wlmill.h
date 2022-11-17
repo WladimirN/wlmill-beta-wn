@@ -143,6 +143,7 @@
 #define   _lScriptFile QCoreApplication::applicationDirPath()+"//wlmillconfig//script//lscript.js"
 #define    _scriptPath QCoreApplication::applicationDirPath()+"//wlmillconfig//script//"
 #define       _qmlPath QCoreApplication::applicationDirPath()+"//wlmillconfig//qml//"
+#define     _soundPath QCoreApplication::applicationDirPath()+"//wlmillconfig//sound//"
 
 class WLTBarTool: public WLTBarData
 {
@@ -303,6 +304,11 @@ void addTabQML(QString file);
 
 void runQMLFile(QString file);
 void addTabQMLFile(QString file);
+
+void playSound(QString file)  {playSoundFile(_soundPath+file);}
+void playSoundFile(QString file);
+void runFile(QString file);
+
 private: 
 	
  void autoSaveChekers();

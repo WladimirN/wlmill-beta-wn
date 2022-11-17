@@ -179,7 +179,13 @@ return false;
 
 bool WLEVScript::setProperty(QString name,QScriptValue value)
 {
+if(MutexTask.tryLock())   {
 engine->globalObject().setProperty(name,value);
+MutexTask.unlock();
+}
+else {
+qDebug()<<"WLEVScript::setProperty error set property"<<name<<value.toString();
+}
 
 return true;
 }

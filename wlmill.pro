@@ -3,7 +3,7 @@
 # ------------------------------------------------------
 TEMPLATE = app
 TARGET = wlmill
-QT += core widgets serialport gui network opengl script
+QT += core widgets serialport gui network opengl script multimedia
 
 QMAKE_LFLAGS = -no-pie
 
