@@ -2712,7 +2712,14 @@ preRunProgramList+=getGCode()->getActivGCodeString();
 //  preRunProgramList+=QString("G53 G0 Z%1").arg(planeZ);
 
 if(getCurrentPosition().z<getGCode()->getG28Position().z)
-  preRunProgramList+=QString("G53 G0 Z%1").arg(getGCode()->getG28Position().z);
+  {
+  double safeZ=getGCode()->getG28Position().z;
+
+  if(getDrive("Z")
+    &&safeZ>getDrive("Z")->maxPosition())  safeZ=getDrive("Z")->maxPosition();
+
+  preRunProgramList+=QString("G53 G0 Z%1").arg(safeZ);
+  }
 
 preRunProgramList+=QString("G53 G0 X%1 Y%2").arg(endPoint.x).arg(endPoint.y);
 preRunProgramList+=QString("G53 G0 A%1 B%2 C%3").arg(endPoint.a).arg(endPoint.b).arg(endPoint.c);
