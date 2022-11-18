@@ -7,6 +7,14 @@
 
 #define sizeTimers 32
 
+struct STimerScript{
+qint64 m_point;
+qint64 m_stopCount;
+  bool m_activ;
+
+STimerScript() {m_activ=false; m_stopCount=0;}
+};
+
 class WLTimerScript : public QObject
 {
 	Q_OBJECT
@@ -16,17 +24,17 @@ public:
     ~WLTimerScript();
 
 private:
-qint64 m_point[sizeTimers];
-  bool m_activ[sizeTimers];
+QMap<QString,STimerScript> m_Timers;
 
-QElapsedTimer ElapsedTimer;
+QElapsedTimer m_elapsedTimer;
 
 public:
 
-    Q_INVOKABLE void start(int index)     {if(index<sizeTimers)    {m_activ[index]=true; m_point[index]=ElapsedTimer.elapsed();}}
-    Q_INVOKABLE void restart(int index)   {if(index<sizeTimers)    {start(index);}}
-    Q_INVOKABLE void stop(int index)      {if(index<sizeTimers)    {m_activ[index]=false;}}
-    Q_INVOKABLE qint64 getCount(int index){if(index<sizeTimers)    return ElapsedTimer.elapsed()-m_point[index]; else return -1;}
+    Q_INVOKABLE void start(QString name);
+    Q_INVOKABLE void restart(QString name);
+    Q_INVOKABLE void stop(QString name);
+    Q_INVOKABLE qint64 getCount(QString name);
+    Q_INVOKABLE qint64 getCountMS(QString name) {return getCountMS(name);}
 
 public slots:
 
