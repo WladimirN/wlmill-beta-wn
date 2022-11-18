@@ -723,6 +723,7 @@ stream.writeAttribute("ofstSlaveAxis",str);
 stream.writeAttribute("feedVFind1",     QString::number(getVFind1()));
 stream.writeAttribute("feedVFind2",     QString::number(getVFind2()));
 stream.writeAttribute("backDistFind",   QString::number(getBackDistFind()));
+stream.writeAttribute("freeDistFind",   QString::number(getFreeDistFind()));
 stream.writeAttribute("Pad",     m_Pad.toString());
 /*
 foreach(dataPad pad,m_Pad.getDataList())
@@ -802,6 +803,9 @@ if(!stream.attributes().value("feedVFind2").isEmpty())
 
 if(!stream.attributes().value("backDistFind").isEmpty())
        setBackDistFind(stream.attributes().value("backDistFind").toDouble());
+
+if(!stream.attributes().value("freeDistFind").isEmpty())
+       setFreeDistFind(stream.attributes().value("freeDistFind").toDouble());
 
 if(!stream.attributes().value("Pad").isEmpty())
        pad()->fromString(stream.attributes().value("Pad").toString());
@@ -1690,8 +1694,9 @@ if(isAutoDrive()
                 if(!isMotion()&&!isMotionSubAxis())
                 switch(autoOperation)
                    {
-                    case 0 :
-                            foreach(WLAxis *Axis,getAxisList()){
+
+                  case 0 :
+                           foreach(WLAxis *Axis,getAxisList()){
                              if(Axis->getActIn(typePM)==WLIOPut::INPUT_actNo){
                                  emit sendMessage(getFullName(),tr("no set action")
                                                                +" Axis:"
@@ -1702,7 +1707,31 @@ if(isAutoDrive()
                              }
                             }
 
+                           if(((typePM==AXIS_inPEL)&&(getInput(AXIS_inPEL)==0))
+                             ||((typePM==AXIS_inMEL)&&(getInput(AXIS_inMEL)==0))
+                             ||((typePM==AXIS_inORG)&&(getInput(AXIS_inORG)==0))) {
+                             }
+                            else if (getFreeDistFind()!=0.0)
+                                {
+                                if(logicFindPos==onlyPEL
+                                 ||logicFindPos==onlyPELHome
+                                 ||logicFindPos==onlyPORG
+                                 ||logicFindPos==onlyPORGHome) {
+                                  setMot(-getFreeDistFind());
+                                  }
+                                  else if(logicFindPos==onlyMEL
+                                        ||logicFindPos==onlyMELHome
+                                        ||logicFindPos==onlyMORG
+                                        ||logicFindPos==onlyMORGHome) {
+                                         setMot(getFreeDistFind());
+                                         }
+                                startMotion(m_VFind1);
 
+                                autoOperation=1;
+                                break;
+                                }
+
+                  case 1:
                           if(((typePM==AXIS_inPEL)&&(getInput(AXIS_inPEL)==0))
                             ||((typePM==AXIS_inMEL)&&(getInput(AXIS_inMEL)==0))
                             ||((typePM==AXIS_inORG)&&(getInput(AXIS_inORG)==0)))

@@ -189,6 +189,7 @@ private:
   double m_VFind1=10;
   double m_VFind2=5;
   double m_backDistFind=5;
+  double m_freeDistFind=5;
 
   QTimer *updateTimer;
 
@@ -226,8 +227,11 @@ static  bool                  isHomeLogicFindPos(WLDrive::typeLogiFind logic);
   void setVFind2(double Vfind) {if(Vfind>0) m_VFind2=Vfind;}
 double getVFind2() {return m_VFind2;}
 
-  void setBackDistFind(double dist)   {if(m_backDistFind>=0) m_backDistFind=dist;}
+  void setBackDistFind(double dist)   {if(dist>=0) m_backDistFind=dist;}
 double getBackDistFind()              {return m_backDistFind;}
+
+  void setFreeDistFind(double dist)   {if(dist>=0) m_freeDistFind=dist;}
+double getFreeDistFind()              {return m_freeDistFind;}
 
  double getOffsetAxis(quint8 index) {return index<MAXSLAVEAXIS ? m_ofstSlaveAxis[index]:0;}
    void setOffsetAxis(quint8 index,double value) {if(index<MAXSLAVEAXIS)  {m_ofstSlaveAxis[index]=value;qDebug()<<value;}}

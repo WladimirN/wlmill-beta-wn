@@ -55,6 +55,8 @@ WLDriveWidget::WLDriveWidget(WLDrive *_Drive,QWidget *parent)
     ui.cbTypeDrive->setCurrentIndex(m_Drive->getType());
 
     ui.sbBackDist->setValue(m_Drive->getBackDistFind());
+    ui.sbFreeDist->setValue(m_Drive->getFreeDistFind());
+
     ui.gbLimit->setChecked(!m_Drive->isInfinity());
 
 	connect(ui.pbVerError,SIGNAL(clicked()),SLOT(onVerifyError()));
@@ -342,11 +344,7 @@ void WLDriveWidget::updateFindLogic()
 WLDrive::typeLogiFind type=static_cast<WLDrive::typeLogiFind>(ui.comboBoxLogicFind->currentData().toInt());
 
 if(type==WLDrive::onlyORG
- ||type==WLDrive::onlyORGHome
- ||type==WLDrive::onlyPORG
- ||type==WLDrive::onlyMORG
- ||type==WLDrive::onlyPORGHome
- ||type==WLDrive::onlyMORGHome)
+ ||type==WLDrive::onlyORGHome)
     ui.sbOrgSize->setEnabled(true);
 else
     ui.sbOrgSize->setEnabled(false);
@@ -364,6 +362,10 @@ ui.sbVfind2->setEnabled(type!=WLDrive::noFind
                       &&type!=WLDrive::onlyORGHome);
 
 ui.sbBackDist->setEnabled(type!=WLDrive::noFind
+                        &&type!=WLDrive::onlyORG
+                        &&type!=WLDrive::onlyORGHome);
+
+ui.sbFreeDist->setEnabled(type!=WLDrive::noFind
                         &&type!=WLDrive::onlyORG
                         &&type!=WLDrive::onlyORGHome);
 
@@ -471,7 +473,9 @@ m_Drive->setOrgPosition(ui.sbOrgPosition->value());
 
 m_Drive->setVFind1(m_Fminutes ? ui.sbVfind1->value() / 60 : ui.sbVfind1->value());
 m_Drive->setVFind2(m_Fminutes ? ui.sbVfind2->value() / 60 : ui.sbVfind2->value());
+
 m_Drive->setBackDistFind(ui.sbBackDist->value());
+m_Drive->setFreeDistFind(ui.sbFreeDist->value());
 
 
 m_Drive->setType(static_cast<WLDrive::typeDrive>(ui.cbTypeDrive->currentIndex()));

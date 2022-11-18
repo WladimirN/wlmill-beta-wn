@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>500</width>
-    <height>471</height>
+    <height>477</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -98,33 +98,8 @@
           <string>Find position</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_5">
-          <item row="0" column="0" colspan="2">
-           <widget class="QComboBox" name="comboBoxLogicFind"/>
-          </item>
           <item row="6" column="1">
            <widget class="QDoubleSpinBox" name="sbBackFindPosition">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimum">
-             <double>-999999.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>999999.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>1.000000000000000</double>
-            </property>
-            <property name="value">
-             <double>0.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="1">
-           <widget class="QDoubleSpinBox" name="sbOrgPosition">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -152,10 +127,64 @@
             </property>
            </widget>
           </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="QComboBox" name="comboBoxLogicFind"/>
+          </item>
           <item row="6" column="0">
            <widget class="QCheckBox" name="cbBackFind">
             <property name="text">
              <string>back position</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="QDoubleSpinBox" name="sbOrgPosition">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimum">
+             <double>-999999.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>999999.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="sbFreeDist">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimum">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>999999.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>1.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>0.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="labelFreeDistFind">
+            <property name="text">
+             <string notr="true">free dist find</string>
             </property>
            </widget>
           </item>
