@@ -688,7 +688,7 @@ focusElement=f;
 }
 
 
-void WLPositionWidget::keyPressEvent ( QKeyEvent * event )
+void WLPositionWidget::keyPressEvent (QKeyEvent * event)
 {
 if(!event->isAutoRepeat())
     qDebug()<<"WLPositionWidget press"<<event->key();
@@ -1231,13 +1231,49 @@ E1->setData(EPos.e1.pos,5);
 bool WLPositionWidget::eventFilter(QObject *watched, QEvent *event)
 {
 if(event->type()==QEvent::KeyPress)
+  {
+  QKeyEvent *kevent=static_cast<QKeyEvent*>(event);
+
+  if(kevent->key()==Qt::Key_Tab){
+    if(ui.cbExGCode==watched)  {
+      setFocus(Qt::MouseFocusReason);
+      return true;
+      }
+    }
+  }
+/*
+if(watched==ui.cbExGCode
+  &&ui.cbExGCode->currentText().isEmpty())
+  {
+  QKeyEvent *kevent=static_cast<QKeyEvent*>(event);
+
+  if(kevent->key()==Qt::Key_Left
+   ||kevent->key()==Qt::Key_Right
+   ||kevent->key()==Qt::Key_Down
+   ||kevent->key()==Qt::Key_Up
+   ||kevent->key()==Qt::Key_PageDown
+   ||kevent->key()==Qt::Key_PageUp){
+
+    if(event->type()==QEvent::KeyPress){
+       keyPressEvent(static_cast<QKeyEvent*>(event));
+       return true;
+       }
+
+    if(event->type()==QEvent::KeyRelease){
+       keyReleaseEvent(static_cast<QKeyEvent*>(event));
+       return true;
+       }
+    }
+  }
+*/
+if(event->type()==QEvent::KeyPress)
  {
- //qDebug()<<"eventFilter keyPress"<<watched->metaObject()->className();
+ qDebug()<<"eventFilter keyPress"<<watched->metaObject()->className();
  }
 
 if(event->type()==QEvent::KeyRelease)
  {
- //qDebug()<<"eventFilter keyRelease"<<watched->metaObject()->className();
+ qDebug()<<"eventFilter keyRelease"<<watched->metaObject()->className();
  }
 
 return QWidget::eventFilter(watched,event);

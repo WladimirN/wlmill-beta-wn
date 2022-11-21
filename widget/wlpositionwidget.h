@@ -44,6 +44,9 @@ explicit WLCorSFDialog(QWidget *parent):QDialog(parent)
     QToolButton *tbEnter = new QToolButton(this);
     tbEnter->setText("...");
 
+    QToolButton *tbClose = new QToolButton(this);
+    tbClose->setText("X");
+
     connect(tbEnter,&QPushButton::clicked,this,[=](){
     WLEnterNum  EnterNum (this);
 
@@ -72,11 +75,13 @@ explicit WLCorSFDialog(QWidget *parent):QDialog(parent)
     hlayout->addWidget(set100);
     hlayout->addWidget(tbEnter);
     hlayout->addWidget(slider);
+    hlayout->addWidget(tbClose);
     setLayout(hlayout);
 
+    connect(tbClose,&QToolButton::clicked,this,[=](){close();});
     connect(set100,&QToolButton::clicked,this,[=](){setValue(100);});
     connect(slider,&QSlider::valueChanged,this,[=](int _value){emit changedValue(m_value=_value/m_scaleSlider);});
-    //connect(this,&WLCorSFDialog::changedValue,this,[=](double)QToolButton::clicked,this,[=](){emit changedValue(100);});
+    //connect(this,&WLCorSFDialog::changedValue,this,[=](double)QToolButton::clicked,this,[=](){emit changedValue(100);});    
     }
 
 void setScaleSlider(double scale)
@@ -123,6 +128,9 @@ void changedValue(double);
 public slots:
 
  //void setRange()
+// QObject interface
+
+
 };
 
 class WLValueLabel: public QLabel
