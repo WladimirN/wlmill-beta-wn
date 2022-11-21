@@ -33,7 +33,8 @@ class WLGProgram : public QObject
 	Q_OBJECT
 
 private: 
-    bool activ;
+    bool m_activ;
+    bool m_checked=false;
 
     quint32 m_maxShowPoints;
 
@@ -95,9 +96,6 @@ public:
 bool isOpenFile() {return File.isOpen();}
 void setGModelData(WLGModelData _GModelData) {m_GModel.setData(_GModelData); updateShowTraj();}
 
-Q_INVOKABLE quint32 getActivElement()   {return iActivElement;}
-Q_INVOKABLE quint32 getLastMovElement() {return iLastMovElement;}
-
 QList <int> getSCList() {return m_scList;}
 QList <int> getToolList() {return m_toolList;}
 
@@ -112,14 +110,14 @@ void reloadFile(bool build=false) {loadFile(m_fileName,build);}
 void saveFile(QString file);
 
 
-   bool isActiv() {return activ;}
+bool isActiv() {return m_activ;}
 
-   long getTotalKadr(){return m_totalKadr;}
-   void setTotalKadr(long t) {qDebug()<<"sendTotalKadr "<<t; emit changedTotalKadr(m_totalKadr=t);} 
+long getTotalKadr(){return m_totalKadr;}
+void setTotalKadr(long t) {qDebug()<<"sendTotalKadr "<<t; emit changedTotalKadr(m_totalKadr=t);}
 
-    int getElementCount() {return indexData.size();}
+int getElementCount() {return indexData.size();}
 
-    void setShowGCode(WLGCode *GCode) {m_showGCode=GCode;}
+void setShowGCode(WLGCode *GCode) {m_showGCode=GCode;}
 
 static bool translate(QString dataStr,QList <WLElementTraj> &curListTraj,WLGCode *GCode,qint32 _index=0,bool GCodeOnly=false);
 
@@ -136,7 +134,7 @@ static  bool convert_arc_comp2(WLElementTraj ElementTraj,QList <WLElementTraj> &
 
 private:
     long getNKadr(QString data);
-    void setActiv(bool a) {activ=a; emit changedActiv(activ);}
+    void setActiv(bool a) {m_activ=a; emit changedActiv(m_activ);}
 	
 	
 static bool calcDrill(WLElementTraj ElementTraj,QList <WLElementTraj> &curListTraj,WLGPoint &lastGPoint,WLGCode *GCode);
@@ -169,11 +167,19 @@ private slots:
                                  }
                            }
 
+public:
+   Q_INVOKABLE quint32 getActivElement()   {return iActivElement;}
+   Q_INVOKABLE quint32 getLastMovElement() {return iLastMovElement;}
+
+   Q_INVOKABLE QString getSCListStr(QString split=",");
+   Q_INVOKABLE QString getToolListStr(QString split=",");
+
+   Q_INVOKABLE bool isChecked() {return m_checked;}
 
 public slots:
 
  void stopBuildShow() {m_buildShow=false;} 
- void setActivElement(int i) {if(iActivElement!=i) emit changedActivElement(iActivElement=i);}
+ void setActivElement(quint32 i);
  
 signals:
 

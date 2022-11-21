@@ -71,8 +71,8 @@ WLMill::WLMill(QWidget *parent)
 //    MessManager =new WLMessManager(this);
 //    connect(this,SIGNAL(sendMessage(QString)),MessManager,SLOT(setMessage(QString)),Qt::QueuedConnection);
 
-    Program = new WLGProgram(nullptr);
-    connect(Program,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
+    m_GProgram = new WLGProgram(nullptr);
+    connect(m_GProgram,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
 
 //  connect(Program,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
 
@@ -92,20 +92,21 @@ WLMill::WLMill(QWidget *parent)
     MScript->addObject(new WLFileScript(MScript),"FILE");
     MScript->addObject(new WLTimerScript(MScript),"TIMER");
     MScript->addObject(this,"WLMILL");
+    MScript->addObject(m_GProgram,"GPROGRAM");
 
     DialogM= new WLDialogScript(this);
 
     MScript->addObject(DialogM,"DIALOG");
     connect(MScript,&WLEVScript::reset,DialogM,&WLDialogScript::close);
 
-    MillMachine = new WLGMachine(Program,MScript,LScript);
+    MillMachine = new WLGMachine(m_GProgram,MScript,LScript);
 
     connect(MillMachine,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
 
-    Program->setShowGCode(MillMachine->getGCode());
+    m_GProgram->setShowGCode(MillMachine->getGCode());
 
 //  connect(MillMachine,SIGNAL(sendMessage(QString,QString,int)),MessManager,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
-    connect(MillMachine->getGCode(),SIGNAL(changedSC(int)),Program,SLOT(updateShowTraj()),Qt::DirectConnection);
+    connect(MillMachine->getGCode(),SIGNAL(changedSC(int)),m_GProgram,SLOT(updateShowTraj()),Qt::DirectConnection);
 
     connect(MillMachine,&WLGMachine::changedReady,this,&WLMill::readyMachine);
 
@@ -114,7 +115,7 @@ WLMill::WLMill(QWidget *parent)
 
     tabWidget->setFocusPolicy(Qt::NoFocus);
 
-    VisualWidget=new WLVisualWidget(Program,MillMachine);
+    VisualWidget=new WLVisualWidget(m_GProgram,MillMachine);
 
     tabWidget->addTab(VisualWidget,tr("Visual"));
 
@@ -344,7 +345,7 @@ void WLMill::onPBStartAt()
 if(MillMachine->isActiv()) return;
 
 WLEnterNum EnterNum(this);
-EnterNum.setMinMaxNow(0,Program->getElementCount(),Program->getActivElement());
+EnterNum.setMinMaxNow(0,m_GProgram->getElementCount(),m_GProgram->getActivElement());
 EnterNum.setDecimals(0);
 EnterNum.setLabel(tr("Which element to start processing?:"));
 EnterNum.show();
@@ -358,9 +359,9 @@ void WLMill::onPBStartContinue()
 {
 if(MillMachine->isActiv()) return;
 
-if(Program->getLastMovElement()!=0)
+if(m_GProgram->getLastMovElement()!=0)
   {
-  MillMachine->runGProgram(Program->getLastMovElement());
+  MillMachine->runGProgram(m_GProgram->getLastMovElement());
  }
 }
 
@@ -382,7 +383,7 @@ void WLMill::createMenuBar()
 MenuBar = new QMenuBar;
 
 QMenu *MFile= new QMenu(tr("File")); 
-MFile->addAction(tr("Save program"),Program,SLOT(saveFile()));
+MFile->addAction(tr("Save program"),m_GProgram,SLOT(saveFile()));
 MFile->addAction(tr("Save program as"),this,SLOT(onSaveAsProgram()));
 MFile->addSeparator();
 MFile->addAction(tr("Load program"),this,SLOT(onLoadProgram()));
@@ -479,7 +480,7 @@ void WLMill::createDockProgram()
 {
 dockProgram=new QDockWidget(this);
 
-ProgramWidget = new WLGProgramWidget(Program,this);
+ProgramWidget = new WLGProgramWidget(m_GProgram,this);
 
 //connect(ProgramWidget,SIGNAL(changed()),this,SLOT(setStarChangedProgram()));
 //connect(ProgramWidget,&WLGProgramWidget::changed,this,&WLMill::sendProSLOT(sendProgramToShow()));
@@ -487,8 +488,8 @@ ProgramWidget = new WLGProgramWidget(Program,this);
 connect(ProgramWidget,&WLGProgramWidget::pressOpenFile,this,&WLMill::onLoadProgram);
 
 connect(VisualWidget,&WLVisualWidget::changedEditElement,ProgramWidget,&WLGProgramWidget::setEditElement);
-
 connect(ProgramWidget,&WLGProgramWidget::changedEditElement,VisualWidget,&WLVisualWidget::setEditElement);
+
 connect(MillMachine,&WLGMachine::changedReadyRunList,ProgramWidget,&WLGProgramWidget::setEditDisabled);
 
 dockProgram->setWindowTitle(tr("Program"));
@@ -509,7 +510,7 @@ dockPosition=new QDockWidget(this);
 dockPosition->setWindowTitle(tr("Positions"));
 dockPosition->setObjectName("DPosition");
 
-PositionWidget=new WLPositionWidget(MillMachine,Program,dockPosition);
+PositionWidget=new WLPositionWidget(MillMachine,m_GProgram,dockPosition);
 
 PositionWidget->addTopWidget(MessManager);
 
@@ -527,7 +528,7 @@ ToolWidget = new WLDataWidget(this);
 
 WLGToolsTableModel *toolsModel=new WLGToolsTableModel(MillMachine->getGCode(),ToolWidget);
 
-connect(Program,&WLGProgram::changedToolList,toolsModel,&WLGDataTableModel::setSelectList);
+connect(m_GProgram,&WLGProgram::changedToolList,toolsModel,&WLGDataTableModel::setSelectList);
 
 ToolWidget ->setModel(toolsModel);
 
@@ -556,7 +557,7 @@ SCWidget = new WLDataWidget(this);
 
 WLGSCTableModel *scModel=new WLGSCTableModel(MillMachine->getGCode(),SCWidget);
 
-connect(Program,&WLGProgram::changedSCList,scModel,&WLGDataTableModel::setSelectList);
+connect(m_GProgram,&WLGProgram::changedSCList,scModel,&WLGDataTableModel::setSelectList);
 
 SCWidget ->setModel(scModel);
 
@@ -732,7 +733,7 @@ if(MillMachine->isReady())
           saveConfigINI();
 
 delete VisualWidget;
-delete Program;
+delete m_GProgram;
 delete MillMachine;
 
 qDebug("WLMill END");
@@ -982,12 +983,12 @@ void WLMill::onLoadProgram()
 {
 if(MillMachine->isActiv())  return;
 
-QString fileName = QFileDialog::getOpenFileName(this, tr("Load program"),Program->getNameFile(),("g-code (*.ncc *.nc *.tap);;all type(*.*)"));
+QString fileName = QFileDialog::getOpenFileName(this, tr("Load program"),m_GProgram->getNameFile(),("g-code (*.ncc *.nc *.tap);;all type(*.*)"));
 
 if(!fileName.isEmpty())
       {
-      if(Program->loadFile(fileName,true)) {
-                Program->setLastMovElement(0);
+      if(m_GProgram->loadFile(fileName,true)) {
+                m_GProgram->setLastMovElement(0);
                 }
 
       }
@@ -996,9 +997,9 @@ if(!fileName.isEmpty())
 
 void WLMill::onSaveAsProgram()
 {
-QString fileName = QFileDialog::getSaveFileName(this, tr("Save program as"),Program->getNameFile(),("g-code (*.ncc *.nc);;all type(*.*)"));
+QString fileName = QFileDialog::getSaveFileName(this, tr("Save program as"),m_GProgram->getNameFile(),("g-code (*.ncc *.nc);;all type(*.*)"));
 if(!fileName.isEmpty())
-     Program->saveFile(fileName); 
+     m_GProgram->saveFile(fileName);
 //updateTitleDockProgram(1);
 }
 
@@ -1370,15 +1371,15 @@ QSettings setting(iniconfigWLMill,QSettings::IniFormat);
 
 setLifeM(setting.value("minuteLife",0).toUInt());
 
-Program->setMaxShowPoints(setting.value("View/maxShowPoint",250000).toInt());
+m_GProgram->setMaxShowPoints(setting.value("View/maxShowPoint",250000).toInt());
 VisualWidget->setZoomDir(setting.value("View/zoomDir",0).toBool());
 
 QColor color;
 color.setNamedColor(setting.value("View/clearColor",VisualWidget->getClearColor().name()).toString());
 VisualWidget->setClearColor(color);
 
-Program->setLastMovElement(setting.value("Program/iLastElement",0).toUInt());
-Program->loadFile(setting.value("Program/file","").toString(),true);
+m_GProgram->setLastMovElement(setting.value("Program/iLastElement",0).toUInt());
+m_GProgram->loadFile(setting.value("Program/file","").toString(),true);
 
 ToolWidget->setHeadersTable(setting.value("Tools/showColumn","").toString());
 SCWidget->setHeadersTable(setting.value("SC/showColumn","").toString());
@@ -1393,12 +1394,12 @@ QSettings setting(iniconfigWLMill,QSettings::IniFormat);
 
 setting.setValue("minuteLife",getLifeM());
 
-setting.setValue("View/maxShowPoint",Program->maxShowPoints());
+setting.setValue("View/maxShowPoint",m_GProgram->maxShowPoints());
 setting.setValue("View/zoomDir",VisualWidget->zoomDir());
 setting.setValue("View/clearColor",VisualWidget->getClearColor().name());
 
-setting.setValue("Program/file",Program->getNameFile());
-setting.setValue("Program/iLastElement",Program->getLastMovElement());
+setting.setValue("Program/file",m_GProgram->getNameFile());
+setting.setValue("Program/iLastElement",m_GProgram->getLastMovElement());
 
 setting.setValue("Tools/showColumn",ToolWidget->getHeaderTable().join(","));
 setting.setValue("SC/showColumn",SCWidget->getHeaderTable().join(","));
@@ -1536,7 +1537,7 @@ if(FileXML.open(QIODevice::ReadOnly))
 	ret=1;
 	
     if(!stream.attributes().value("maxShowPoints").isEmpty()) {
-     Program->setMaxShowPoints(stream.attributes().value("maxShowPoints").toLongLong());
+     m_GProgram->setMaxShowPoints(stream.attributes().value("maxShowPoints").toLongLong());
      }
 
     if(!stream.attributes().value("zoomDir").isEmpty()) {
@@ -1544,7 +1545,7 @@ if(FileXML.open(QIODevice::ReadOnly))
      }
 
 	lastProg=stream.attributes().value("LastProgram").toString();
-	Program->setLastMovElement(stream.attributes().value("LastElementProgram").toString().toLong());
+    m_GProgram->setLastMovElement(stream.attributes().value("LastElementProgram").toString().toLong());
 
 	lastFileSC=(stream.attributes().value("LastSC").toString());
 
@@ -1574,7 +1575,7 @@ if(FileXML.open(QIODevice::ReadOnly))
 
 		if(stream.name()=="Name")
 		  {
-		  Program->loadFile(stream.readElementText(),true);
+          m_GProgram->loadFile(stream.readElementText(),true);
 		  continue;
 	      }
 
@@ -1583,7 +1584,7 @@ if(FileXML.open(QIODevice::ReadOnly))
     }
    }
 
-  Program->loadFile(lastProg,true);
+  m_GProgram->loadFile(lastProg,true);
   }
   else
     ret=0;

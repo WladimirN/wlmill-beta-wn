@@ -65,7 +65,7 @@ m_toolDiametr=8;
 
 setFocusPolicy(Qt::NoFocus);
 
-EditElement=0;
+m_EditElement=0;
 
 m_rotTool=0;
 
@@ -1179,8 +1179,8 @@ glDrawArrays(GL_LINE_STRIP, 0,m_Program->showPoints.size());
 progTraj.release();
 }	
 
-if((0<=EditElement)&&((EditElement)<m_Program->getElementCount())
- &&(m_Program->indexData[EditElement].offsetPoint<m_Program->showPoints.size()))
+if((0<=m_EditElement)&&((m_EditElement)<m_Program->getElementCount())
+ &&(m_Program->indexData[m_EditElement].offsetPoint<m_Program->showPoints.size()))
 { 
   QMatrix4x4 matrix;
 
@@ -1199,11 +1199,11 @@ if((0<=EditElement)&&((EditElement)<m_Program->getElementCount())
 
   glLineWidth(3);
 
-  if(EditElement!=0)
-   glDrawArrays(GL_LINE_STRIP, m_Program->indexData[EditElement-1].offsetPoint, m_Program->indexData[EditElement].offsetPoint
-                                                                               -m_Program->indexData[EditElement-1].offsetPoint);
+  if(m_EditElement!=0)
+   glDrawArrays(GL_LINE_STRIP, m_Program->indexData[m_EditElement-1].offsetPoint, m_Program->indexData[m_EditElement].offsetPoint
+                                                                               -m_Program->indexData[m_EditElement-1].offsetPoint);
   else
-   glDrawArrays(GL_LINE_STRIP, m_Program->indexData[EditElement].offsetPoint, m_Program->indexData[EditElement].offsetPoint);
+   glDrawArrays(GL_LINE_STRIP, m_Program->indexData[m_EditElement].offsetPoint, m_Program->indexData[m_EditElement].offsetPoint);
 
 
   progOneColor.release();
@@ -1267,7 +1267,7 @@ if (event->buttons() & Qt::LeftButton)
  setEditElement(n);
 
  if(n>0){
-   emit changedEditElement(EditElement);
+   emit changedEditElement(m_EditElement);
    }
 
  updatePointRot();
@@ -1505,7 +1505,7 @@ void WLVisualWidget::createGLListTraj()
 
 void WLVisualWidget::updatePointRot()
 {
-qDebug()<<"updateRotPoint"<<EditElement;
+qDebug()<<"updateRotPoint"<<m_EditElement;
 //return;
 QMutexLocker locker(&m_Program->Mutex);
 //if(Program->ListTraj.size()==0) return; //если пуст
@@ -1516,11 +1516,11 @@ if(m_typeOffset==Tool)
 else {
  if(m_Program->MutexShowPoint.tryLock(100))
  {
- if(EditElement>0
- &&(EditElement<m_Program->indexData.size())
- &&((m_Program->indexData[EditElement].offsetPoint+1)<m_Program->showPoints.size()))
+ if(m_EditElement>0
+ &&(m_EditElement<m_Program->indexData.size())
+ &&((m_Program->indexData[m_EditElement].offsetPoint+1)<m_Program->showPoints.size()))
   {
-  Psum=m_Program->showPoints[m_Program->indexData[EditElement].offsetPoint+1].pos;
+  Psum=m_Program->showPoints[m_Program->indexData[m_EditElement].offsetPoint+1].pos;
   }
  else
   {
@@ -1849,14 +1849,14 @@ void WLVisualWidget::setEditElement(int id)
 {
 qDebug()<<"setEditElement"<<id;
 
-if(EditElement==id) return;
+if(m_EditElement==id) return;
 
 m_Program->Mutex.lock();
 
 if(0<=id&&id<m_Program->getElementCount())
   {
-  EditElement=id;
-  m_Program->setActivElement(EditElement);
+  m_EditElement=id;
+  m_Program->setActivElement(m_EditElement);
   m_Program->Mutex.unlock();
   }
 else

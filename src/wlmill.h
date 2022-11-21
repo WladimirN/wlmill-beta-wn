@@ -193,7 +193,7 @@ QTime TimeEnd;
 int f;
 
 QString        lastFileSC;
-WLGProgram    *Program;
+WLGProgram    *m_GProgram;
 WLGMachine *MillMachine;
 WLMessManager *MessManager;
 

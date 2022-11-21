@@ -30,7 +30,7 @@ moveToThread(threadProg);
 m_buildElement=0;
 
 time=0;
-activ=0;
+m_activ=0;
 
 m_showGCode=nullptr;
 
@@ -90,8 +90,8 @@ Mutex.lock();
 m_fileName=file;
 
 indexData.clear();
-m_toolList.clear();
-m_scList.clear();
+
+m_checked=false;
 
 if(File.isOpen()) File.close();
 
@@ -132,10 +132,10 @@ Mutex.unlock();
 
 if(getElementCount()<500000){
  checkData();
-  }
+ }
 
 if(build)
-    QTimer::singleShot(0,this,SLOT(updateShowTraj()));
+   QTimer::singleShot(0,this,SLOT(updateShowTraj()));
 
 emit changedProgram();
 emit changedTrajSize(getElementCount());
@@ -149,6 +149,9 @@ WLGCode GCode;
 
 QList <int> toolList;
 QList <int> scList;
+
+m_toolList.clear();
+m_scList.clear();
 
 int i=0;
 
@@ -172,6 +175,8 @@ if(i==getElementCount()){
 
   emit changedToolList(m_toolList);
   emit changedSCList(m_scList);
+
+  m_checked=true;
   }
 }
 
@@ -185,6 +190,36 @@ File.copy(file);
 void WLGProgram::calcTime()
 {
 emit changedTime(++time);
+}
+
+QString WLGProgram::getSCListStr(QString split)
+{
+QString ret;
+
+foreach(int i,getSCList())
+{
+if(!ret.isEmpty())
+    ret+=split;
+
+ret+=QString::number(i);
+}
+
+return ret;
+}
+
+QString WLGProgram::getToolListStr(QString split)
+{
+QString ret;
+
+foreach(int i,getToolList())
+{
+if(!ret.isEmpty())
+    ret+=split;
+
+ret+=QString::number(i);
+}
+
+return ret;
 }
 
 long WLGProgram::getNKadr(QString data)
@@ -1817,4 +1852,10 @@ GCode->data()->curPoint.z=end_z;
 //settings->w_current = w;
 
 return true;
+}
+
+void WLGProgram::setActivElement(quint32 i)
+{
+if(iActivElement!=i)
+    emit changedActivElement(iActivElement=i);
 }

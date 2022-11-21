@@ -81,7 +81,7 @@ private:
       
 	 WL3DPoint rotPointProgram;
 
-     int EditElement;
+     int m_EditElement;
 
      QMutex Mutex;
 
@@ -115,7 +115,7 @@ public:
     WLVisualWidget(WLGProgram *_Program,WLGMachine *m_MillMachine);
 	~WLVisualWidget();  
 		
-    long getEditElement() {return EditElement;}
+    long getEditElement() {return m_EditElement;}
 
      void paintGLold();
 
