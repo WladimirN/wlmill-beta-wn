@@ -33,7 +33,7 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comSpindle_clearData;
+Stream<<(quint8)comSpindle_clearData<<getIndex();
 
 spindleDataList.clear();
 

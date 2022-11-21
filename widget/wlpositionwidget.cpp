@@ -696,12 +696,24 @@ if(!event->isAutoRepeat())
 if(!event->isAutoRepeat())
 switch(event->key())
    {
+#ifdef GCODE_MILL
    case Qt::Key_Left:    if(pbMinusX->isEnabled()) {pbMinusX->setDown(true);onPBAxis("X", -1,1);} break;
    case Qt::Key_Right:   if(pbPlusX->isEnabled())  {pbPlusX->setDown(true); onPBAxis("X",  1,1);} break;
    case Qt::Key_Down:    if(pbMinusY->isEnabled()) {pbMinusY->setDown(true);onPBAxis("Y", -1,1);} break;
    case Qt::Key_Up:      if(pbPlusY->isEnabled())  {pbPlusY->setDown(true); onPBAxis("Y",  1,1);} break;
    case Qt::Key_PageDown:if(pbMinusZ->isEnabled()) {pbMinusZ->setDown(true);onPBAxis("Z", -1,1);} break;
    case Qt::Key_PageUp:  if(pbPlusZ->isEnabled())  {pbPlusZ->setDown(true); onPBAxis("Z",  1,1);} break;
+#endif
+
+#ifdef GCODE_TURN
+   case Qt::Key_Up:      if(pbMinusX->isEnabled()) {pbMinusX->setDown(true);onPBAxis("X", -1,1);} break;
+   case Qt::Key_Down:    if(pbPlusX->isEnabled())  {pbPlusX->setDown(true); onPBAxis("X",  1,1);} break;
+   case Qt::Key_PageDown:if(pbMinusY->isEnabled()) {pbMinusY->setDown(true);onPBAxis("Y", -1,1);} break;
+   case Qt::Key_PageUp:  if(pbPlusY->isEnabled())  {pbPlusY->setDown(true); onPBAxis("Y",  1,1);} break;
+   case Qt::Key_Left:    if(pbMinusZ->isEnabled()) {pbMinusZ->setDown(true);onPBAxis("Z", -1,1);} break;
+   case Qt::Key_Right:   if(pbPlusZ->isEnabled())  {pbPlusZ->setDown(true); onPBAxis("Z",  1,1);} break;
+#endif
+
 
    case Qt::Key_Z:       if(pbMinusA->isEnabled()) {pbMinusA->setDown(true);onPBAxis("A", -1,1);} break;
    case Qt::Key_A:       if(pbPlusA->isEnabled())  {pbPlusA->setDown(true); onPBAxis("A",  1,1);} break;
@@ -743,13 +755,23 @@ qDebug()<<"WLPositionWidget release"<<event->key();
 
   switch(event->key())
   {
+#ifdef GCODE_MILL
   case Qt::Key_Left:    if(pbMinusX->isEnabled()) {pbMinusX->setDown(false); onPBAxis("X", 1,0);} break;
   case Qt::Key_Right:   if(pbPlusX->isEnabled())  {pbPlusX->setDown(false);  onPBAxis("X", 1,0);} break;
   case Qt::Key_Down:    if(pbMinusY->isEnabled()) {pbMinusY->setDown(false); onPBAxis("Y", 1,0);} break;
   case Qt::Key_Up:      if(pbPlusY->isEnabled())  {pbPlusY->setDown(false);  onPBAxis("Y", 1,0);} break;
   case Qt::Key_PageDown:if(pbMinusZ->isEnabled()) {pbMinusZ->setDown(false); onPBAxis("Z", 1,0);} break;
   case Qt::Key_PageUp:  if(pbPlusZ->isEnabled())  {pbPlusZ->setDown(false);  onPBAxis("Z", 1,0);} break;
+#endif
 
+#ifdef GCODE_TURN
+  case Qt::Key_Up:      if(pbMinusX->isEnabled()) {pbMinusX->setDown(false); onPBAxis("X", 1,0);} break;
+  case Qt::Key_Down:    if(pbPlusX->isEnabled())  {pbPlusX->setDown(false);  onPBAxis("X", 1,0);} break;
+  case Qt::Key_PageDown:if(pbMinusY->isEnabled()) {pbMinusY->setDown(false); onPBAxis("Y", 1,0);} break;
+  case Qt::Key_PageUp:  if(pbPlusY->isEnabled())  {pbPlusY->setDown(false);  onPBAxis("Y", 1,0);} break;
+  case Qt::Key_Left:    if(pbMinusZ->isEnabled()) {pbMinusZ->setDown(false); onPBAxis("Z", 1,0);} break;
+  case Qt::Key_Right:   if(pbPlusZ->isEnabled())  {pbPlusZ->setDown(false);  onPBAxis("Z", 1,0);} break;
+#endif
 
   case Qt::Key_Z:       if(pbMinusA->isEnabled()) {pbMinusA->setDown(false);onPBAxis("A",  1,0);} break;
   case Qt::Key_A:       if(pbPlusA->isEnabled())  {pbPlusA->setDown(false); onPBAxis("A",  1,0);} break;
