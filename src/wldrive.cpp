@@ -1713,18 +1713,21 @@ if(isAutoDrive()
                              }
                             else if (getFreeDistFind()!=0.0)
                                 {
+                                setMainPad();
+
                                 if(logicFindPos==onlyPEL
                                  ||logicFindPos==onlyPELHome
                                  ||logicFindPos==onlyPORG
                                  ||logicFindPos==onlyPORGHome) {
-                                  setMot(-getFreeDistFind());
+                                  setMov(-getFreeDistFind());
                                   }
                                   else if(logicFindPos==onlyMEL
                                         ||logicFindPos==onlyMELHome
                                         ||logicFindPos==onlyMORG
                                         ||logicFindPos==onlyMORGHome) {
-                                         setMot(getFreeDistFind());
+                                         setMov(getFreeDistFind());
                                          }
+
                                 startMotion(m_VFind1);
 
                                 autoOperation=1;
