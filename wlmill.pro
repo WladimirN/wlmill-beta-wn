@@ -7,14 +7,14 @@ QT += core widgets serialport gui network opengl script multimedia
 
 QMAKE_LFLAGS = -no-pie
 
-#DEFINES  += GCODE_MILL
-DEFINES  += GCODE_TURN
+DEFINES  += GCODE_MILL
+#DEFINES  += GCODE_TURN
 #DEFINES += QT_NO_DEBUG_OUTPUT\
 #           QT_NO_INFO_OUTPUT\
 #           QT_NO_WARNING_OUTPUT\
 
-DEFINES  += DEF_QML
-DEFINES  += DEF_CAMERA
+#DEFINES  += DEF_QML
+#DEFINES  += DEF_CAMERA
 
 DEFINES  += DEF_PLOT
 DEFINES  += DEF_HMAP

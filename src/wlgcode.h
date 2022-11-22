@@ -256,6 +256,11 @@ public:
     WLData *getDataTool() {return &m_data.dataTools;}
     WLData *getDataSC()   {return &m_data.dataSC;}
 
+public:
+
+static QString getSupportGCode();
+static QString getSupportSCData();
+static QString getSupportToolData();
 
 private:
     void resetValid();

@@ -526,6 +526,12 @@ void WLMill::createTabTools()
 {
 ToolWidget = new WLDataWidget(this);
 
+ToolWidget->setSupportStr(WLGCode::getSupportToolData()+"<b>Other:</font></b>"
+                                                        "<ol>"
+                                                          "<li> all (all hide data)</li>"
+                                                          "<li> GCode (name in G Code) </li>"
+                                                        "</ol>");
+
 WLGToolsTableModel *toolsModel=new WLGToolsTableModel(MillMachine->getGCode(),ToolWidget);
 
 connect(m_GProgram,&WLGProgram::changedToolList,toolsModel,&WLGDataTableModel::setSelectList);
@@ -554,6 +560,12 @@ tabWidget->addTab(ToolWidget,"Tools");
 void WLMill::createTabSC()
 {
 SCWidget = new WLDataWidget(this);
+
+SCWidget->setSupportStr(WLGCode::getSupportSCData()+"<b>Other:</font></b>"
+                                                    "<ol>"
+                                                      "<li> all (all hide data)</li>"
+                                                      "<li> GCode (name in G Code) </li>"
+                                                    "</ol>");
 
 WLGSCTableModel *scModel=new WLGSCTableModel(MillMachine->getGCode(),SCWidget);
 

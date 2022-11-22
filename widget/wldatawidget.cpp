@@ -36,7 +36,7 @@ header->setToolTip(tr("double click for edit column"));
 connect(header, &QHeaderView::sectionDoubleClicked,[=](int logicalIndex){
     bool ok;
     QString text = QInputDialog::getMultiLineText(this, tr("Enter column names"),
-                                                  tr("Example:")+"index,GCode,all", m_Model->getHeaders().join(","), &ok);
+                                                  m_supportColumn, m_Model->getHeaders().join(","), &ok);
     if (ok && !text.isEmpty()) {
         m_Model->setHeaders(text);
         }
@@ -71,7 +71,12 @@ QString WLDataWidget::curData()
 if(m_Model)
   return m_Model->getHeaders().at(ui->tableViewData->currentIndex().column());
 else
-  return "no model";
+    return "no model";
+}
+
+void WLDataWidget::setSupportStr(QString str)
+{
+m_supportColumn=str;
 }
 
 void WLTBarData::setDataWidget(WLDataWidget *_DataWidget)

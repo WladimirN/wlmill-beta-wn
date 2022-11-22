@@ -360,7 +360,53 @@ return m_data.dataTools.getValue(ikey,key,defvalue);
 
 QVariant WLGCode::getDataSC(int ikey, QString key,QVariant defvalue)
 {
-return m_data.dataSC.getValue(ikey,key,defvalue);
+    return m_data.dataSC.getValue(ikey,key,defvalue);
+}
+
+QString WLGCode::getSupportGCode()
+{
+return   "<b>GCode:</font></b>"
+         "<ol>"
+           "<li>G0,G1</li>"
+           "<li>G2,G3 (I,J,K,R) </li>"
+#ifdef GCODE_TURN
+           "<li>G7,G8 (Raius/Diametr X)</li>"
+#endif
+           "<li>G17,G18,G19</li>"
+           "<li>G28 </li>"
+           "<li>G40 G41 G42</li>"
+           "<li>G43 G44 G49</li>"
+           "<li>G51(XYZ scale)</li>"
+           "<li>G53(no modal)</li>"
+           "<li>G54-G59</li>"
+           "<li>G64,G61.1,G64(P,Q)</li>"
+           "<li>G68,G69(X,Y,R)</li>"
+           "<li>G80,G81,G83(Z,R,Q)</li>"
+           "<li>G90,G91</li>"
+           "<li>G93,G94</li>"
+           "<li>G98,G99</li>"
+         "</ol>";
+}
+
+QString WLGCode::getSupportSCData()
+{
+return   "<b>SC Data:</font></b>"
+         "<ol>"
+           "<li> X,Y,Z,A,B,C (offset of G53)</li>"
+           "<li> R (rot SC in plane XY) </li>"
+           "<li> Xrot*,Yrot* (0 - base point rot, 1 - check point rot) </li>"
+         "</ol>";
+}
+
+QString WLGCode::getSupportToolData()
+{
+return   "<b>Tool Data:</font></b>"
+         "<ol>"
+           "<li> Xo,Yo,Zo (tool offset)</li>"
+           "<li> Xw,Yw,Zw (add tool offset) </li>"
+           "<li> H,Hw (tool height) </li>"
+           "<li> D,Dw (tool diametr) </li>"
+         "</ol>";
 }
 
 double WLGCode::getHToolOfst()
@@ -718,7 +764,7 @@ switch(code)
            m_data.GCode[2]=0;
            m_data.GCode[3]=1;
            break;
-
+#ifdef GCODE_TURN
    case 7: m_data.GCode[7]=1;//"X Diam";
            m_data.GCode[8]=0;
            break;
@@ -726,7 +772,7 @@ switch(code)
    case 8: m_data.GCode[7]=0;
            m_data.GCode[8]=1;//"X Radius";
            break;
-
+#endif
   case 102:
   case 103:m_data.GCode[2]=0;
            m_data.GCode[3]=0;

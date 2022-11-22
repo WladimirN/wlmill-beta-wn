@@ -91,27 +91,7 @@ WLPositionWidget::WLPositionWidget(WLGMachine *_MillMachine,WLGProgram *_Program
 
     connect(MillMachine,&WLGMachine::changedBusy,this,&WLPositionWidget::updateEnableMoved);
 
-    ui.cbExGCode->setToolTip(
-                 tr(
-                "<b>GCode:</font></b>"
-                "<ol>"
-                  "<li>G0,G1</li>"
-                  "<li>G2,G3 (I,J,K,R) </li>"
-                  "<li>G17,G18,G19</li>"
-                  "<li>G28 </li>"
-                  "<li>G40 G41 G42</li>"
-                  "<li>G43 G44 G49</li>"
-                  "<li>G51(XYZ scale)</li>"
-                  "<li>G53(no modal)</li>"
-                  "<li>G54-G59</li>"
-                  "<li>G64,G61.1,G64(P,Q)</li>"
-                  "<li>G80,G81,G83(Z,R,Q)</li>"
-                  "<li>G90,G91</li>"
-                  "<li>G93,G94</li>"
-                  "<li>G98,G99</li>"
-                "</ol>"
-                  )
-                );
+    ui.cbExGCode->setToolTip(WLGCode::getSupportGCode());
 
 initElementControls();
 
@@ -120,22 +100,22 @@ QTimer *timerFS= new QTimer;
 connect(timerFS,SIGNAL(timeout()),SLOT(updateFSLabel()));
 timerFS->start(50);
 
-WLMPG *Whell=MillMachine->getMPG();
+WLMPG *MPG=MillMachine->getMPG();
 
-if(Whell)
+if(MPG)
  {
- connect(Whell,&WLMPG::changedCurIndexAxis,this,[=](quint8 i){if(gALabelX) gALabelX->setChecked(i==1);
+ connect(MPG,&WLMPG::changedCurIndexAxis,this,[=](quint8 i){if(gALabelX) gALabelX->setChecked(i==1);
                                                               if(gALabelY) gALabelY->setChecked(i==2);
                                                               if(gALabelZ) gALabelZ->setChecked(i==3);
                                                               if(gALabelA) gALabelA->setChecked(i==4);
                                                               if(gALabelB) gALabelB->setChecked(i==5);});
 
 
- if(gALabelX) gALabelX->setChecked(Whell->getCurIndexAxis()==1);
- if(gALabelY) gALabelY->setChecked(Whell->getCurIndexAxis()==2);
- if(gALabelZ) gALabelZ->setChecked(Whell->getCurIndexAxis()==3);
- if(gALabelA) gALabelA->setChecked(Whell->getCurIndexAxis()==4);
- if(gALabelB) gALabelB->setChecked(Whell->getCurIndexAxis()==5);
+ if(gALabelX) gALabelX->setChecked(MPG->getCurIndexAxis()==1);
+ if(gALabelY) gALabelY->setChecked(MPG->getCurIndexAxis()==2);
+ if(gALabelZ) gALabelZ->setChecked(MPG->getCurIndexAxis()==3);
+ if(gALabelA) gALabelA->setChecked(MPG->getCurIndexAxis()==4);
+ if(gALabelB) gALabelB->setChecked(MPG->getCurIndexAxis()==5);
 
  //connect(Whell,&WLWhell::changedCurIndexX,this,[=](quint8 i){cbTypeManual->setCurrentIndex(i);});
  //connect(Whell,&WLWhell::changedCurVmode,ui.rbWhellVMode,&QRadioButton::setChecked);

@@ -48,10 +48,13 @@ public:
 
         int curIndex();
     QString curData();
+
+    void setSupportStr(QString);
 private:
     Ui::WLDataWidget *ui;
 
     WLDataTableModel *m_Model=nullptr;
+    QString m_supportColumn;
 
 private slots:
 };
