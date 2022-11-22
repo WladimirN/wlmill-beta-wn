@@ -591,7 +591,7 @@ int vertexLocation;
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
-matrix.scale(Zoom);
+matrix.scale(m_zoom);
 
 progOneColor.bind();
 progOneColor.setUniformValue("mpv_matrix",projection
@@ -705,7 +705,7 @@ int vertexLocation;
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
-matrix.scale(Zoom);
+matrix.scale(m_zoom);
 
 progTraj.bind();
 progTraj.setUniformValue("mpv_matrix",projection*matrix*getShowMatrix());
@@ -800,7 +800,7 @@ QMatrix4x4 matrix;
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
-matrix.scale(Zoom);
+matrix.scale(m_zoom);
 
 vGLBufBox.bind();
 vGLBufBox.allocate(Points,8*sizeof(WL3DPointf));
@@ -839,7 +839,7 @@ if(rot)
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
-matrix.scale(Zoom);
+matrix.scale(m_zoom);
 
 vGLBufTool.bind();
 iGLBufTool.bind();
@@ -872,7 +872,7 @@ QMatrix4x4 matrix;
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
-matrix.scale(Zoom);
+matrix.scale(m_zoom);
 
 vGLBufHome.bind();
 iGLBufHome.bind();
@@ -897,7 +897,7 @@ QMatrix4x4 matrix;
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
-matrix.scale(Zoom);
+matrix.scale(m_zoom);
 
 glLineWidth(3);
 
@@ -909,7 +909,7 @@ progOneColor.setUniformValue("mpv_matrix",projection
                                          *getShowMatrix()
                                          *pos.toM());
 
-progOneColor.setUniformValue("u_scale",(scale*50.0f/Zoom));
+progOneColor.setUniformValue("u_scale",(scale*50.0f/m_zoom));
 
 vertexLocation = progOneColor.attributeLocation("a_position");
 progOneColor.enableAttributeArray(vertexLocation);
@@ -1001,7 +1001,7 @@ QMatrix4x4 matrix;
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
-matrix.scale(Zoom);
+matrix.scale(m_zoom);
 
 if(!progOneColor.isLinked()) return;
 
@@ -1060,7 +1060,7 @@ QVector <WL3DPointf> track=trackTraj.toVector();
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
-matrix.scale(Zoom);
+matrix.scale(m_zoom);
 
 if(!progOneColor.isLinked()) return;
 
@@ -1137,7 +1137,7 @@ QMatrix4x4 matrix;
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
-matrix.scale(Zoom);
+matrix.scale(m_zoom);
 
 progSelect.bind();
 progSelect.setUniformValue("mpv_matrix",projection*matrix*getShowMatrix());
@@ -1160,7 +1160,7 @@ QMatrix4x4 matrix;
 
 matrix.setToIdentity();
 matrix.translate(showOffset.x(),showOffset.y(),.0);
-matrix.scale(Zoom);
+matrix.scale(m_zoom);
 
 progTraj.bind();
 progTraj.setUniformValue("mpv_matrix",projection*matrix*getShowMatrix());
@@ -1186,7 +1186,7 @@ if((0<=m_EditElement)&&((m_EditElement)<m_Program->getElementCount())
 
   matrix.setToIdentity();
   matrix.translate(showOffset.x(),showOffset.y(),.0);
-  matrix.scale(Zoom);
+  matrix.scale(m_zoom);
 
   progOneColor.bind();
   progOneColor.setUniformValue("mpv_matrix",projection*matrix*getShowMatrix());
@@ -1252,6 +1252,7 @@ void WLVisualWidget::mousePressEvent(QMouseEvent *event)
 {
 event->accept();
 //qDebug()<<"press";
+
 m_lastMousePos=event->pos();
 
 //QList<WLElementTraj>  ListTraj=Program->getTraj();
@@ -1275,7 +1276,6 @@ if (event->buttons() & Qt::LeftButton)
  } 
  else
  if (event->buttons() & Qt::MidButton )  updatePointRot();
-
 }
 
 
@@ -1368,7 +1368,7 @@ int WLVisualWidget::selectElement(int x,int y)
 void WLVisualWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
 Q_UNUSED(event);
-//setViewCenter();
+setViewCenterFrame(WLFrame(0,0,0,0,0,0).toM());
 }
 
 void WLVisualWidget::keyPressEvent ( QKeyEvent * event )
@@ -1538,23 +1538,29 @@ setPointRot(QVector4D(Psum.x,Psum.y,Psum.z,0));
 
 QMatrix4x4 WLVisualWidget::getShowMatrix()
 {
+return getShowMatrix(showMatrix);
+}
+
+QMatrix4x4 WLVisualWidget::getShowMatrix(QMatrix4x4 M)
+{
 QMatrix4x4 ret;
+
 if(m_typeOffset==Tool)
  {
  if(m_typeView==XYZ)
    {
-   ret=showMatrix*m_MillMachine->getCurrentPosition().to3D().toM().inverted();
+   ret=M*m_MillMachine->getCurrentPosition().to3D().toM().inverted();
    }
  else
    {
    WLFrame Fr=m_MillMachine->getGModel()->getFrame(m_MillMachine->getCurrentPosition());
 
-   ret=showMatrix*Fr.toM().inverted();
+   ret=M*Fr.toM().inverted();
    }
 
  }
 else
- ret=WLOpenGL::getShowMatrix();
+ ret=M;
 
 return ret;
 }
@@ -1584,17 +1590,38 @@ m_tbViewRot->setIcon(m_rotViewF ?
 
 void WLVisualWidget::setViewCenter()
 {
+QVector4D sofst=getViewOffset(getShowMatrix());
+
+float z=sofst.w();
+sofst.setW(0);
+
+setView(getShowMatrix(),sofst,z);
+}
+
+void WLVisualWidget::setViewCenterFrame(QMatrix4x4 fr)
+{
+QVector4D sofst=getViewOffset(fr);
+
+float z=sofst.w();
+sofst.setW(0);
+
+setView(fr,QVector4D(),z);
+}
+
+QVector4D WLVisualWidget::getViewOffset(WLFrame Fr)
+{
 WL3DPointf minP,maxP;
 QVector4D P;
+QVector4D ret;
 
-QMatrix4x4 M=getShowMatrix();
+QMatrix4x4 M=getShowMatrix(Fr.toM());
 
  bool first=true;
 
  m_Program->MutexShowPoint.lock();
 
  foreach(WLShowPointProgram point,m_Program->showPoints)
- { 
+ {
  P.setX(point.pos.x);
  P.setY(point.pos.y);
  P.setZ(point.pos.z);
@@ -1622,30 +1649,29 @@ QMatrix4x4 M=getShowMatrix();
 
  if(m_Program->showPoints.isEmpty())
   {
-  Zoom=1;
+  ret.setW(1);
 
-  showOffset.setX(0);
-  showOffset.setY(0);
+  ret.setX(0);
+  ret.setY(0);
   }
  else
   {
-  Zoom=qMin(qAbs(vport[2]/(maxP.x-minP.x)),qAbs(vport[3]/(maxP.y-minP.y)));
-
+  ret.setW(qMin(qAbs(m_vport[2]/(maxP.x-minP.x)),qAbs(m_vport[3]/(maxP.y-minP.y))));
 
   if(m_typeOffset==Model)   {
-  showOffset.setX(-(minP.x+maxP.x)/2*Zoom);
-  showOffset.setY(-(minP.y+maxP.y)/2*Zoom);
+  ret.setX(-(minP.x+maxP.x)/2*ret.w());
+  ret.setY(-(minP.y+maxP.y)/2*ret.w());
   }
   else if(m_typeOffset==Tool) {
-    showOffset.setX(0);
-    showOffset.setY(0);
+    ret.setX(0);
+    ret.setY(0);
+
+    ret.setW(m_zoom);
     }
   }
 
+return ret;
 }
-
-
-
 
 void WLVisualWidget::setToolDiametr(float d)
 {
@@ -1785,7 +1811,7 @@ trackTraj.clear();
 
 m_Program->setGModelData(WLGModelData());
 
-QTimer::singleShot(200,this,SLOT(setViewCenter()));
+QTimer::singleShot(200,this,SLOT(setViewFrame()));
 }
 
 void WLVisualWidget::setViewGModel()
@@ -1797,7 +1823,7 @@ m_Program->setGModelData(m_MillMachine->getGModel()->getData());
 
 m_MillMachine->getGModel()->setOffsetFrame(m_MillMachine->getGCode()->getOffsetSC(m_MillMachine->getGCode()->getActivSC()).to3D());
 
-QTimer::singleShot(200,this,SLOT(setViewCenter()));
+QTimer::singleShot(200,this,SLOT(setViewFrame()));
 }
 
 void WLVisualWidget::updateViewGModel()

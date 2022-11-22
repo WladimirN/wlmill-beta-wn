@@ -170,6 +170,7 @@ private:
    void updatePointRot();
    void updatePointRotAll(float *X,float *Y,float *Z);
 
+   QVector4D getViewOffset(WLFrame Fr);
 private:
 
    bool ShowCorF;
@@ -181,6 +182,7 @@ private:
    QPoint m_lastMousePos;
 
    QMatrix4x4 getShowMatrix();
+   QMatrix4x4 getShowMatrix(QMatrix4x4);
 
 signals:
    
@@ -200,6 +202,7 @@ public slots:
 		
     void setTypeView(int type)   {m_typeView=(TypeViewModel)type; updateTrajProgram();}
     void setViewCenter();
+    void setViewCenterFrame(QMatrix4x4);
 
     void updateTrajProgram();
 
@@ -223,6 +226,7 @@ public slots:
 
     void setViewOffsetModel()     {m_typeOffset=Model;setViewCenter();}
     void setViewOffsetTool()      {m_typeOffset=Tool; setViewCenter();}
+
     // QWidget interface
 protected:
    void showEvent(QShowEvent *event);

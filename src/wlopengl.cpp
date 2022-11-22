@@ -7,11 +7,11 @@ showMatrix.setToIdentity();
 
 showOffset=QVector4D(0,0,0,0);
 
-Zoom=1;
+m_zoom=1;
 
-TimerMovie = new QTimer;
-connect(TimerMovie,SIGNAL(timeout()),SLOT(updateView()));
-TimerMovie->setInterval(30);
+m_timerMovie = new QTimer;
+connect(m_timerMovie,SIGNAL(timeout()),SLOT(updateView()));
+m_timerMovie->setInterval(30);
 
 setClearColor(QColor(150,150,150));
 }
@@ -45,7 +45,7 @@ pR.setW(0); //устанавливаем в ноль
 
 QVector4D P=showMatrix*pR;//находим наши коорд на экран
 
-showOffset+=(showMatrix.column(3)+P)*Zoom;//двигаем экран на разницу
+showOffset+=(showMatrix.column(3)+P)*m_zoom;//двигаем экран на разницу
 
 showMatrix.setColumn(3,QVector4D(-P.x(),-P.y(),-P.z(),1));//устанавливаем 
 
@@ -59,10 +59,10 @@ void WLOpenGL::setRotView()
 
 void WLOpenGL::resizeGL(int w, int h)
 {
-vport[0]=0;
-vport[1]=0;
-vport[2]=w;
-vport[3]=h;
+m_vport[0]=0;
+m_vport[1]=0;
+m_vport[2]=w;
+m_vport[3]=h;
 
 float wf=w;
 float hf=h;
@@ -73,31 +73,31 @@ projection.ortho(-wf/2,wf/2,-hf/2,hf/2,-50000,50000);
 
 void WLOpenGL::zoomView(QPoint MousePos,int delta)
 {
-if(MousePos.x()<=0||MousePos.x()>=vport[2]
- ||MousePos.y()<=0||MousePos.y()>=vport[3])
+if(MousePos.x()<=0||MousePos.x()>=m_vport[2]
+ ||MousePos.y()<=0||MousePos.y()>=m_vport[3])
   {
-  MousePos.setX(vport[2]/2);
-  MousePos.setY(vport[3]/2);
+  MousePos.setX(m_vport[2]/2);
+  MousePos.setY(m_vport[3]/2);
   }
 
-QVector4D P0(MousePos.x()-vport[2]/2-showOffset.x()
-	       ,-MousePos.y()+vport[3]/2-showOffset.y()
+QVector4D P0(MousePos.x()-m_vport[2]/2-showOffset.x()
+           ,-MousePos.y()+m_vport[3]/2-showOffset.y()
 		   ,0
 		   ,1); //Текущая позиция на экране
 
 QVector4D P1=P0;  
 
 QMatrix4x4 M=showMatrix;
-M.scale(Zoom);
+M.scale(m_zoom);
 M.setColumn(3,QVector4D(0,0,0,1));//убераем смещение нам нужен только поворот
 
 P0=M.inverted()*P0;   //узнаём позицию в ск отображения
 
 //уменьшаем увеличение
-Zoom-=(delta*Zoom/1000);
+m_zoom-=(delta*m_zoom/1000);
 //P0 координата мыши в СК плоского окна новые
 M=showMatrix;
-M.scale(Zoom);
+M.scale(m_zoom);
 M.setColumn(3,QVector4D(0,0,0,1));//убераем смещение нам нужен только поворот
 
 P0=M*P0; //Узнаём новую точку на экране после увелиечния
@@ -111,7 +111,7 @@ movView(P1.x(),P1.y());
 void WLOpenGL::resetView()
 {
 showMatrix.setToIdentity();
-Zoom=1; 
+m_zoom=1;
 }; 
 
 void WLOpenGL::resetRotView()
@@ -125,55 +125,69 @@ showMatrix.setColumn(2,QVector4D(0,0,1,0));
 void WLOpenGL::startMovie()
 {
 t=0;
-TimerMovie->start();
+m_timerMovie->start();
 }
 
 void WLOpenGL::updateView()
 {
 t+=0.1;
 
-if(t>=1)   {TimerMovie->stop(); t=1;}
+if(t>=1)   {
+m_timerMovie->stop(); t=1;
+}
 
-QQuaternion curQuant=QQuaternion::nlerp(startQuant,endQuant,t);
+if(m_startOffset!=m_endOffset){
+showOffset=m_startOffset+(m_endOffset-m_startOffset)*t;
+}
 
-QMatrix4x4 M=startShowMatrix;
+if(m_startZoom!=m_endZoom){
+m_zoom=m_startZoom+(m_endZoom-m_startZoom)*t;
+}
+
+QQuaternion curQuant=QQuaternion::nlerp(m_startQuant,m_endQuant,t);
+
+QMatrix4x4 M=m_startShowMatrix;
 
 M.setColumn(3,QVector4D(0,0,0,1));
 
-showMatrix=M.inverted()*startShowMatrix;//узнаём координаты смещения отн. базовой ск
+showMatrix=M.inverted()*m_startShowMatrix;//узнаём координаты смещения отн. базовой ск
 
 M=getRotMatrix(0,0);
 M.rotate(curQuant);
 
 showMatrix=M*showMatrix;//поварачиваем на квантерион
 
-
 if(t==3)
  {
- showMatrix=startShowMatrix;
-  resetRotView();
- showMatrix.rotate(endQuant);
+ showMatrix=m_startShowMatrix;
+ resetRotView();
+ showMatrix.rotate(m_endQuant);
  }
-
 
 update();
 }
 
-void WLOpenGL::setView(WLFrame Fr)
+void WLOpenGL::setView(QMatrix4x4 Fr,QVector4D V,float _Zoom)
 {
-startQuant=MatrixToQuaternion(showMatrix);
-startQuant.setScalar(-startQuant.scalar());
+m_startQuant=MatrixToQuaternion(showMatrix);
+m_startQuant.setScalar(-m_startQuant.scalar());
+
+if(_Zoom<=0) _Zoom=m_zoom;
+
+m_startOffset=showOffset;
+m_endOffset=V;
+
+m_startZoom=m_zoom;
+m_endZoom=_Zoom;
 
 QMatrix4x4 M;
 
-M=startShowMatrix=showMatrix;
+M=m_startShowMatrix=showMatrix;
 
 M.setColumn(3,QVector4D(0,0,0,1));
 
-endQuant=MatrixToQuaternion(Fr.toM()*M.inverted()*showMatrix);
-endQuant.setScalar(-endQuant.scalar());
-
+m_endQuant=MatrixToQuaternion(Fr*M.inverted()*showMatrix);
+m_endQuant.setScalar(-m_endQuant.scalar());
 
 startMovie();
-
 }

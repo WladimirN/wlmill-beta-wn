@@ -25,11 +25,16 @@ class WLOpenGL : public QOpenGLWidget, protected QOpenGLFunctions
 	Q_OBJECT
 
 private:
-	QTimer *TimerMovie;
-	QQuaternion startQuant;
-	QQuaternion   endQuant;
-	QVector4D  startOffset;
-	QVector4D    endOffset;
+    QTimer *m_timerMovie;
+
+    QQuaternion m_startQuant;
+    QQuaternion   m_endQuant;
+
+    QVector4D  m_startOffset;
+    QVector4D    m_endOffset;
+
+    float m_startZoom;
+    float m_endZoom;
 	
 	float t;
 	
@@ -44,7 +49,7 @@ public:
      WLOpenGL();
     ~WLOpenGL();
 
-    float getZoom() {return Zoom;}
+    float getZoom() {return m_zoom;}
 	void  resetRotView();
 	void  resetView();
 
@@ -79,33 +84,31 @@ protected:
     virtual void initGLBuffers(){}
 
 private:
-	void setView(WLFrame Fr);
 
-private:
-
-public:
+protected:
    QMatrix4x4 showMatrix;
    QMatrix4x4 projection;
    QVector4D  showOffset;
 
-   float      Zoom;
-
-   GLint vport[4];
-
-   QMatrix4x4 startShowMatrix;
+   float      m_zoom=1;
+   GLint      m_vport[4];
+   QMatrix4x4 m_startShowMatrix;
 
 public slots: 
 
     void setClearColor(QColor _color) {clearColor=_color;}
 
-    void setViewUp(void)     {setView(WLFrame(0,0,0,0,0,0));}
-    void setViewDown(void)   {setView(WLFrame(0,0,0,0,0,180));}
-    void setViewLeft(void)   {setView(WLFrame(0,0,0,180,0,90));}
-    void setViewRight(void)  {setView(WLFrame(0,0,0,0,0,-90));}
-    void setViewFront(void)  {setView(WLFrame(0,0,0,-90,-90,0));}
-    void setViewRear(void)   {setView(WLFrame(0,0,0,90,90,0));}    
+virtual  void setViewUp(void)     {setView(WLFrame(0,0,0,0,0,0).toM(),showOffset);}
+virtual  void setViewDown(void)   {setView(WLFrame(0,0,0,0,0,180).toM(),showOffset);}
+virtual  void setViewLeft(void)   {setView(WLFrame(0,0,0,180,0,90).toM(),showOffset);}
+virtual  void setViewRight(void)  {setView(WLFrame(0,0,0,0,0,-90).toM(),showOffset);}
+virtual  void setViewFront(void)  {setView(WLFrame(0,0,0,-90,-90,0).toM(),showOffset);}
+virtual  void setViewRear(void)   {setView(WLFrame(0,0,0,90,90,0).toM(),showOffset);}
 
-virtual void setViewCenter(void) {
+    void setView(QMatrix4x4 Fr,QVector4D offset,float zoom=-1);
+
+
+virtual void setViewFrame(void) {
                                  showOffset.setX(0);
                                  showOffset.setY(0);
                                  update();

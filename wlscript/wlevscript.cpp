@@ -9,6 +9,8 @@ QRegExp commentEndExpression;
 
 text=text.remove(QRegExp("//[^\n]*"));
 
+return text;
+
 int startIndex = 0;
 
 commentStartExpression = QRegExp("/\\*");
