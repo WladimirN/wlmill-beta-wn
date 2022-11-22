@@ -2,6 +2,38 @@
 
 #include <QTextCodec>
 
+QString removeComment(QString text)
+{
+QRegExp commentStartExpression;
+QRegExp commentEndExpression;
+
+text=text.remove(QRegExp("//[^\n]*"));
+
+int startIndex = 0;
+
+commentStartExpression = QRegExp("/\\*");
+commentEndExpression = QRegExp("\\*/");
+
+startIndex = commentStartExpression.indexIn(text);
+
+while (startIndex >= 0) {
+    int endIndex = commentEndExpression.indexIn(text, startIndex);
+    int commentLength;
+    if (endIndex == -1) {
+        commentLength = text.length() - startIndex;
+    } else {
+        commentLength = endIndex - startIndex
+                        + commentEndExpression.matchedLength();
+    }
+
+    text.remove(startIndex,commentLength);
+
+    startIndex = commentStartExpression.indexIn(text);
+}
+
+return text;
+}
+
 WLEVScript::WLEVScript(QObject *parent)
 	: QThread(parent)
 {
@@ -24,13 +56,9 @@ if(isBusy())
  }
 else 
  {
- clearTimeout();
- clearInterval();
-
- baseCode=_code;
-
+ baseCode=removeComment(_code);
  updateComment(baseCode);
-
+ /*
  SLoadCode LC;
 
  LC.code=baseCode;
@@ -40,8 +68,8 @@ else
  updateComment(baseCode);
 
  QTimer::singleShot(50 ,this,&WLEVScript::evalCodes);
-
- return 1;
+ */
+ return true;
  }
 }
 
@@ -220,7 +248,7 @@ if(file.open(QIODevice::ReadOnly|QIODevice::Text))
  {
  SLoadCode LC;
  LC.nameFile=nameFile;
- LC.code=QTextCodec::codecForName("Windows-1251")->toUnicode(file.readAll());
+ LC.code=removeComment(QTextCodec::codecForName("Windows-1251")->toUnicode(file.readAll()));
 
  listCode+=LC;
 
@@ -463,6 +491,7 @@ qDebug()<<list.last();
 
 pos+=RegExp.matchedLength();
 }
+
 }
 
 void WLEVScript::evalTasks()

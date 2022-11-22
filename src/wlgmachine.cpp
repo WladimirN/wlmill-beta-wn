@@ -50,77 +50,11 @@ QDir().mkdir(_iconsGMPath);
 setContinueMov(true);
 setBLNextMov(true);
 
-bool saveF=false;
-
-QFile FileMJS(_mScriptFile);
-
-if(!FileMJS.open(QIODevice::ReadOnly|QIODevice::Text))  {
-    FileMJS.setFileName(mScriptFile);
-
-    saveF=true;
-
-    if(!FileMJS.open(QIODevice::ReadOnly|QIODevice::Text))  {
-       FileMJS.setFileName(":/data/wlmillconfig/script/mscript.js");
-       FileMJS.open(QIODevice::ReadOnly|QIODevice::Text);
-       }
-    }
-
-if(FileMJS.isOpen()){
-    m_CodeMScript=QTextCodec::codecForName("Windows-1251")->toUnicode(FileMJS.readAll());    
-
-    if(m_CodeMScript.isEmpty()){
-      FileMJS.close();
-      FileMJS.setFileName(":/data/wlmillconfig/script/mscript.js");
-      FileMJS.open(QIODevice::ReadOnly|QIODevice::Text);
-      m_CodeMScript=QTextCodec::codecForName("Windows-1251")->toUnicode(FileMJS.readAll());
-
-      saveF=true;
-      }
-
-    FileMJS.close();
-    }
+loadMScript();
+loadLScript(); //загружаем старые или дефолтные
 
 QFile::remove(mScriptFile);
-QFile::remove(lScriptFile);
-
-if(saveF)
-   saveMScript(m_CodeMScript);
-
-connect(m_MScript,&WLEVScript::changedBusy,this,&WLGMachine::updatePosible);
-
-saveF=false;
-
-QFile FileLJS(_lScriptFile);
-
-if(!FileLJS.open(QIODevice::ReadOnly|QIODevice::Text))  {
-    FileLJS.setFileName(lScriptFile);
-
-   saveF=true;
-
-   if(!FileLJS.open(QIODevice::ReadOnly|QIODevice::Text))  {
-      FileLJS.setFileName(":/data/wlmillconfig/script/lscript.js");
-      FileLJS.open(QIODevice::ReadOnly|QIODevice::Text);
-    }   
-   }
-
-if(FileLJS.isOpen()){
-    m_CodeLScript=QTextCodec::codecForName("Windows-1251")->toUnicode(FileLJS.readAll());
-
-    if(m_CodeLScript.isEmpty()){
-      FileLJS.close();
-      FileLJS.setFileName(":/data/wlmillconfig/script/lscript.js");
-      FileLJS.open(QIODevice::ReadOnly|QIODevice::Text);
-
-      m_CodeLScript=QTextCodec::codecForName("Windows-1251")->toUnicode(FileLJS.readAll());
-
-      saveF=true;
-      }
-
-    FileLJS.close();
-    }
-
-if(saveF)
-   saveLScript(m_CodeLScript);
+QFile::remove(lScriptFile); //удаляем старые
 
 m_busy=false;
 m_pause=false;
@@ -334,6 +268,9 @@ if(!on) //OFF
   foreach(WLDrive *drive,getDrives()){
      drive->setEnable(true);
      }
+
+  m_LScript->setBaseCode(loadLScript());
+  m_MScript->setBaseCode(loadMScript());
 
   m_LScript->setEnable(true);
   m_MScript->setEnable(true);
@@ -620,15 +557,9 @@ m_MScript->addObject(getMPG(),"MPG");
 connect(m_MScript,SIGNAL(sendMessage(QString,QString,int)),this,SLOT(setMessage(QString,QString,int)),Qt::QueuedConnection);
 connect(m_MScript,SIGNAL(complete(QString)),SLOT(setCompleteScript(QString)),Qt::QueuedConnection);
 
-m_MScript->setIncludePath(_scriptPath);
+connect(m_MScript,&WLEVScript::changedBusy,this,&WLGMachine::updatePosible);
 
-m_MScript->setBaseCode(m_CodeMScript);
-/*
-m_MScript->addProperty("WLMillPath",QCoreApplication::applicationDirPath());
-m_MScript->addProperty("WLMillIconsPath",_iconsMMPath);
-m_MScript->addProperty("WLScriptPath",_scriptPath);
-m_MScript->addProperty("WLMillConfigPath",configMMPath);
-*/
+m_MScript->setIncludePath(_scriptPath);
 
 connect(m_Program,&WLGProgram::changedProgram,this
         ,[=](){m_MScript->runFunction(QString("changedGProgram()"),true);});
@@ -651,17 +582,9 @@ connect(m_LScript,&WLEVScript::error,this,[=](QString txt){
               sendMessage("LScript","set disable: "+txt,-1);
               });
 
-
-//timerLoopPLC = new QTimer;
-
 m_LScript->setIncludePath(_scriptPath);
-m_LScript->setBaseCode(m_CodeLScript);
 
 m_LScript->setEnableTimerTask();
-//connect(timerLoopPLC,&QTimer::timeout,this,[=](){m_LScript->runFunction("loopPLC()");});
-//connect(m_LScript,&WLEVScript::error,timerLoopPLC,&QTimer::stop);
-
-//timerLoopPLC->setInterval(100);
 
 WLModuleIOPut *MIOPut=getMotionDevice()->getModuleIOPut();
 
@@ -1077,6 +1000,85 @@ if(FileLJS.open(QIODevice::WriteOnly))            {
       FileLJS.write(QTextCodec::codecForName("Windows-1251")->fromUnicode(txt));
       FileLJS.close();
 }
+}
+
+QString WLGMachine::loadMScript()
+{
+QFile FileMJS(_mScriptFile);
+QString codeMScript;
+bool saveF=false;
+
+if(!FileMJS.open(QIODevice::ReadOnly|QIODevice::Text))  {
+    FileMJS.setFileName(mScriptFile);
+
+    saveF=true;
+
+    if(!FileMJS.open(QIODevice::ReadOnly|QIODevice::Text))  {
+       FileMJS.setFileName(":/data/wlmillconfig/script/mscript.js");
+       FileMJS.open(QIODevice::ReadOnly|QIODevice::Text);
+       }
+    }
+
+if(FileMJS.isOpen()){
+    codeMScript=QTextCodec::codecForName("Windows-1251")->toUnicode(FileMJS.readAll());
+
+    if(codeMScript.isEmpty()){
+      FileMJS.close();
+      FileMJS.setFileName(":/data/wlmillconfig/script/mscript.js");
+      FileMJS.open(QIODevice::ReadOnly|QIODevice::Text);
+      codeMScript=QTextCodec::codecForName("Windows-1251")->toUnicode(FileMJS.readAll());
+
+      saveF=true;
+      }
+
+    FileMJS.close();
+    }
+
+
+if(saveF)
+   saveMScript(codeMScript);
+
+return codeMScript;
+}
+
+
+QString WLGMachine::loadLScript()
+{
+QFile FileLJS(_lScriptFile);
+QString codeLScript;
+bool saveF=false;
+
+if(!FileLJS.open(QIODevice::ReadOnly|QIODevice::Text))  {
+    FileLJS.setFileName(lScriptFile);
+
+    saveF=true;
+
+    if(!FileLJS.open(QIODevice::ReadOnly|QIODevice::Text))  {
+       FileLJS.setFileName(":/data/wlmillconfig/script/lscript.js");
+       FileLJS.open(QIODevice::ReadOnly|QIODevice::Text);
+       }
+    }
+
+if(FileLJS.isOpen()){
+    codeLScript=QTextCodec::codecForName("Windows-1251")->toUnicode(FileLJS.readAll());
+
+    if(codeLScript.isEmpty()){
+      FileLJS.close();
+      FileLJS.setFileName(":/data/wlmillconfig/script/lscript.js");
+      FileLJS.open(QIODevice::ReadOnly|QIODevice::Text);
+      codeLScript=QTextCodec::codecForName("Windows-1251")->toUnicode(FileLJS.readAll());
+
+      saveF=true;
+      }
+
+    FileLJS.close();
+    }
+
+
+if(saveF)
+   saveLScript(codeLScript);
+
+return codeLScript;
 }
 
 void WLGMachine::setMessage(QString name, QString data, int code)

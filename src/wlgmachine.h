@@ -246,13 +246,7 @@ QList <SCorrectSOut> m_correctSList;
 
     WLGProgram *m_Program=nullptr;
 
-    QString m_CodeMScript;
-    QString m_CodeLScript;
-
-//    QTimer *timerLoopPLC;
-
     double m_baseOffsetTool=0;
-
 
     QList <double> m_percentManualList;
 
@@ -511,6 +505,11 @@ public:
     virtual void addDrive(WLGDrive *millDrive);
     virtual void removeDrive(WLGDrive *millDrive);
 
+public:
+
+   QString loadMScript();
+   QString loadLScript();
+
 private slots:
 
    void setCompleteScript(QString);
@@ -523,6 +522,7 @@ private slots:
  public slots: 
 
 	void saveConfig();
+
     void saveMScript(QString txt);
     void saveLScript(QString txt);
 

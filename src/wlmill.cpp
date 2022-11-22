@@ -858,13 +858,12 @@ void WLMill::onEditCodeMScript()
 WLEditText EditText;
 WLMCodeSH  codeSH(EditText.getDocument());
 
-EditText.setText(MScript->getCode());
+EditText.setText(MillMachine->loadMScript());
 EditText.setLabel(tr("Edit")+"MScript:");
 
 EditText.show();
 
 if(EditText.exec())  {
-  MScript->setBaseCode(EditText.getText());
   MillMachine->saveMScript(EditText.getText());
   }
 }
@@ -874,13 +873,12 @@ void WLMill::onEditCodeLScript()
 WLEditText EditText;
 WLMCodeSH  codeSH(EditText.getDocument());
 
-EditText.setText(LScript->getCode());
+EditText.setText(MillMachine->loadLScript());
 EditText.setLabel(tr("Edit")+"LScript:");
 
 EditText.show();
 
-if(EditText.exec()) {
-  LScript->setBaseCode(EditText.getText());
+if(EditText.exec()) {  
   MillMachine->saveLScript(EditText.getText());
   }
 }
