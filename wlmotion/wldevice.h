@@ -35,7 +35,6 @@
 #define comDev_reboot      11 //rebooting
 
 #define sendDev_prop     100
-#define sendDev_UID      102
 #define sendDev_Module   101 //send modules
 #define sendDev_UID      102 //send uid
 #define sendDev_status   103 //send status

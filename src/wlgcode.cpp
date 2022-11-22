@@ -15,7 +15,7 @@ setGCode(17);
 setGCode(01);
 setGCode(54);
 setGCode(61);
-setGCode(7);  //radius Turn Mode
+setGCode(8);
 
 push();
 }
@@ -370,7 +370,7 @@ return   "<b>GCode:</font></b>"
            "<li>G0,G1</li>"
            "<li>G2,G3 (I,J,K,R) </li>"
 #ifdef GCODE_TURN
-           "<li>G7,G8 (Raius/Diametr X)</li>"
+           "<li>G7,G8 (Diametr/Radius X)</li>"
 #endif
            "<li>G17,G18,G19</li>"
            "<li>G28 </li>"

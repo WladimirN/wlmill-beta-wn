@@ -277,7 +277,7 @@ public:
     Q_INVOKABLE int getOfstTool();
 
     Q_INVOKABLE void setXDiam(bool en=true) {setGCode(en ? 7 : 8);}
-    Q_INVOKABLE bool isXDiam()              {return isGCode(8);}
+    Q_INVOKABLE bool isXDiam()              {return isGCode(7);}
 
     Q_INVOKABLE void removeTool(int ikey);
     Q_INVOKABLE void setDataTool(int ikey,QString key,QVariant value,bool send=true);

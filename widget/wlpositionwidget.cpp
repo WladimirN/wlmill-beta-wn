@@ -686,8 +686,8 @@ switch(event->key())
 #endif
 
 #ifdef GCODE_TURN
-   case Qt::Key_Up:      if(pbMinusX->isEnabled()) {pbMinusX->setDown(true);onPBAxis("X", -1,1);} break;
-   case Qt::Key_Down:    if(pbPlusX->isEnabled())  {pbPlusX->setDown(true); onPBAxis("X",  1,1);} break;
+   case Qt::Key_Down:    if(pbMinusX->isEnabled()) {pbMinusX->setDown(true);onPBAxis("X", -1,1);} break;
+   case Qt::Key_Up:      if(pbPlusX->isEnabled())  {pbPlusX->setDown(true); onPBAxis("X",  1,1);} break;
    case Qt::Key_PageDown:if(pbMinusY->isEnabled()) {pbMinusY->setDown(true);onPBAxis("Y", -1,1);} break;
    case Qt::Key_PageUp:  if(pbPlusY->isEnabled())  {pbPlusY->setDown(true); onPBAxis("Y",  1,1);} break;
    case Qt::Key_Left:    if(pbMinusZ->isEnabled()) {pbMinusZ->setDown(true);onPBAxis("Z", -1,1);} break;
@@ -745,8 +745,8 @@ qDebug()<<"WLPositionWidget release"<<event->key();
 #endif
 
 #ifdef GCODE_TURN
-  case Qt::Key_Up:      if(pbMinusX->isEnabled()) {pbMinusX->setDown(false); onPBAxis("X", 1,0);} break;
-  case Qt::Key_Down:    if(pbPlusX->isEnabled())  {pbPlusX->setDown(false);  onPBAxis("X", 1,0);} break;
+  case Qt::Key_Down:    if(pbMinusX->isEnabled()) {pbMinusX->setDown(false); onPBAxis("X", 1,0);} break;
+  case Qt::Key_Up:      if(pbPlusX->isEnabled())  {pbPlusX->setDown(false);  onPBAxis("X", 1,0);} break;
   case Qt::Key_PageDown:if(pbMinusY->isEnabled()) {pbMinusY->setDown(false); onPBAxis("Y", 1,0);} break;
   case Qt::Key_PageUp:  if(pbPlusY->isEnabled())  {pbPlusY->setDown(false);  onPBAxis("Y", 1,0);} break;
   case Qt::Key_Left:    if(pbMinusZ->isEnabled()) {pbMinusZ->setDown(false); onPBAxis("Z", 1,0);} break;
