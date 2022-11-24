@@ -94,7 +94,7 @@ void updateComment(QString txt);
 //private slots:
 	//void evalCode() {qDebug()<<"retScript="<<engine->evaluate(code).toString();};
 public:
-    bool setBaseCode(QString _code) ;
+    bool setBaseCode(QString _code,bool eval=false) ;
  QString getCode() {return baseCode;}
 
 Q_INVOKABLE bool runFunction(QString _func,bool _chError=true);

@@ -47,7 +47,7 @@ WLEVScript::~WLEVScript()
 
 }
 
-bool WLEVScript::setBaseCode(QString _code)
+bool WLEVScript::setBaseCode(QString _code,bool eval)
 {
 QMutexLocker locker(&Mutex);
 
@@ -60,17 +60,18 @@ else
  {
  baseCode=removeComment(_code);
  updateComment(baseCode);
- /*
- SLoadCode LC;
 
- LC.code=baseCode;
+ if(eval)
+   {
+   SLoadCode LC;
 
- listCode+=LC;
+   LC.code=baseCode;
+   listCode+=LC;
+   updateComment(baseCode);
 
- updateComment(baseCode);
+   QTimer::singleShot(50 ,this,&WLEVScript::evalCodes);
+   }
 
- QTimer::singleShot(50 ,this,&WLEVScript::evalCodes);
- */
  return true;
  }
 }

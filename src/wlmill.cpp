@@ -88,6 +88,7 @@ WLMill::WLMill(QWidget *parent)
 
     LScript->addObject(new WLFileScript(LScript),"FILE");
     LScript->addObject(new WLTimerScript(LScript),"TIMER");
+    LScript->addObject(this,"WLMILL");
 
     MScript->addObject(new WLFileScript(MScript),"FILE");
     MScript->addObject(new WLTimerScript(MScript),"TIMER");
@@ -120,8 +121,8 @@ WLMill::WLMill(QWidget *parent)
     tabWidget->addTab(VisualWidget,tr("Visual"));
 
     #ifdef DEF_CAMERA
-    camera = new WLCamera(this);
-    tabWidget->addTab(camera,tr("Camera"));
+      camera = new WLCamera(this);
+      tabWidget->addTab(camera,tr("Camera"));
     #endif
 
     setCentralWidget(tabWidget);
@@ -486,6 +487,8 @@ ProgramWidget = new WLGProgramWidget(m_GProgram,this);
 //connect(ProgramWidget,&WLGProgramWidget::changed,this,&WLMill::sendProSLOT(sendProgramToShow()));
 
 connect(ProgramWidget,&WLGProgramWidget::pressOpenFile,this,&WLMill::onLoadProgram);
+
+connect(m_GProgram,&WLGProgram::changedActivElement,ProgramWidget,&WLGProgramWidget::setEditElement);
 
 connect(VisualWidget,&WLVisualWidget::changedEditElement,ProgramWidget,&WLGProgramWidget::setEditElement);
 connect(ProgramWidget,&WLGProgramWidget::changedEditElement,VisualWidget,&WLVisualWidget::setEditElement);

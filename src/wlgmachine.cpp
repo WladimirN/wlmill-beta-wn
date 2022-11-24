@@ -560,6 +560,7 @@ connect(m_MScript,SIGNAL(complete(QString)),SLOT(setCompleteScript(QString)),Qt:
 connect(m_MScript,&WLEVScript::changedBusy,this,&WLGMachine::updatePosible);
 
 m_MScript->setIncludePath(_scriptPath);
+m_MScript->setBaseCode(loadMScript(),true);
 
 connect(m_Program,&WLGProgram::changedProgram,this
         ,[=](){m_MScript->runFunction(QString("changedGProgram()"),true);});
@@ -583,6 +584,7 @@ connect(m_LScript,&WLEVScript::error,this,[=](QString txt){
               });
 
 m_LScript->setIncludePath(_scriptPath);
+m_LScript->setBaseCode(loadLScript(),true);
 
 m_LScript->setEnableTimerTask();
 
