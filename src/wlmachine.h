@@ -49,11 +49,11 @@ QList<WLDrive*> m_Drives;
 
 bool updateDrivesFindPos();
 
-private:
+protected:
 
 virtual bool verifyReadyMotion()     {return true;}
 virtual bool verifyReadyAutoMotion() {return true;}
-virtual bool isPossiblyManual()      {return true;}
+virtual bool isPossiblyManual()      {return isEnable();}
 
 public:
 

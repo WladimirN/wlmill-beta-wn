@@ -321,11 +321,10 @@ if(MPlanner)
 {
 return   (MPlanner->getStatus()==PLANNER_stop
         ||MPlanner->getStatus()==PLANNER_pause)
-           &&(!isRunMScript()
-           &&isEnable());
+         &&WLMachine::isPossiblyManual();
 }
 
-return true;
+return WLMachine::isPossiblyManual();
 }
 
 bool WLGMachine::isPossiblyEditModeRun()
