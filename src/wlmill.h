@@ -280,12 +280,12 @@ WLHeightMapWidget *HMWidget;
 
 QToolButton *TButtonGo;
 QToolButton *TButtonStop;
-///
+
+QList <QWidget*> addTabList;
 //Menu
 QMenuBar *MenuBar;
 
 //QWorkspace *WorkSpace;
-
 QDialog *MW;
 
 public:
@@ -304,6 +304,8 @@ void addTabQML(QString file);
 
 void runQMLFile(QString file);
 void addTabQMLFile(QString file);
+
+void removeTab(QString name);
 
 void playSound(QString file)  {playSoundFile(_soundPath+file);}
 void playSoundFile(QString file);

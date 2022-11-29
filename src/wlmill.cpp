@@ -1196,10 +1196,26 @@ if(view) {
  view->setFocusPolicy(Qt::WheelFocus);
 
  tabWidget->addTab(view,FI.baseName());
+
+ MScript->addBeforeInitScript("WLMILL.removeTab(FI.baseName())");
  }
 #else
 qDebug()<<"no addQMLFile"<<file;
 #endif
+}
+
+void WLMill::removeTab(QString name)
+{
+foreach(QWidget *widget,addTabList)    {
+    int index=tabWidget->indexOf(widget);
+
+    if(index!=-1){
+      if(tabWidget->tabText(index)==name)  {
+        tabWidget->removeTab(index);
+        addTabList.removeOne(widget);
+        }
+      }
+    }
 }
 
 void WLMill::playSoundFile(QString file)
