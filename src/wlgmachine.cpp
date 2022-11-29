@@ -2752,7 +2752,14 @@ preRunProgramList+=getGCode()->getActivGCodeString();
 //  preRunProgramList+=QString("G53 G0 Z%1").arg(planeZ);
 
 if(getCurrentPosition().z<getGCode()->getG28Position().z)
-  preRunProgramList+=QString("G53 G0 Z%1 //add wlmill -up z").arg(getGCode()->getG28Position().z);
+  {
+  double safeZ=getGCode()->getG28Position().z;
+
+  if(getDrive("Z")
+    &&safeZ>getDrive("Z")->maxPosition())  safeZ=getDrive("Z")->maxPosition();
+
+  preRunProgramList+=QString("G53 G0 Z%1 //add wlmill -up z").arg(safeZ);
+  }
 
 preRunProgramList+=QString("G53 G0 X%1 Y%2 //add wlmill -mov xy").arg(endPoint.x).arg(endPoint.y);
 preRunProgramList+=QString("G53 G0 A%1 B%2 C%3 //add wlmill -mov abc").arg(endPoint.a).arg(endPoint.b).arg(endPoint.c);
@@ -3701,7 +3708,7 @@ case WLElementTraj::line:  {
 
                               foreach(WLGDrive *mD,getGDrives()){
                               if(!mD->getAxis()) continue;
-                              ePos+=round(ME.data.line.endPoint.get(mD->getName())/mD->dimension());
+                              ePos+=(qint32)((qint64)round(ME.data.line.endPoint.get(mD->getName())/mD->dimension()));
                               indexs+=i;
                               i++;
                               }
@@ -3728,8 +3735,8 @@ case WLElementTraj::uline:   {
 
                              foreach(WLGDrive *mD,getGDrives()){
                               if(!mD->getAxis()) continue;
-                              ePos+=round(ME.data.uline.endPoint.get(mD->getName())/mD->dimension());
-                              mPos+=round(ME.data.uline.midPoint.get(mD->getName())/mD->dimension());
+                              ePos+=(qint32)((qint64)round(ME.data.uline.endPoint.get(mD->getName())/mD->dimension()));
+                              mPos+=(qint32)((qint64)round(ME.data.uline.midPoint.get(mD->getName())/mD->dimension()));
                               indexs+=i;
                               i++;
                               }
@@ -3760,8 +3767,8 @@ case WLElementTraj::arc: {
 
                           foreach(WLGDrive *mD,getGDrives()){
                            if(!mD->getAxis()) continue;
-                           ePos+=round(ME.data.arc.endPoint.get(mD->getName())/mD->dimension());
-                           cPos+=round(ME.data.arc.centerPoint.get(mD->getName())/mD->dimension());
+                           ePos+=(qint32)((qint64)round(ME.data.arc.endPoint.get(mD->getName())/mD->dimension()));
+                           cPos+=(qint32)((qint64)round(ME.data.arc.centerPoint.get(mD->getName())/mD->dimension()));
                            indexs+=i;
 
                            if(mD->getName()=="X") Ib=i;

@@ -2,7 +2,7 @@
 # WLDEV.RU WLMill
 # ------------------------------------------------------
 TEMPLATE = app
-TARGET = wlmill
+TARGET = wlmill-beta
 QT += core widgets serialport gui network opengl script multimedia
 
 QMAKE_LFLAGS = -no-pie
@@ -14,13 +14,13 @@ DEFINES  += GCODE_MILL
 #           QT_NO_WARNING_OUTPUT\
 
 DEFINES  += DEF_QML
-#DEFINES  += DEF_CAMERA
+DEFINES  += DEF_CAMERA
 
 DEFINES  += DEF_PLOT
 DEFINES  += DEF_HMAP
 
 contains(DEFINES, GCODE_TURN) {
-TARGET = wlturn
+TARGET = wlturn-beta
 }
 
 contains(DEFINES, DEF_PLOT) {
