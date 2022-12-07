@@ -180,6 +180,7 @@ Q_INVOKABLE bool isCompleteGProgram() {return m_iProgram==m_Program->getElementC
 
 Q_INVOKABLE quint32 getElementCountGProgram()  {return m_Program->getElementCount();}
 Q_INVOKABLE quint32 getActivElementGProgram()  {return m_Program->getActivElement();}
+Q_INVOKABLE    void setActivElementGProgram(quint32 index) {m_Program->setActivElement(index);}
 Q_INVOKABLE quint32 getLastMovElementGProgram(){return m_Program->getLastMovElement();}
 
 bool isRunList()      {return m_runList;}

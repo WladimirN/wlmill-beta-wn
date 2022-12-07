@@ -31,6 +31,10 @@ Q_INVOKABLE QString curPath(){return  QCoreApplication::applicationDirPath();}
 
 Q_INVOKABLE bool createFile(QString namefile);
 Q_INVOKABLE bool write(QString namefile,QString str);
+
+Q_INVOKABLE QString listFiles(QString path,QString split=",");
+Q_INVOKABLE QString listDirs(QString path,QString split=",");
+
 private:
 	QMutex mutex;
 };

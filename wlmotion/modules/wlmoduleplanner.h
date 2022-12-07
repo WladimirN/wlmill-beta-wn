@@ -285,9 +285,10 @@ public:
 
 statusPlanner getStatus()  const {return m_status;}
 
-   bool isEmpty()  {return Flags.get(PLF_empty);}
-   bool isMoving() {return Flags.get(PLF_moving);}
+   bool isEmpty() {return  Flags.get(PLF_empty);}
+   bool isMoving(){return  Flags.get(PLF_moving);}
    bool isBusy()  {return !isEmpty()||isMoving();}
+   bool isStop()  {return  m_status=PLANNER_stop;}
 
    qint32 getProbe2(int index) {if(0<=index&&index<m_posProbe2.size()) return m_posProbe2.at(index); else return 0;}
    qint32 getProbe3(int index) {if(0<=index&&index<m_posProbe3.size()) return m_posProbe3.at(index); else return 0;}

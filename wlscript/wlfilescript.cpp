@@ -1,5 +1,7 @@
 #include "wlfilescript.h"
 
+#include <QDir>
+
 WLFileScript::WLFileScript(QObject *parent)
 	: QObject(parent)
 {
@@ -32,6 +34,38 @@ if(File.open(QIODevice::Append))
  return true;
  }
 return false;
+}
+
+QString WLFileScript::listFiles(QString path, QString split)
+{
+QDir dir(path);
+QString ret;
+
+foreach(QString name,dir.entryList(QDir::Files))
+    {
+    if(!ret.isEmpty())
+        ret+=split;
+
+    ret+=name;
+    }
+
+return ret;
+}
+
+QString WLFileScript::listDirs(QString path, QString split)
+{
+QDir dir(path);
+QString ret;
+
+foreach(QString name,dir.entryList(QDir::Dirs))
+    {
+    if(!ret.isEmpty())
+        ret+=split;
+
+    ret+=name;
+    }
+
+return ret;
 }
 
 bool WLFileScript::saveValue(QString namefile,QString nameData,QScriptValue data)
