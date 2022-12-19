@@ -65,8 +65,16 @@ WLEditMillWidget::WLEditMillWidget(WLGMachine *_MillMachine,QWidget *parent)
 
     ui.cbUseMPG->setChecked(MillMachine->isUseMPG());
 
-    ui.cbUseDriveA->setChecked(MillMachine->getDrive("A")!=nullptr);
-    ui.cbUseDriveB->setChecked(MillMachine->getDrive("B")!=nullptr);
+    QStringList names;
+
+    foreach(WLDrive *drive,MillMachine->getDrives()) {
+      names+=drive->getName();
+      }
+
+    m_drivesStr=names.join(",");
+
+    ui.leDrivesStr->setText(m_drivesStr);
+
     ui.cbUseGModel->setChecked(MillMachine->isUseGModel());
 
    // ui.sbOffsetHToolProbe->setValue(MillMachine->getOffsetHTool());
@@ -166,37 +174,30 @@ MillMachine->setAutoSetSafeProbe(ui.cbAutoSetSafeProbe->isChecked());
 
 MillMachine->getMotionDevice()->getModulePlanner()->setKFpause(ui.sbPerFpause->value()/100.0f);
 
-if(ui.cbUseDriveA->isChecked())
-{
-if(MillMachine->getDrive("A")==nullptr)
+if(m_drivesStr!=ui.leDrivesStr->text()) { // if changed drives str
+
+QStringList names=ui.leDrivesStr->text().toUpper().split(",");
+
+for(int i=0;i<MillMachine->getDrives().size();i++) //remove deleted names
     {
-    WLGDrive *MD = new WLGDrive("A",MillMachine->getMotionDevice()->getModuleAxis());
-
-    MillMachine->addDrive(MD);
-    ret=true;
-    }
-}
-else if(MillMachine->getDrive("A")!=nullptr)
+    WLDrive *drive=MillMachine->getDrives().at(i);
+    if(names.indexOf(drive->getName())==-1)
        {
-       MillMachine->removeDrive(MillMachine->getDrive("A"));
-       ret=true;
+       MillMachine->removeDrive(MillMachine->getDrive(drive->getName()));
+       i--;
        }
-
-if(ui.cbUseDriveB->isChecked())
-{
-if(MillMachine->getDrive("B")==nullptr)
-    {
-    WLGDrive *MD = new WLGDrive("B",MillMachine->getMotionDevice()->getModuleAxis());
-
-    MillMachine->addDrive(MD);
-    ret=true;
+       else {
+       names.removeOne(drive->getName());
+       }
     }
+
+foreach(QString name,names){
+ WLGDrive *MD = new WLGDrive(name,MillMachine->getMotionDevice()->getModuleAxis());
+ MillMachine->addDrive(MD);
+ }
+
+ret=true; // need restart WLMill
 }
-else if(MillMachine->getDrive("B")!=nullptr)
-       {
-       MillMachine->removeDrive(MillMachine->getDrive("B"));
-       ret=true;
-       }
 
 //MillMachine->setOffsetHTool(ui.sbOffsetHToolProbe->value());
 MillMachine->setEnableGModel(ui.cbUseGModel->isChecked());

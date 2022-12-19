@@ -282,8 +282,12 @@ if(!on) //OFF
 
   QVector <quint8> indexsAxis;
 
-  foreach(WLGDrive *mD, getGDrives())
-      if(mD->getAxis())  indexsAxis+=mD->getAxis()->getIndex();
+  QStringList List=QString("X,Y,Z,A,B,C").split(","); //only this name
+
+  foreach(WLGDrive *mD, getGDrives()){
+      if(List.indexOf(mD->getName()) != -1 && mD->getAxis())
+          indexsAxis+=mD->getAxis()->getIndex();
+      }
 
   WLModulePlanner *ModulePlanner=getMotionDevice()->getModulePlanner();
 
@@ -589,7 +593,7 @@ m_LScript->setEnableTimerTask();
 
 WLModuleIOPut *MIOPut=getMotionDevice()->getModuleIOPut();
 
-if(getMotionDevice()->getModuleIOPut())
+if(MIOPut)
   {
   connect(MIOPut,&WLModuleIOPut::changedInput,this
           ,[=](int index){m_LScript->runFunction(QString("changedInput(%1,%2)").arg(index).arg(MIOPut->getInput(index)->getNow()),true);});
@@ -599,8 +603,16 @@ if(getMotionDevice()->getModuleIOPut())
 
   }
 
+WLModuleUART *MUART=getMotionDevice()->getModuleUART();
+
+if(MUART)
+ {
+ m_LScript->addObject(MUART,"MUART");
+ }
+
 connect(m_Program,&WLGProgram::changedProgram,this
         ,[=](){m_LScript->runFunction(QString("changedGProgram()"),true);});
+
 
 }
 
@@ -974,7 +986,7 @@ FileXML.close();
 motDevice->writeToFile(configGMPath+motDevice->getNameDevice()+".xml");
 
 getGCode()->writeToolFile(toolsFile);
-getGCode()->writeSCFile(scFile);
+getGCode()->writeSCFile(_scFile);
 }
 
 void WLGMachine::saveMScript(QString txt)
@@ -1100,11 +1112,7 @@ if(code<0) {
 
 void WLGMachine::addDrive(WLGDrive *millDrive)
 {
-QStringList List=QString("X,Y,Z,A,B,C,U,V,W").split(",");
-
 qDebug()<<"WLGMachine::addDrive"<<millDrive->getName();
-
-if(List.indexOf(millDrive->getName())==-1) return;
 
 millDrive->moveToThread(this->thread());
 
@@ -1515,7 +1523,14 @@ if(FileXML.isOpen())
   }
 
   getGCode()->readToolFile(toolsFile);
-  getGCode()->readSCFile(scFile);
+
+  if(QFile(scFile).exists()){
+     getGCode()->readSCFile(scFile);
+     QFile(scFile).remove();
+     }
+    else {
+     getGCode()->readSCFile(_scFile);
+     }
 
   updatePosible();
 

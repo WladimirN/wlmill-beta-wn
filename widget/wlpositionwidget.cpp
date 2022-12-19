@@ -175,7 +175,7 @@ font.setPointSize(12);
 
 foreach(WLGDrive *mdrive,list)
  {
- WLGAxisLabel *AL=nullptr;
+ WLGAxisLabel *AL=new WLGAxisLabel(this);
 
       if(mdrive->getName()=="X")  AL=gALabelX;
  else if(mdrive->getName()=="Y")  AL=gALabelY;

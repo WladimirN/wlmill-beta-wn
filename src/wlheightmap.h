@@ -89,6 +89,8 @@ bool m_showGrid =false;
 
 bool m_updateShow=true;
 
+double m_defValue=0.0;
+
 WLHeightMap::typeInterpoliation m_typeInterpoliation=bicubic;
 WLHeightMap::stateHMap          m_state=disable;
 
@@ -101,8 +103,6 @@ public:
 
 void setData(SHMapData _data) {data=_data; m_updateShow=true;}
 SHMapData getData() {return data;}
-
-void clear() {data.clear(); setZShow(0); emit changed();}
 
 double getInterpStepX() {return data.interpX;}
 double getInterpStepY() {return data.interpY;}
@@ -118,6 +118,9 @@ bool  isShowGrid()             {return m_showGrid;}
 
 bool isUpdateShow()  {return m_updateShow;}
 void resetUpdateShow() {m_updateShow=false;}
+
+Q_INVOKABLE void setDefaultValue(double val=0) {m_defValue=val;}
+Q_INVOKABLE void clear() {data.clear(); setZShow(0); emit changed();}
 
 Q_INVOKABLE double getZShow() {return data.Zshow;}
 Q_INVOKABLE void   setZShow(double Z0) {data.Zshow=Z0;m_updateShow=true;}

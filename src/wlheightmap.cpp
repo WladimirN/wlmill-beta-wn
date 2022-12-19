@@ -207,7 +207,7 @@ WLHeightMap::stateHMap lastState=m_state;
 
 if(enable){
  switch(m_state)  {
-  case disable:m_state=start;  break;
+  case disable:m_state=start;  break; //disable - start - middle - end - disable
   case start:  m_state=middle; break;
   case middle: m_state=middle; break;
   case end:    m_state=start;  break;
@@ -309,7 +309,7 @@ return 0;
 double WLHeightMap::getValue(double x, double y)
 {
 if(!isValid()
- ||!isEnable())   return 0.0;
+ ||!isEnable())   return m_defValue;
 // Setup grid
 int gridPointsX = countX();
 int gridPointsY = countY();

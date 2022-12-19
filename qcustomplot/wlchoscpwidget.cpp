@@ -18,7 +18,7 @@ WLChOscpWidget::WLChOscpWidget(WLModuleOscp *_module,quint8 _iCh,QWidget *parent
 
     connect(ui->cbElement,QOverload<int>::of(&QComboBox::currentIndexChanged),this,&WLChOscpWidget::updateIElement);
 
-    ui->groupBox->setTitle(tr("Channel")+" "+QString::number(m_iCh));
+    ui->groupBox->setTitle(tr("Channel")+" "+QString::number(m_iCh+1));
 
     connect(m_module,&WLModuleOscp::changedSource,this,&WLChOscpWidget::setSource);
 

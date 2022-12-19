@@ -132,6 +132,7 @@
 #define        pamFile QCoreApplication::applicationDirPath()+"//wlmillconfig//pam.dat"
 #define      toolsFile QCoreApplication::applicationDirPath()+"//wlmillconfig//tools.csv"
 #define         scFile QCoreApplication::applicationDirPath()+"//wlmillconfig//cs.csv"
+#define        _scFile QCoreApplication::applicationDirPath()+"//wlmillconfig//sc.csv"
 
 #define    iconsGMPath QCoreApplication::applicationDirPath()+"//icons//"
 #define   _iconsGMPath QCoreApplication::applicationDirPath()+"//wlmillconfig//icons//"
@@ -389,12 +390,6 @@ private slots:
     void onSetColors();
 
     void onEditDrive(QString nameDrive);
-
-    void onEditDriveX(){onEditDrive("X");}
-    void onEditDriveY(){onEditDrive("Y");}
-    void onEditDriveZ(){onEditDrive("Z");}
-    void onEditDriveA(){onEditDrive("A");}
-    void onEditDriveB(){onEditDrive("B");}
 
     void onEditWLMill();
 

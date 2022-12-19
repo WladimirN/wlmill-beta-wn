@@ -48,16 +48,61 @@ Q_ASSERT((index<getSizeUART())&&(index<255));
 return index<getSizeUART()? UART[index]:nullptr;
 }
 
+void WLModuleUART::setEnable(int index, bool enable)
+{
+if(index>=UART.size())
+{return;}
+
+UART[index]->setEnable(enable);
+}
+
+void WLModuleUART::transmitData(int index, QString data)
+{
+if(index>=UART.size()) return;
+
+qDebug()<<"SIZE="<<data.toLocal8Bit().length();
+
+UART[index]->transmitData(data.toLocal8Bit());
+}
+
+void WLModuleUART::clearRecive(int index)
+{
+if(index>=UART.size()) return;
+
+ UART[index]->clearReciveData();
+}
+
+QString WLModuleUART::getReciveStr(int index, int len)
+{
+if(index>=UART.size()) return QString();
+
+return UART[index]->getReciveStr(len);
+}
+
+int WLModuleUART::getReciveByte(int index)
+{
+if(index>=UART.size()) return 0;
+
+return UART[index]->getReciveByte();
+}
+
+bool WLModuleUART::isEmptyRecive(int index)
+{
+if(index>=UART.size()) return true;
+
+return UART[index]->isEmptyReciveData();
+}
+
 void WLModuleUART::update()
 {
-foreach(WLUART *uart,UART)
-       uart->sendGetData();
+    foreach(WLUART *uart,UART)
+        uart->sendGetData();
 }
 
 void WLModuleUART::backup()
 {
-foreach(WLUART *uart,UART)
- {
+    foreach(WLUART *uart,UART)
+    {
  uart->setBaudrate(uart->getBaudrate());
  }
 }
@@ -80,9 +125,14 @@ case sendUART_recive:  Stream>>index;
 
                        if(index<getSizeUART())
                        {
-                       QByteArray buf;
-                       Stream>>buf;
-                       getUART(index)->setReciveData(buf);
+                       QByteArray BA;
+
+                       while(!Stream.atEnd()){
+                             Stream>>ui1;
+                             BA+=ui1;
+                             }
+
+                       getUART(index)->setReciveData(BA);
                        }
 
                        break;

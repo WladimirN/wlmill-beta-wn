@@ -27,6 +27,8 @@ QString verifyError();
 bool getNeedClose() const;
 
 private:
+QString m_drivesStr;
+
 WLGMachine *MillMachine;
 
 QList <QDialog*> dialogList;

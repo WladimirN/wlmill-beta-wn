@@ -27,6 +27,19 @@ public:
 
     WLUART* getUART(int m_index);
 
+public:
+
+Q_INVOKABLE void setBaudrate(int index,quint32 _baudrate) {if(index>=UART.size()) {return;} UART[index]->setBaudrate(_baudrate);}
+Q_INVOKABLE void setEnable(int index,bool enable);
+Q_INVOKABLE void transmitData(int index,QString data);
+
+Q_INVOKABLE void clearRecive(int index);
+Q_INVOKABLE QString getReciveStr(int index,int len=-1);
+Q_INVOKABLE int     getReciveByte(int index);
+//Q_INVOKABLE double  getReciveNum(int index);
+Q_INVOKABLE bool isEmptyRecive(int index);
+//Q_INVOKABLE QString getReciveNum(int index,int type,int n);
+
 public slots:
 
 virtual void update();

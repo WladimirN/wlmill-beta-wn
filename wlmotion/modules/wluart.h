@@ -80,9 +80,17 @@ public:
      bool setDelayFrame(quint16 delay_ms);
   quint16 getDelayFrame() {return m_delayFrame;}
 
+     QByteArray takeReciveData();
 
-     QByteArray getReciveData();
+     void clearReciveData();
+     bool isEmptyReciveData();
+
      bool transmitData(QByteArray data);
+
+     QString getReciveStr(int len=0);
+     quint8  getReciveByte();
+
+     double getReciveNum(int type, int n);
 
 signals:
 

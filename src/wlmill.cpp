@@ -405,15 +405,10 @@ MenuBar->addMenu(MFile);
 QMenu *MEdit= new QMenu(tr("Edit")); 
 MEdit->addAction(("WLMill"),this,SLOT(onEditWLMill()));
 MEdit->addSeparator();
-MEdit->addAction((tr("Drive")+" X"),this,SLOT(onEditDriveX()));
-MEdit->addAction((tr("Drive")+" Y"),this,SLOT(onEditDriveY()));
-MEdit->addAction((tr("Drive")+" Z"),this,SLOT(onEditDriveZ()));
-
-if(MillMachine->getDrive("A"))
-   MEdit->addAction((tr("Drive")+" A"),this,SLOT(onEditDriveA()));
-
-if(MillMachine->getDrive("B"))
-   MEdit->addAction((tr("Drive")+" B"),this,SLOT(onEditDriveB()));
+foreach(WLDrive *Drive,MillMachine->getDrives())
+{
+MEdit->addAction((tr("Drive")+" "+Drive->getName()),[=](){onEditDrive(Drive->getName());});
+}
 
 MEdit->addSeparator();
 MEdit->addAction(tr("MScript"),this,SLOT(onEditCodeMScript()));

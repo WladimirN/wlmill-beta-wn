@@ -106,11 +106,22 @@ emit sendCommand(data);
 return true;
 }
 
-QByteArray WLUART::getReciveData()
+QByteArray WLUART::takeReciveData()
 {
 QByteArray ret=m_recive;
-m_recive.clear();
+clearReciveData();
+
 return ret;
+}
+
+void WLUART::clearReciveData()
+{
+m_recive.clear();
+}
+
+bool WLUART::isEmptyReciveData()
+{
+return m_recive.isEmpty();
 }
 
 bool WLUART::transmitData(QByteArray trdata)
@@ -121,11 +132,84 @@ QDataStream Stream(&data,QIODevice::WriteOnly);
 Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 Stream.setByteOrder(QDataStream::LittleEndian);
 
-Stream<<(quint8)comUART_transmit<<getIndex()<<trdata;
+Stream<<(quint8)comUART_transmit<<getIndex();
+
+for(int i=0;i<trdata.size();i++)
+       Stream<<(quint8)trdata[i];
 
 emit sendCommand(data);
 
 return true;
+}
+
+QString WLUART::getReciveStr(int len)
+{
+if(isEmptyReciveData()){
+ return QString();
+ }
+
+QByteArray ba;
+
+for(int i=0;i<m_recive.size();i++)
+    qDebug()<<m_recive.at(i);
+
+if(m_recive.size()<=len || len<=0) {
+ ba=m_recive;
+ m_recive.clear();
+ }
+ else {
+ ba=m_recive.mid(0,len);
+ m_recive=m_recive.mid(len);
+ }
+
+return QString::fromUtf8(ba);
+}
+
+quint8 WLUART::getReciveByte()
+{
+if(m_recive.isEmpty())
+    return 0;
+
+quint8 ret=(quint8)m_recive[0];
+
+m_recive=m_recive.mid(1);
+
+return ret;
+}
+
+double WLUART::getReciveNum(int type, int n)
+{
+if(isEmptyReciveData()){
+ return 0;
+ }
+
+QByteArray ba;
+
+if(m_recive.size()<=n) {
+ ba=m_recive;
+ m_recive.clear();
+ }
+ else {
+ ba=m_recive.mid(0,n);
+ m_recive=m_recive.mid(n);
+ }
+
+switch(type)
+{
+case 1: return ba.toUShort();
+case 2: return ba.toShort();
+
+case 3: return ba.toInt();
+case 4: return ba.toUInt();
+
+case 5: return ba.toLong();
+case 6: return ba.toULong();
+
+case 7: return ba.toFloat();
+case 8: return ba.toDouble();
+}
+
+return 0;
 }
 
 void WLUART::writeXMLData(QXmlStreamWriter &stream)

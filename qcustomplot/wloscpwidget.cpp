@@ -120,10 +120,15 @@ if(values.size()!=mGraphs.size()
 bool ok;
 
 for(int i=0;i<mGraphs.size()&&i<values.size();i++){
-  mGraphs[i]->addData(lastTime, values[i]);
-  //mGraphs[i]->rescaleAxes(true);
-
+   mGraphs[i]->addData(lastTime, values[i]);
+  //mGraphs[i]->rescaleAxes(true);   
    mGraphs[selectChannel->checkedId()]->rescaleValueAxis(true, false);
+
+   if(i==selectChannel->checkedId())
+       {
+       ui->plot->yAxis->setRange(mGraphs[selectChannel->checkedId()]->getValueRange(ok));
+       qDebug()<<"i="<<i;
+       }
   }
 
 

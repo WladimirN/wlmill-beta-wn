@@ -29,11 +29,17 @@ int count() const;
 bool readFromFile(QString filename,QString split=";");
 bool writeToFile(QString filename ,QString split=";");
 
+bool write(QString split=";");
+bool read(QString split=";");
+
 void setHeaders(QStringList headers);
 void clear();
 
+QString getFileName() {return m_fileName;}
 private:
 QStringList m_headers;
+
+QString m_fileName;
 
 QMap <int,WLEData> m_data;
 };

@@ -155,6 +155,22 @@ return true;
 return false;
 }
 
+bool WLData::write(QString split)
+{
+if(m_fileName.isEmpty())
+    return false;
+
+return writeToFile(m_fileName,split);
+}
+
+bool WLData::read(QString split)
+{
+if(m_fileName.isEmpty())
+        return false;
+
+return readFromFile(m_fileName,split);
+}
+
 void WLData::setHeaders(QStringList headers)
 {
 m_headers=headers;
