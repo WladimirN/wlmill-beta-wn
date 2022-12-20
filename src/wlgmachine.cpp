@@ -649,6 +649,7 @@ m_MScript->addObject(&m_Joysticks,"JOYSTICK");
 void WLGMachine::initHeightMap()
 {
 m_MScript->addObject(&m_HeightMap,"HMAP");
+m_LScript->addObject(&m_HeightMap,"HMAP");
 }
 
 void WLGMachine::initValuesScript()
@@ -4208,7 +4209,7 @@ if(m_waitMScript)
   QTimer::singleShot(0,this,SLOT(startMov()));
   }
 
-setSafeProbe();
+setSafeProbe(isSafeProbe());
 
 updateBusy();
 updatePosible();
