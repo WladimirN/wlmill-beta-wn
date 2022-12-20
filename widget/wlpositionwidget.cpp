@@ -175,7 +175,7 @@ font.setPointSize(12);
 
 foreach(WLGDrive *mdrive,list)
  {
- WLGAxisLabel *AL=new WLGAxisLabel(this);
+ WLGAxisLabel *AL=nullptr;
 
       if(mdrive->getName()=="X")  AL=gALabelX;
  else if(mdrive->getName()=="Y")  AL=gALabelY;
@@ -183,7 +183,9 @@ foreach(WLGDrive *mdrive,list)
  else if(mdrive->getName()=="A")  AL=gALabelA;
  else if(mdrive->getName()=="B")  AL=gALabelB;
 
- if(AL==nullptr) continue;
+ if(AL==nullptr) AL=new WLGAxisLabel(this);
+
+ labelList+=AL;
 
  horLayout=new QHBoxLayout(this);
 
@@ -1164,11 +1166,8 @@ ui.qwAxisLabelPosB->rootObject()->setProperty("p_feed",QString("%1").arg(MillMac
 
 }*/
 
-gALabelX->update();
-gALabelY->update();
-gALabelZ->update();
-gALabelA->update();
-gALabelB->update();
+foreach(WLGAxisLabel *label,labelList)
+    label->update();
 
 ui.pbRotSC->setText(QString::number(MillMachine->m_GCode.getRotCurSC(),'f',2));
 

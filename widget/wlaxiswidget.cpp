@@ -411,7 +411,7 @@ case WLAxis::AXIS_noMotor:
                     ui->gbErrorPos->setVisible(false);
                        ui->gbInput->setVisible(false);
                       ui->gbOutput->setVisible(false);                      
-                     ui->gbDynamic->setVisible(false);
+                     ui->gbDynamic->setVisible(true);
                    break;
 
 case WLAxis::AXIS_stepMotor:

@@ -614,6 +614,12 @@ connect(m_Program,&WLGProgram::changedProgram,this
         ,[=](){m_LScript->runFunction(QString("changedGProgram()"),true);});
 
 
+WLModuleAxis *MAxis=getMotionDevice()->getModuleAxis();
+
+if(MAxis)
+ {
+ m_LScript->addObject(MAxis,"MAXIS");
+ }
 }
 
 void WLGMachine::initJoystick()

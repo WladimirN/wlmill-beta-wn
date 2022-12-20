@@ -235,6 +235,9 @@ signals:
      void chnagedGPos(QString name,double pos);
 
 private:
+
+   QList <WLGAxisLabel*> labelList;
+
    WLGAxisLabel  *gALabelX=nullptr;
    WLGAxisLabel  *gALabelY=nullptr;
    WLGAxisLabel  *gALabelZ=nullptr;

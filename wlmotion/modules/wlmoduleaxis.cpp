@@ -181,6 +181,44 @@ emit sendCommand(data);
 return true;
 }
 
+void WLModuleAxis::addSumAxis(quint8 iA, quint8 iAsum)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMAxis<<(quint8)comAxis_addSumAxis<<(quint8)iA<<(quint8)iAsum;
+
+emit sendCommand(data);
+}
+
+void WLModuleAxis::clearSumAxis(quint8 iA)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)typeMAxis<<(quint8)comAxis_clearSumAxis<<(quint8)iA;
+
+emit sendCommand(data);
+}
+
+void WLModuleAxis::trackPosAxis(quint8 iA, long pos, float F, quint8 mask)
+{
+if(iA<Axis.size())
+    getAxis(iA)->trackPos(mask,pos,F);
+}
+
+void WLModuleAxis::setPosAxis(quint8 iA, long pos)
+{
+if(iA<Axis.size())
+    getAxis(iA)->setPos(pos);
+}
+
 
 void WLModuleAxis::setInEMGStop(int index)
 {

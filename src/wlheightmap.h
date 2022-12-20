@@ -119,6 +119,7 @@ bool  isShowGrid()             {return m_showGrid;}
 bool isUpdateShow()  {return m_updateShow;}
 void resetUpdateShow() {m_updateShow=false;}
 
+Q_INVOKABLE double getDefaultValue() {return m_defValue;}
 Q_INVOKABLE void setDefaultValue(double val=0) {m_defValue=val;}
 Q_INVOKABLE void clear() {data.clear(); setZShow(0); emit changed();}
 

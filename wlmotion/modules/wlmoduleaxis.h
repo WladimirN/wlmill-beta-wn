@@ -66,7 +66,12 @@ virtual void update();
 virtual void backup();
 
 public:
-    bool setInputMAxis(typeIOPutAXIS getTypeModule,quint8 num);
+             bool setInputMAxis(typeIOPutAXIS getTypeModule,quint8 num);
+
+Q_INVOKABLE void addSumAxis(quint8 iA,quint8 iAsum);
+Q_INVOKABLE void clearSumAxis(quint8 iA);
+Q_INVOKABLE void trackPosAxis(quint8 iA,long pos,float F,quint8 mask=MASK_abs);
+Q_INVOKABLE void setPosAxis(quint8 iA,long pos);
 
 signals:
     void changedInEMGStop();

@@ -620,6 +620,23 @@ emit sendCommand(data);
 return true;
 }
 
+bool WLAxis::trackPos(quint8 mask, qint32 Dist, float Fmov)
+{
+QByteArray data;
+QDataStream Stream(&data,QIODevice::WriteOnly);
+
+QMutexLocker locker(&mutex);
+
+Stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+Stream.setByteOrder(QDataStream::LittleEndian);
+
+Stream<<(quint8)comAxis_trackPos<<mask<<getIndex()<<Dist<<Fmov;
+
+status=AXIS_wait;
+
+emit sendCommand(data);
+return true;
+}
 
 bool WLAxis::acc()
 {

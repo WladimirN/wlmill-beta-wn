@@ -107,6 +107,10 @@ const QString errorAxis("0,no error\
 #define comAxis_addMParList       35//add data MPar to list
 #define comAxis_clearMParList     36//clear data list
 
+#define comAxis_addSumAxis        37 //
+#define comAxis_clearSumAxis      38 //
+#define comAxis_trackPos      39 //
+
 #define comAxis_getDataAxis   100 //call data Axis
 
 #define comAxis_setData 128
@@ -518,8 +522,9 @@ public:
     bool setMPar(WLMParAxis MPar,typeMParAxis type=typeMParAxis::AXIS_MParAll);    
     bool addMParList(float Aac,float Ade,float Fst,float Fma,QString name);
     bool clearMParList();
-    bool movPos(quint8 mask,qint32 Dist,float Fmov);
-    bool movVel(quint8 mask,float Fmov);
+    bool movPos(quint8 mask,qint32 Dist,float Fmov);    
+    bool movVel(quint8 mask,float Fmov);    
+    bool trackPos(quint8 mask,qint32 Dist,float Fmov);
 	bool acc();
 	bool pause();
 	bool sdStop();

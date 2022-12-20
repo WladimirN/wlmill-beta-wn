@@ -1219,7 +1219,6 @@ if(_ModuleAxis) {
 
 void WLDrive::setIndexModuleAxisStr(QString str)
 {
-QList <quint8> indexs;
 QStringList List=str.split(",",QString::SkipEmptyParts);
 
 qDebug()<<getName()<<"setIndexModuleAxisStr"<<str;
@@ -1254,6 +1253,7 @@ foreach(QString num,List)
      &&m_AxisList.size()<MAXSLAVEAXIS)
             {
             WLAxis *axis=m_ModuleAxis->getAxis(num.toInt());
+
             qDebug()<<"Axis add"<<num.toInt()<<axis->isEnable();
 
             if(!axis) {sendMessage(getName(),tr(" index axis is not correct"),-1);continue;}
