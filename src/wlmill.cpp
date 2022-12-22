@@ -852,6 +852,8 @@ void WLMill::onEditCodeMScript()
 WLEditText EditText;
 WLMCodeSH  codeSH(EditText.getDocument());
 
+codeSH.addKeywords(MScript->getObjectNameList());
+
 EditText.setText(MillMachine->loadMScript());
 EditText.setLabel(tr("Edit")+"MScript:");
 
@@ -866,6 +868,8 @@ void WLMill::onEditCodeLScript()
 {
 WLEditText EditText;
 WLMCodeSH  codeSH(EditText.getDocument());
+
+codeSH.addKeywords(LScript->getObjectNameList());
 
 EditText.setText(MillMachine->loadLScript());
 EditText.setLabel(tr("Edit")+"LScript:");
@@ -1170,6 +1174,45 @@ addTabQMLFile(_qmlPath+file);
 
 void WLMill::addTabQMLFile(QString file)
 {
+/*
+
+qDebug()<<"Test";
+
+auto list=MScript->getObjectList();
+
+foreach(WLObjectScript os, list){
+
+const QMetaObject *obj=os.obj->metaObject();
+
+qDebug()<<"Metods"<<os.name;
+for(int i=0;i<obj->methodCount();i++)
+{
+if(obj->method(i).access()==QMetaMethod::Public
+ &&(obj->method(i).parameterType(obj->method(i).returnType())==QMetaType::Void
+  ||obj->method(i).parameterType(obj->method(i).returnType())==QMetaType::QString
+  ||obj->method(i).parameterType(obj->method(i).returnType())==QMetaType::Float
+  ||obj->method(i).parameterType(obj->method(i).returnType())==QMetaType::Double
+  ||obj->method(i).parameterType(obj->method(i).returnType())==QMetaType::Int
+  ||obj->method(i).parameterType(obj->method(i).returnType())==QMetaType::UInt
+  ||obj->method(i).parameterType(obj->method(i).returnType())==QMetaType::Long
+  ||obj->method(i).parameterType(obj->method(i).returnType())==QMetaType::LongLong
+  ||obj->method(i).parameterType(obj->method(i).returnType())==QMetaType::ULong
+  ||obj->method(i).parameterType(obj->method(i).returnType())==0))
+qDebug()<<i<<obj->method(i).name()<<" type "<<obj->method(i).methodSignature()
+                                       <<"/"<<obj->method(i).tag();
+
+for(int j=0;j<obj->method(i).parameterCount();j++)
+    qDebug()<<obj->method(i).parameterNames().at(j);
+}
+
+qDebug()<<"Property"<<os.name;
+
+for(int i=0;i<obj->propertyCount();i++)
+{
+qDebug()<<i<<obj->property(i).name()<<obj->property(i).typeName();
+}
+}
+*/
 #ifdef DEF_QML
 QFileInfo FI(file);
 

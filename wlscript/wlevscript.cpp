@@ -58,16 +58,16 @@ if(isBusy())
  }
 else 
  {
- baseCode=removeComment(_code);
- updateComment(baseCode);
+ m_baseCode=removeComment(_code);
+ updateComment(m_baseCode);
 
  if(eval)
    {
    SLoadCode LC;
 
-   LC.code=baseCode;
+   LC.code=m_baseCode;
    listCode+=LC;
-   updateComment(baseCode);
+   updateComment(m_baseCode);
 
    QTimer::singleShot(50 ,this,&WLEVScript::evalCodes);
    }
@@ -92,9 +92,9 @@ if(isEnable())
  {  
  emit changedBusy(m_busy=true);
 
- taskScriptList+=funcSript;
+ m_taskScriptList+=funcSript;
 
- if(taskScriptList.size()<DEF_MAXTASKLIST)
+ if(m_taskScriptList.size()<DEF_MAXTASKLIST)
   {
   QTimer::singleShot(0,this,&WLEVScript::evalTasks);
   ret=true;
@@ -123,9 +123,9 @@ if(m_enable)
  {
  emit changedBusy(m_busy=true);
 
- taskScriptList+=taskSript;
+ m_taskScriptList+=taskSript;
 
- if(taskScriptList.size()<DEF_MAXTASKLIST)
+ if(m_taskScriptList.size()<DEF_MAXTASKLIST)
   {
   QTimer::singleShot(0,this,&WLEVScript::evalTasks);
   ret=true;
@@ -158,7 +158,7 @@ return false;
 
 bool WLEVScript::isFuncDefined(QString name)
 {
-return allCode.contains(QRegExp("function[\\s]+"+name+"[(][^(]*[)][\\s]*[/]*"));
+return m_allCode.contains(QRegExp("function[\\s]+"+name+"[(][^(]*[)][\\s]*[/]*"));
 }
 
 QVariant WLEVScript::getValue(QString name,QVariant def,double timeout)
@@ -191,6 +191,8 @@ if(obj){
  QScriptValue sValue = engine->newQObject(objScript.obj);
  engine->globalObject().setProperty(objScript.name,sValue);
 
+ m_objectNameList+=name;
+
  return true;
  }
 
@@ -203,6 +205,8 @@ if(obj){
  QScriptValue sValue = engine->newQObject(obj);
  engine->globalObject().setProperty(name,sValue);
 
+ m_objectNameList+=name;
+
  return true;
  }
 
@@ -213,6 +217,7 @@ bool WLEVScript::setProperty(QString name,QScriptValue value)
 {
 if(MutexTask.tryLock())   {
 engine->globalObject().setProperty(name,value);
+m_propertyList+=name;
 MutexTask.unlock();
 }
 else {
@@ -227,7 +232,7 @@ void WLEVScript::reset()
 qDebug()<<"WLEVScript::reset";
 QMutexLocker locker(&Mutex);
 
-taskScriptList.clear();
+m_taskScriptList.clear();
 
 if(isBusy())
     {
@@ -318,6 +323,8 @@ if(m_enable!=enable){
 
  engine->deleteLater();
 
+ m_objectNameList.clear();
+
  engine= new QScriptEngine;
 
  engine->setProcessEventsInterval(1000);// не работает в Rasberry
@@ -326,15 +333,17 @@ if(m_enable!=enable){
     {
     QScriptValue sValue = engine->newQObject(objScript.obj);
     engine->globalObject().setProperty(objScript.name,sValue);
+
+    m_objectNameList+=objScript.name;
     }
 
  Mutex.unlock();
 
- allCode.clear();
+ m_allCode.clear();
 
  SLoadCode LC;
 
- LC.code=baseCode;
+ LC.code=m_baseCode;
 
  foreach(WLObjectScript objScript,m_objList)
     {
@@ -358,7 +367,7 @@ if(m_enable!=enable){
 
 int  WLEVScript::setTimeout(QString task, long ms)
 {
-if(!enableTimerTask) return 0;
+if(!m_enableTimerTask) return 0;
 
 QTimer *timer=new QTimer(this);
 
@@ -377,7 +386,7 @@ return timer->timerId();
 
 int WLEVScript::setInterval(QString task, long ms)
 {
-if(!enableTimerTask) return 0;
+if(!m_enableTimerTask) return 0;
 
 QTimer *timer=new QTimer(this);
 
@@ -487,10 +496,25 @@ ready=true;
 exec();
 }
 
+QStringList WLEVScript::getAllFunc() const
+{
+    return m_allFunc;
+}
+
+void WLEVScript::setAllFunc(const QStringList &value)
+{
+    m_allFunc = value;
+}
+
+QStringList WLEVScript::getObjectNameList() const
+{
+   return m_objectNameList;
+}
+
 void WLEVScript::updateComment(QString txt)
 {
-QStringList list;
-QRegExp RegExp("function[\\s]+[\\S]+[(][^(]*[)][\\s]*[/]*");
+    QStringList list;
+    QRegExp RegExp("function[\\s]+[\\S]+[(][^(]*[)][\\s]*[/]*");
 int pos=0;
 
 while ((pos = RegExp.indexIn(txt, pos)) != -1)
@@ -510,17 +534,17 @@ if(engine->isEvaluating()) return;
 
 QMutexLocker locker(&MutexTask);
 
-while(!taskScriptList.isEmpty()) {
+while(!m_taskScriptList.isEmpty()) {
 
  Mutex.lock();
- WLTaskScript task=taskScriptList.takeFirst();
+ WLTaskScript task=m_taskScriptList.takeFirst();
  Mutex.unlock();
 
  evalTask(task);
  }
 
 Mutex.lock();
-if(taskScriptList.isEmpty())
+if(m_taskScriptList.isEmpty())
    emit changedBusy(m_busy=false);
 Mutex.unlock();
 }
@@ -633,7 +657,7 @@ if(svcode.isError())
  emit sendMessage("scriptEngine:"+LC.nameFile,svcode.toString(),-1);
  }
  else {
- allCode+=LC.code;
+ m_allCode+=LC.code;
  qDebug()<<" WLEVScript::evalCode Complete"<<LC.nameFile<<svcode.isError();
 
  if(LC.nameFile.isEmpty()){

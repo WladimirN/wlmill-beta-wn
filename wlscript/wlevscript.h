@@ -60,23 +60,24 @@ QScriptEngine *engine=nullptr;
 QElapsedTimer timeProcess;
 
 void setIncludePath(QString path) {includePath=path;}
-void setEnableTimerTask(bool en=true){enableTimerTask=en;}
+void setEnableTimerTask(bool en=true){m_enableTimerTask=en;}
 
 private:
 
 QString includePath=QCoreApplication::applicationDirPath();
 
 bool m_busy=false;
-bool enableTimerTask=false;
+bool m_enableTimerTask=false;
 
-QString baseCode;
-QList<WLTaskScript> taskScriptList;
-QScriptValueList vList;
+QString m_baseCode;
+QList<WLTaskScript> m_taskScriptList;
+QScriptValueList m_vList;
 
+QStringList m_objectNameList;
 QList <SLoadCode> listCode;
 
-QStringList allFunc;
-QString allCode;
+QStringList m_allFunc;
+QString     m_allCode;
 QStringList m_beforeInitScriptList;
 QStringList m_afterInitScriptList;
 
@@ -96,7 +97,7 @@ void updateComment(QString txt);
 	//void evalCode() {qDebug()<<"retScript="<<engine->evaluate(code).toString();};
 public:
     bool setBaseCode(QString _code,bool eval=false) ;
- QString getCode() {return baseCode;}
+ QString getCode() {return m_baseCode;}
 
 Q_INVOKABLE bool runFunction(QString _func,bool _chError=true);
 Q_INVOKABLE bool runScript(QString _script,bool _chError=true);
@@ -113,9 +114,10 @@ Q_INVOKABLE bool isFuncDefined(QString name);
     void addBeforeInitScript(QString script) {m_beforeInitScriptList+=script;}
     void addAfterInitScript(QString script)  {m_afterInitScriptList+=script;}
 
+    QList <WLObjectScript> getObjectList() {return m_objList;}
 private:
     QList <WLObjectScript> m_objList;
-    QList <WLValueScript>  m_valList;
+    QList <QString>   m_propertyList;
 
 public slots:
     void reset();
@@ -141,6 +143,12 @@ Q_INVOKABLE void process() {if(timeProcess.elapsed()>5)
                             }
 
 Q_INVOKABLE bool isBusy() {return m_busy||engine->isEvaluating();}
+Q_INVOKABLE QString   getObjectNameListStr(QString split=",") const {return  m_objectNameList.join(split);}
+    QStringList getAllFunc() const;
+    void setAllFunc(const QStringList &value);
+
+    QStringList getObjectNameList() const;
+
 
 private :
     void includeOneFile(QString nameFile);

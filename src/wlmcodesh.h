@@ -15,6 +15,7 @@ public:
 	WLMCodeSH(QTextDocument *parent = 0);
 	~WLMCodeSH();
 
+    void addKeywords(QStringList keys,QColor color=Qt::darkGreen);
 protected:
      void highlightBlock(const QString &text);
 
