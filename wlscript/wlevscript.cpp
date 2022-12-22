@@ -177,13 +177,14 @@ if(svalue.isValid()){
 return def;
 }
 
-bool WLEVScript::addObject(QObject *obj, QString name)
+bool WLEVScript::addObject(QObject *obj, QString name, QString clearScript)
 {
 if(obj){     
  WLObjectScript objScript;
 
  objScript.obj = obj;
  objScript.name = name;
+ objScript.clearScript = clearScript;
 
  m_objList.append(objScript);
 
@@ -334,6 +335,12 @@ if(m_enable!=enable){
  SLoadCode LC;
 
  LC.code=baseCode;
+
+ foreach(WLObjectScript objScript,m_objList)
+    {
+     if(!objScript.clearScript.isEmpty())
+        LC.code.prepend(" "+objScript.clearScript+" \n\r");
+    }
 
  listCode+=LC;
 
@@ -630,7 +637,22 @@ if(svcode.isError())
  qDebug()<<" WLEVScript::evalCode Complete"<<LC.nameFile<<svcode.isError();
 
  if(LC.nameFile.isEmpty()){
-    initCode(m_beforeInitScript+"\r\n"+"init()"+"\r\n"+m_afterInitScript);
+
+    QString before;
+    QString after;
+
+    foreach(QString str,m_beforeInitScriptList) {
+    before+=str+"\n\r";
+    }
+
+    foreach(QString str,m_afterInitScriptList) {
+    after+=str+"\n\r";
+    }
+
+    m_beforeInitScriptList.clear();
+    m_afterInitScriptList.clear();
+
+    initCode(before+"init()"+after);
     }
     else{
          setProperty(QFileInfo(LC.nameFile).baseName()+"FileINI"

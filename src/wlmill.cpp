@@ -155,8 +155,7 @@ void WLMill::createTBar2()
 {
 WLTBarScript *tBar = new WLTBarScript(MScript,tr("toolbar 2"),this);
 
-MScript->addObject(tBar,"TOOLBAR2");
-MScript->addBeforeInitScript("TOOLBAR2.removeButtons();");
+MScript->addObject(tBar,"TOOLBAR2","TOOLBAR2.removeButtons()");
 
 connect(tBar,&WLTBarScript::runScript,this,[=](QString txt){MScript->runScript(txt);});
 
@@ -170,8 +169,7 @@ void WLMill::createTBar1()
 {
 WLTBarScript *tBar = new WLTBarScript(MScript,tr("toolbar 1"),this);
 
-MScript->addObject(tBar,"TOOLBAR1");
-MScript->addBeforeInitScript("TOOLBAR1.removeButtons();");
+MScript->addObject(tBar,"TOOLBAR1","TOOLBAR1.removeButtons()");
 
 connect(tBar,&WLTBarScript::runScript,this,[=](QString txt){MScript->runScript(txt);});
 
@@ -538,8 +536,7 @@ ToolWidget ->setModel(toolsModel);
 
 WLTBarTool *tBarTools = new WLTBarTool(MScript,this);
 
-MScript->addObject(tBarTools,"TOOLBARTOOLS");
-MScript->addBeforeInitScript("TOOLBARTOOLS.removeButtons();");
+MScript->addObject(tBarTools,"TOOLBARTOOLS","TOOLBARTOOLS.removeButtons()");
 
 connect(tBarTools,&WLTBarScript::runScript,this,[=](QString txt){MScript->runScript(txt);});
 tBarTools->setIconSize(QSize(48,48));
@@ -573,8 +570,7 @@ SCWidget ->setModel(scModel);
 
 WLTBarData *tBarSC = new WLTBarData(MScript,this);
 
-MScript->addObject(tBarSC,"TOOLBARSC");
-MScript->addBeforeInitScript("TOOLBARSC.removeButtons();");
+MScript->addObject(tBarSC,"TOOLBARSC","TOOLBARSC.removeButtons()");
 
 connect(tBarSC,&WLTBarScript::runScript,this,[=](QString txt){MScript->runScript(txt);});
 tBarSC->setIconSize(QSize(48,48));
@@ -1192,7 +1188,9 @@ if(view) {
 
  tabWidget->addTab(view,FI.baseName());
 
- MScript->addBeforeInitScript("WLMILL.removeTab(FI.baseName())");
+ addTabList+=view;
+
+ MScript->addBeforeInitScript("WLMILL.removeTab(\""+FI.baseName()+"\")");
  }
 #else
 qDebug()<<"no addQMLFile"<<file;
@@ -1201,6 +1199,7 @@ qDebug()<<"no addQMLFile"<<file;
 
 void WLMill::removeTab(QString name)
 {
+qDebug()<<"removeTab"<<name;
 foreach(QWidget *widget,addTabList)    {
     int index=tabWidget->indexOf(widget);
 

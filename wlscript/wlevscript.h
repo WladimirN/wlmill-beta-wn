@@ -34,6 +34,7 @@ struct WLObjectScript
 {
 QObject *obj=nullptr;
 QString name;
+QString clearScript;
 };
 
 struct WLValueScript
@@ -76,8 +77,8 @@ QList <SLoadCode> listCode;
 
 QStringList allFunc;
 QString allCode;
-QString m_beforeInitScript;
-QString m_afterInitScript;
+QStringList m_beforeInitScriptList;
+QStringList m_afterInitScriptList;
 
 QMutex Mutex;
 QMutex MutexTask;
@@ -104,15 +105,13 @@ Q_INVOKABLE bool setValue(QString name,QVariant,double timeout=0);
 Q_INVOKABLE bool isFuncDefined(QString name);
 
     bool setProperty(QString name,QScriptValue value);
-    bool addObject(QObject *obj,QString name);
+    bool addObject(QObject *obj,QString name,QString clearScript="");
     bool setObject(QObject *obj,QString name);
     bool isEnable() {return m_enable;}
     bool isReady() {return ready;}
 
- QString getBeforeInitScript() {return m_beforeInitScript;}
-    void addBeforeInitScript(QString script) {m_beforeInitScript+=script;}
-    void setBeforeInitScript(QString script) {m_beforeInitScript=script;}
-    void setAfterInitScript(QString script)  {m_afterInitScript=script;}
+    void addBeforeInitScript(QString script) {m_beforeInitScriptList+=script;}
+    void addAfterInitScript(QString script)  {m_afterInitScriptList+=script;}
 
 private:
     QList <WLObjectScript> m_objList;
